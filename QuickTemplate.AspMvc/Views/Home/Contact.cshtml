@@ -1,0 +1,29 @@
+﻿@*@BaseCode*@
+
+@{
+    //var controller = ViewContext?.RouteData?.Values["controller"]?.ToString();
+    //var action = ViewContext?.RouteData?.Values["action"]?.ToString();
+    var title = "Contact";
+
+    ViewData["Title"] = title;
+
+    <div class="card" style="margin-bottom: 1em; border: none;">
+        <img class="card-img-top" src="/img/contact.jpg" alt="Item image">
+        <div class="card-body">
+            <div class="bs-docs-section">
+                <h1 id="contact">Contact information</h1>
+                <hr />
+                <address>
+                    <strong>HTL-Leonding</strong><br>
+                    Limesstraße 12-14<br>
+                    A-4060 Leonding<br>
+                    <abbr title="Phonenumber">Tel.</abbr> +43 732 67 33 68 – 0
+                    <br />
+                    <abbr title="Email-Adresse">Email</abbr> <a href="mailto:office@htl-leonding.ac.at">office(at)htl-leonding.ac.at</a>
+                    <br />
+                    <abbr title="Schoolnumber">Schulkennzahl:</abbr>410427<br>
+                </address>
+            </div>
+        </div>
+    </div>
+}
