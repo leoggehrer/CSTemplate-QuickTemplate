@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		AspMvcDataFlow.md = AspMvcDataFlow.md
 		MultiTierArchitecture.md = MultiTierArchitecture.md
+		Nuget.md = Nuget.md
 		ReadMe.md = ReadMe.md
 		WebApiDataFlow.md = WebApiDataFlow.md
 	EndProjectSection
@@ -27,7 +28,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickTemplate.WpfApp", "Qui
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickTemplate.AspMvc", "QuickTemplate.AspMvc\QuickTemplate.AspMvc.csproj", "{F32EA400-BBCC-4F3C-8A2B-882A20C9C1E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickTemplate.Logic.UnitTest", "QuickTemplate.Logic.UnitTest\QuickTemplate.Logic.UnitTest.csproj", "{DA2BE746-8EFA-48EB-BE54-F27E3ED868C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickTemplate.Logic.UnitTest", "QuickTemplate.Logic.UnitTest\QuickTemplate.Logic.UnitTest.csproj", "{DA2BE746-8EFA-48EB-BE54-F27E3ED868C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
