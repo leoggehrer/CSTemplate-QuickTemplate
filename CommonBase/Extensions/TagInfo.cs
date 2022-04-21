@@ -8,8 +8,6 @@ namespace CommonBase.Extensions
         {
             public TagHeader(string source)
             {
-                source.CheckArgument(nameof(source));
-
                 Source = source;
             }
             public string Source { get; }
@@ -41,9 +39,6 @@ namespace CommonBase.Extensions
 
         public static TagInfo operator -(TagInfo left, TagInfo right)
         {
-            left.CheckArgument(nameof(left));
-            right.CheckArgument(nameof(right));
-
             return new TagInfo
             {
                 Header = left.Header,

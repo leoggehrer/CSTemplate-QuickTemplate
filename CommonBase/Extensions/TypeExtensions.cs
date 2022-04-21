@@ -19,8 +19,6 @@ namespace CommonBase.Extensions
         }
         public static bool IsNullableType(this Type type)
         {
-            type.CheckArgument(nameof(type));
-
             var result = type.IsValueType == false;
 
             if (result == false
@@ -73,8 +71,6 @@ namespace CommonBase.Extensions
         }
         public static bool IsNumericType(this Type type)
         {
-            type.CheckArgument(nameof(type));
-
             var result = false;
             var checkType = type;
 
@@ -104,8 +100,6 @@ namespace CommonBase.Extensions
         }
         public static bool IsFloatingPointType(this Type type)
         {
-            type.CheckArgument(nameof(type));
-
             var result = false;
             var checkType = type;
 
@@ -127,8 +121,6 @@ namespace CommonBase.Extensions
 
         public static IEnumerable<Type> GetBaseClasses(this Type type)
         {
-            type.CheckArgument(nameof(type));
-
             static void GetBaseClassesRec(Type type, List<Type> baseClasses)
             {
                 if (type.BaseType != null)
@@ -147,8 +139,6 @@ namespace CommonBase.Extensions
         }
         public static IEnumerable<Type> GetBaseInterfaces(this Type type)
         {
-            type.CheckArgument(nameof(type));
-
             static void GetBaseInterfaces(Type type, List<Type> interfaces)
             {
                 foreach (var item in type.GetInterfaces())
@@ -176,8 +166,6 @@ namespace CommonBase.Extensions
 
         public static Dictionary<string, PropertyItem> GetAllTypeProperties(this Type typeObject)
         {
-            typeObject.CheckArgument(nameof(typeObject));
-
             var propertyItems = new Dictionary<string, PropertyItem>();
 
             GetAllTypePropertiesRec(typeObject, propertyItems);
@@ -185,9 +173,6 @@ namespace CommonBase.Extensions
         }
         private static void GetAllTypePropertiesRec(Type typeObject, Dictionary<string, PropertyItem> propertyItems)
         {
-            typeObject.CheckArgument(nameof(typeObject));
-            propertyItems.CheckArgument(nameof(propertyItems));
-
             if (typeObject.BaseType != null
                 && typeObject.BaseType != typeof(object))
             {
@@ -236,8 +221,6 @@ namespace CommonBase.Extensions
 
         public static IEnumerable<PropertyInfo> GetAllInterfacePropertyInfos(this Type type)
         {
-            type.CheckArgument(nameof(type));
-
             var result = new List<PropertyInfo>();
 
             if (type.GetTypeInfo().IsInterface)
@@ -255,9 +238,6 @@ namespace CommonBase.Extensions
         }
         private static void GetAllInterfacePropertyInfosRec(Type type, List<PropertyInfo> properties)
         {
-            type.CheckArgument(nameof(type));
-            properties.CheckArgument(nameof(properties));
-
             foreach (var item in type.GetProperties())
             {
                 if (properties.Find(p => p.Name.Equals(item.Name)) == null)
@@ -273,8 +253,6 @@ namespace CommonBase.Extensions
 
         public static bool IsGenericTypeOf(this Type type, Type genericType)
         {
-            genericType.CheckArgument(nameof(genericType));
-
             Type? instanceType = type;
 
             while (instanceType != null)

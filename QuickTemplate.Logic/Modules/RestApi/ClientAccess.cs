@@ -32,7 +32,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
             return client;
         }
 
-        public async Task<T[]> GetAsync<T>(string baseUri, string extUri)
+        public static async Task<T[]> GetAsync<T>(string baseUri, string extUri)
         {
             using var client = CreateClient(baseUri);
             var response = await client.GetAsync($"{extUri}").ConfigureAwait(false);
@@ -42,7 +42,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
                 var contentData = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 var result = await JsonSerializer.DeserializeAsync<T[]>(contentData, DeserializerOptions).ConfigureAwait(false);
 
-                return result == null ? Array.Empty<T>() : result;
+                return result ?? Array.Empty<T>();
             }
             else
             {
@@ -53,7 +53,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
                 throw new LogicException(errorMessage);
             }
         }
-        public async Task<T?> GetByIdAsync<T>(string baseUri, string extUri, int id)
+        public static async Task<T?> GetByIdAsync<T>(string baseUri, string extUri, int id)
         {
             using var client = CreateClient(baseUri);
             var response = await client.GetAsync($"{extUri}/{id}").ConfigureAwait(false);
@@ -74,7 +74,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
                 throw new LogicException(errorMessage);
             }
         }
-        public async Task<T?> PostAsync<T>(string baseUri, string extUri, T model)
+        public static async Task<T?> PostAsync<T>(string baseUri, string extUri, T model)
         {
             model.CheckArgument(nameof(model));
 
@@ -97,7 +97,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
                 throw new LogicException(errorMessage);
             }
         }
-        public async Task<T?> PutAsync<T>(string baseUri, string extUri, int id, T model)
+        public static async Task<T?> PutAsync<T>(string baseUri, string extUri, int id, T model)
         {
             model.CheckArgument(nameof(model));
 
@@ -120,7 +120,7 @@ namespace QuickTemplate.Logic.Modules.RestApi
                 throw new LogicException(errorMessage);
             }
         }
-        public async Task DeleteAsync(string baseUri, string extUri, int id)
+        public static async Task DeleteAsync(string baseUri, string extUri, int id)
         {
             using var client = CreateClient(baseUri);
             var response = await client.DeleteAsync($"{extUri}/{id}").ConfigureAwait(false);

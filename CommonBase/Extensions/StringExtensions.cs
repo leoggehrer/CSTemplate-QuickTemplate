@@ -8,7 +8,7 @@ namespace CommonBase.Extensions
 {
     public static partial class StringExtensions
     {
-        public static void CheckNotNullOrEmpty(this string source, string argName)
+        public static void CheckNotNullOrEmpty(this string? source, string argName)
         {
             if (string.IsNullOrEmpty(source))
                 throw new ArgumentException("String is null or empty!", argName);
@@ -63,8 +63,6 @@ namespace CommonBase.Extensions
         }
         public static bool Contains(this string source, StringComparison comparison, params string[] toChecks)
         {
-            source.CheckArgument(nameof(source));
-
             var result = toChecks.Length > 0;
 
             foreach (var item in toChecks)
@@ -76,11 +74,6 @@ namespace CommonBase.Extensions
 
         public static string ReplaceBetween(this string source, string startText, string endText, string replaceText)
         {
-            source.CheckArgument(nameof(source));
-            startText.CheckArgument(nameof(startText));
-            endText.CheckArgument(nameof(endText));
-            replaceText.CheckArgument(nameof(replaceText));
-
             string result;
             var sIdx = source.IndexOf(startText);
             var eIdx = source.IndexOf(endText);
@@ -99,22 +92,14 @@ namespace CommonBase.Extensions
         }
         public static IEnumerable<string[]> Split(this IEnumerable<string> source, string separator)
         {
-            source.CheckArgument(nameof(source));
-
             return source.Select(l => string.IsNullOrEmpty(l) ? Array.Empty<string>() : l.Split(separator));
         }
         public static IEnumerable<T> SplitAndMap<T>(this IEnumerable<string> source, string separator, Func<string[], T> mapper)
         {
-            source.CheckArgument(nameof(source));
-            mapper.CheckArgument(nameof(mapper));
-
             return source.Split(separator).Select(d => mapper(d));
         }
         public static IEnumerable<T> SplitAndMap<T>(this IEnumerable<string> source, string separator, Func<string[], string[], T> mapper)
         {
-            source.CheckArgument(nameof(source));
-            mapper.CheckArgument(nameof(mapper));
-
             var splitSource = source.Split(separator);
             var header = splitSource.FirstOrDefault();
 
@@ -142,8 +127,6 @@ namespace CommonBase.Extensions
 
             public DivideInfo(TagInfo tagInfo)
             {
-                tagInfo.CheckArgument(nameof(tagInfo));
-
                 StartTag = tagInfo.StartTag;
                 StartTagIndex = tagInfo.StartTagIndex;
                 EndTag = tagInfo.EndTag;
@@ -193,8 +176,6 @@ namespace CommonBase.Extensions
 
         public static IEnumerable<TagInfo> GetAllTags(this string text, string[] tags)
         {
-            tags.CheckArgument(nameof(tags));
-
             List<TagInfo> result = new();
 
             for (int i = 0; i + 1 < tags.Length; i += 2)
@@ -214,8 +195,6 @@ namespace CommonBase.Extensions
         public static IEnumerable<T> GetAllTags<T>(this string text, string startTag, string endTag, params char[] excludeBlocks)
             where T : TagInfo, new()
         {
-            text.CheckArgument(nameof(text));
-
             var parseIndex = 0;
             int startTagIndex;
             int endTagIndex;
@@ -285,7 +264,7 @@ namespace CommonBase.Extensions
         /// </summary>
         /// <param name="text">The string to test.</param>
         /// <returns>true if the value parameter is null or an empty string (""); otherwise, false.</returns>
-        public static bool IsNullOrEmpty(this string text)
+        public static bool IsNullOrEmpty(this string? text)
         {
             return string.IsNullOrEmpty(text);
         }
@@ -295,7 +274,7 @@ namespace CommonBase.Extensions
         /// </summary>
         /// <param name="source">The string to test.</param>
         /// <returns>true if the value parameter is not null and not empty; otherwise, false.</returns>
-        public static bool HasContent(this string source)
+        public static bool HasContent(this string? source)
         {
             return !string.IsNullOrEmpty(source);
         }
@@ -381,9 +360,7 @@ namespace CommonBase.Extensions
         /// <returns>Text ohne redundante Leerzeichen.</returns>
         public static string Fulltrim(this string text)
         {
-            text.CheckArgument(nameof(text));
-
-            if (String.IsNullOrEmpty(text) == false)
+            if (string.IsNullOrEmpty(text) == false)
             {
                 text = Trimmer.Replace(text, " ");
                 text = text.Trim();
@@ -422,8 +399,6 @@ namespace CommonBase.Extensions
         /// <returns>String array with number of indents.</returns>
         public static string[] SetIndent(this string[] lines, int count)
         {
-            lines.CheckArgument(nameof(lines));
-
             if (lines != null)
             {
                 for (int i = 0; i < lines.Length; i++)
@@ -441,8 +416,6 @@ namespace CommonBase.Extensions
         /// <returns>String array with number of indents.</returns>
         public static IEnumerable<string> SetIndent(this IEnumerable<string> lines, int count)
         {
-            lines.CheckArgument(nameof(lines));
-
             return lines.ToArray().SetIndent(count);
         }
 
@@ -453,9 +426,6 @@ namespace CommonBase.Extensions
         /// <returns>The compound text.</returns>
         public static string ToText(this IEnumerable<string> lines)
         {
-            if (lines == null)
-                throw new ArgumentNullException(nameof(lines));
-
             StringBuilder sb = new();
 
             foreach (var line in lines)
@@ -473,9 +443,6 @@ namespace CommonBase.Extensions
         /// <returns>The compound text.</returns>
         public static string ToText(this IEnumerable<string> lines, Func<string, string> lineConvert)
         {
-            if (lines == null)
-                throw new ArgumentNullException(nameof(lines));
-
             StringBuilder sb = new();
 
             foreach (var line in lines)
@@ -492,9 +459,6 @@ namespace CommonBase.Extensions
         /// <returns>The string-array from the text.</returns>
         public static IEnumerable<string> ToLines(this string text)
         {
-            if (text == null)
-                throw new ArgumentNullException(nameof(text));
-
             List<string> result = new();
 
             foreach (var line in text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
@@ -506,8 +470,6 @@ namespace CommonBase.Extensions
 
         public static IEnumerable<string?> Trim(this IEnumerable<string> source)
         {
-            source.CheckArgument(nameof(source));
-
             var result = new List<string?>();
             var prvEmpty = true;
 
@@ -605,10 +567,6 @@ namespace CommonBase.Extensions
         /// <returns>The text with the missing partial text.</returns>
         public static string Remove(this string text, string startTag, string endTag)
         {
-            text.CheckArgument(nameof(text));
-            startTag.CheckArgument(nameof(startTag));
-            endTag.CheckArgument(nameof(endTag));
-
             StringBuilder result = new();
             int parseIndex = 0;
             int startTagIndex;
@@ -681,9 +639,6 @@ namespace CommonBase.Extensions
         }
         public static string ReplaceAll(this string text, TagInfo tagInfo, Func<string, string> replace)
         {
-            text.CheckArgument(nameof(text));
-            tagInfo.CheckArgument(nameof(tagInfo));
-
             StringBuilder result = new();
             int parseIndex = 0;
             int startTagIndex;
@@ -717,16 +672,10 @@ namespace CommonBase.Extensions
         }
         public static string ReplaceAll(this string text, string startTag, string endTag, string replaceText)
         {
-            text.CheckArgument(nameof(text));
-
             return text.ReplaceAll(startTag, endTag, s => replaceText);
         }
         public static string ReplaceAll(this string text, string startTag, string endTag, Func<string, string> replace)
         {
-            text.CheckArgument(nameof(text));
-            startTag.CheckArgument(nameof(startTag));
-            endTag.CheckArgument(nameof(endTag));
-
             int parseIndex = 0;
             int startTagIndex;
             int endTagIndex;
@@ -769,8 +718,6 @@ namespace CommonBase.Extensions
         }
         public static string RemoveAll(this string source, params string[] removeItems)
         {
-            source.CheckArgument(nameof(source));
-
             var result = source;
 
             foreach (var item in removeItems)

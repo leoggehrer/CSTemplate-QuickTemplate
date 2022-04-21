@@ -130,9 +130,6 @@ namespace CommonBase.Extensions
         }
         public static void CopyProperties(object target, object source, Func<string, bool>? filter, Func<string, string>? mapping)
         {
-            target.CheckArgument(nameof(target));
-            source.CheckArgument(nameof(source));
-
             Dictionary<string, PropertyItem> targetPropertyInfos = target.GetType().GetAllTypeProperties();
             Dictionary<string, PropertyItem> sourcePropertyInfos = source.GetType().GetAllTypeProperties();
 

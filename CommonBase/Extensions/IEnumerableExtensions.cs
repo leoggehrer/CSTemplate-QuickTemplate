@@ -7,9 +7,6 @@ namespace CommonBase.Extensions
     {
         public static int IndexOf<T>(this IEnumerable<T> source, Predicate<T> predicate)
         {
-            source.CheckArgument(nameof(source));
-            predicate.CheckArgument(nameof(predicate));
-
             var idx = 0;
             var result = -1;
             var enumerator = source.GetEnumerator();

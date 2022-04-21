@@ -1,6 +1,5 @@
 ﻿//@BaseCode
 //MdStart
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace CommonBase.Extensions
@@ -9,8 +8,6 @@ namespace CommonBase.Extensions
     {
         public PropertyItem(PropertyInfo propertyInfo)
         {
-            propertyInfo.CheckArgument(nameof(propertyInfo));
-
             PropertyInfo = propertyInfo;
             PropertyItems = new Dictionary<string, PropertyItem>();
         }
