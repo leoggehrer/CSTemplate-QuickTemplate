@@ -1,6 +1,5 @@
 ﻿//@BaseCode
 //MdStart
-using System.ComponentModel.DataAnnotations;
 
 namespace QuickTemplate.AspMvc.Models
 {
