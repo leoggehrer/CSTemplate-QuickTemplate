@@ -9,6 +9,17 @@ namespace QuickTemplate.AspMvc.Controllers
         where TEntity : Logic.Entities.IdentityEntity, new()
         where TModel : class, new()
     {
+        public enum ActionMode : int
+        {
+            Index,
+            Details,
+            Create,
+            Insert,
+            Edit,
+            Update,
+            ViewDelete,
+            Delete,
+        }
         protected Logic.Controllers.GenericController<TEntity> Controller { get; init; }
 
         protected GenericController(Logic.Controllers.GenericController<TEntity> controller)
@@ -16,12 +27,12 @@ namespace QuickTemplate.AspMvc.Controllers
             this.Controller = controller ?? throw new ArgumentNullException(nameof(controller));
         }
 
-        protected virtual TModel ToModel(TEntity entity)
+        protected virtual TModel ToModel(TEntity entity, ActionMode actionMode)
         {
             var result = new TModel();
 
             result.CopyFrom(entity);
-            return BeforeView(result);
+            return BeforeView(result, actionMode);
         }
         protected virtual TEntity ToEntity(TModel model)
         {
@@ -30,14 +41,14 @@ namespace QuickTemplate.AspMvc.Controllers
             result.CopyFrom(model);
             return result;
         }
-        protected virtual TModel BeforeView(TModel model) => model;
+        protected virtual TModel BeforeView(TModel model, ActionMode actionMode) => model;
 
         // GET: Item
         public virtual async Task<IActionResult> Index()
         {
             var entities = await Controller.GetAllAsync();
 
-            return View(entities.Select(e => ToModel(e)));
+            return View(entities.Select(e => ToModel(e, ActionMode.Index)));
         }
 
         // GET: Item/Details/5
@@ -53,7 +64,7 @@ namespace QuickTemplate.AspMvc.Controllers
             {
                 return NotFound();
             }
-            return View(ToModel(genre));
+            return View(ToModel(genre, ActionMode.Details));
         }
 
         // GET: Item/Create
@@ -61,7 +72,7 @@ namespace QuickTemplate.AspMvc.Controllers
         {
             var entity = new TEntity();
 
-            return View(ToModel(entity));
+            return View(ToModel(entity, ActionMode.Create));
         }
 
         // POST: Item/Create
@@ -91,7 +102,7 @@ namespace QuickTemplate.AspMvc.Controllers
                     }
                 }
             }
-            return View(ToModel(entity));
+            return View(ToModel(entity, ActionMode.Index));
         }
 
         // GET: Item/Edit/5
@@ -108,7 +119,7 @@ namespace QuickTemplate.AspMvc.Controllers
             {
                 return NotFound();
             }
-            return View(ToModel(entity));
+            return View(ToModel(entity, ActionMode.Edit));
         }
 
         // POST: Item/Edit/5
@@ -144,7 +155,7 @@ namespace QuickTemplate.AspMvc.Controllers
                     }
                 }
             }
-            return string.IsNullOrEmpty(ViewBag.Error) ? RedirectToAction(nameof(Index)) : View(ToModel(entity));
+            return string.IsNullOrEmpty(ViewBag.Error) ? RedirectToAction(nameof(Index)) : View(ToModel(entity, ActionMode.Update));
         }
 
         // GET: Item/Delete/5
@@ -161,7 +172,7 @@ namespace QuickTemplate.AspMvc.Controllers
             {
                 return NotFound();
             }
-            return View(ToModel(entity));
+            return View(ToModel(entity, ActionMode.ViewDelete));
         }
 
         // POST: Item/Delete/5
@@ -188,7 +199,7 @@ namespace QuickTemplate.AspMvc.Controllers
                     }
                 }
             }
-            return ViewBag.Error != null ? View(ToModel(entity)) : RedirectToAction(nameof(Index));
+            return ViewBag.Error != null ? View(ToModel(entity, ActionMode.Delete)) : RedirectToAction(nameof(Index));
         }
 
         protected override void Dispose(bool disposing)
