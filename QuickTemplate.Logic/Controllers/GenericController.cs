@@ -86,6 +86,15 @@ namespace QuickTemplate.Logic.Controllers
         /// <summary>
         /// This method is called before an action is performed.
         /// </summary>
+        /// <param name="actionType">Action types such as insert, edit, etc.</param>
+        /// <param name="entity">The entity that the action affects.</param>
+        protected virtual void ValidateEntity(ActionType actionType, TEntity entity)
+        {
+
+        }
+        /// <summary>
+        /// This method is called before an action is performed.
+        /// </summary>
         /// <param name="actionType">Action types such as save, etc.</param>
         protected virtual void BeforeActionExecute(ActionType actionType)
         {
@@ -118,6 +127,7 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The inserted entity.</returns>
         public virtual async Task<TEntity> InsertAsync(TEntity entity)
         {
+            ValidateEntity(ActionType.Insert, entity);
             BeforeActionExecute(ActionType.Insert, entity);
             await EntitySet.AddAsync(entity).ConfigureAwait(false);
             AfterActionExecute(ActionType.Insert);
@@ -132,6 +142,7 @@ namespace QuickTemplate.Logic.Controllers
         {
             foreach (var entity in entities)
             {
+                ValidateEntity(ActionType.Insert, entity);
                 BeforeActionExecute(ActionType.Insert, entity);
             }
             await EntitySet.AddRangeAsync(entities).ConfigureAwait(false);
@@ -148,6 +159,7 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The the modified entity.</returns>
         public virtual Task<TEntity> UpdateAsync(TEntity entity)
         {
+            ValidateEntity(ActionType.Update, entity);
             BeforeActionExecute(ActionType.Update, entity);
             return Task.Run(() =>
             {
@@ -165,6 +177,7 @@ namespace QuickTemplate.Logic.Controllers
         {
             foreach (var entity in entities)
             {
+                ValidateEntity(ActionType.Update, entity);
                 BeforeActionExecute(ActionType.Update, entity);
             }
             return Task.Run(() =>
@@ -185,12 +198,13 @@ namespace QuickTemplate.Logic.Controllers
         {
             return Task.Run(() =>
             {
-                TEntity? result = EntitySet.Find(id);
+                TEntity? entity = EntitySet.Find(id);
 
-                if (result != null)
+                if (entity != null)
                 {
-                    BeforeActionExecute(ActionType.Delete, result);
-                    EntitySet.Remove(result);
+                    ValidateEntity(ActionType.Delete, entity);
+                    BeforeActionExecute(ActionType.Delete, entity);
+                    EntitySet.Remove(entity);
                     AfterActionExecute(ActionType.Delete);
                 }
             });
