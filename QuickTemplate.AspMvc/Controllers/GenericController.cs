@@ -27,6 +27,7 @@ namespace QuickTemplate.AspMvc.Controllers
             this.Controller = controller ?? throw new ArgumentNullException(nameof(controller));
         }
 
+        protected virtual TEntity[] AfterQuery(TEntity[] entities) => entities;
         protected virtual TModel ToModel(TEntity entity, ActionMode actionMode)
         {
             var result = new TModel();
@@ -48,7 +49,7 @@ namespace QuickTemplate.AspMvc.Controllers
         {
             var entities = await Controller.GetAllAsync();
 
-            return View(entities.Select(e => ToModel(e, ActionMode.Index)));
+            return View(AfterQuery(entities).Select(e => ToModel(e, ActionMode.Index)));
         }
 
         // GET: Item/Details/5
