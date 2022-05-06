@@ -18,7 +18,7 @@ namespace QuickTemplate.Logic.UnitTest
 
         public abstract Controllers.GenericController<T> CreateController();
 
-        public string[] IgnoreUpdateProperties = new[] { nameof(Entities.IdentityEntity.Id), nameof(Entities.VersionEntity.RowVersion) };
+        public List<string> IgnoreUpdateProperties = new() { nameof(Entities.IdentityEntity.Id), nameof(Entities.VersionEntity.RowVersion) };
         /// <summary>
         /// This method deletes all entities in the database.
         /// </summary>
@@ -119,7 +119,7 @@ namespace QuickTemplate.Logic.UnitTest
             var actualUpdateEntity = await ctrlUpdateAfter.GetByIdAsync(id);
 
             Assert.IsNotNull(actualUpdateEntity);
-            Assert.IsTrue(changedEntity.AreEqualProperties(actualUpdateEntity, IgnoreUpdateProperties));
+            Assert.IsTrue(changedEntity.AreEqualProperties(actualUpdateEntity, IgnoreUpdateProperties.ToArray()));
             return actualUpdateEntity;
         }
 
@@ -157,7 +157,7 @@ namespace QuickTemplate.Logic.UnitTest
             var actualUpdateEntity = await ctrlUpdateAfter.GetByIdAsync(insertEntity.Id);
 
             Assert.IsNotNull(actualUpdateEntity);
-            Assert.IsTrue(changedEntity.AreEqualProperties(actualUpdateEntity, IgnoreUpdateProperties));
+            Assert.IsTrue(changedEntity.AreEqualProperties(actualUpdateEntity, IgnoreUpdateProperties.ToArray()));
             return actualUpdateEntity;
         }
 
