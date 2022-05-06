@@ -39,8 +39,8 @@ namespace QuickTemplate.Logic.UnitTest
         /// This method creates an entity in the database, reads this entity again and compares it with the input.
         /// </summary>
         /// <param name="entity">Entity created in the database.</param>
-        /// <returns></returns>
-        public async Task Create_OfEntity_AndCheck(T entity)
+        /// <returns>The actuel entity</returns>
+        public async Task<T> Create_OfEntity_AndCheck(T entity)
         {
             try
             {
@@ -56,6 +56,7 @@ namespace QuickTemplate.Logic.UnitTest
 
                 Assert.IsNotNull(actualEntity);
                 Assert.IsTrue(insertEntity.AreEqualProperties(actualEntity));
+                return actualEntity;
             }
             catch (System.Exception ex)
             {
@@ -96,8 +97,8 @@ namespace QuickTemplate.Logic.UnitTest
         /// </summary>
         /// <param name="entity">Entity created in the Database.</param>
         /// <param name="changeEntity">Entity containing the changes.</param>
-        /// <returns></returns>
-        public async Task Update_OfEntity_AndCheck(T entity, T changeEntity)
+        /// <returns>The actuel entity</returns>
+        public async Task<T> Update_OfEntity_AndCheck(T entity, T changeEntity)
         {
             using var ctrl = CreateController();
             using var ctrlAfter = CreateController();
@@ -125,6 +126,7 @@ namespace QuickTemplate.Logic.UnitTest
 
             Assert.IsNotNull(actualUpdateEntity);
             Assert.IsTrue(updateEntity.AreEqualProperties(actualUpdateEntity));
+            return actualUpdateEntity;
         }
 
         /// <summary>
