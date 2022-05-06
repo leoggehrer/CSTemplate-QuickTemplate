@@ -96,9 +96,9 @@ namespace QuickTemplate.Logic.UnitTest
         /// The entity is then read out again and compared with the input.
         /// </summary>
         /// <param name="id">Id form entity updated in the Database.</param>
-        /// <param name="changeEntity">Entity containing the changes.</param>
+        /// <param name="changedEntity">Entity containing the changes.</param>
         /// <returns>The actuel entity</returns>
-        public async Task<T> Update_OfEntity_AndCheck(int id, T changeEntity)
+        public async Task<T> Update_OfEntity_AndCheck(int id, T changedEntity)
         {
             using var ctrl = CreateController();
             using var ctrlAfter = CreateController();
@@ -109,7 +109,7 @@ namespace QuickTemplate.Logic.UnitTest
 
             Assert.IsNotNull(actualEntity);
 
-            actualEntity.CopyFrom(changeEntity, n => IgnoreUpdateProperties.Contains(n) == false);
+            actualEntity.CopyFrom(changedEntity, n => IgnoreUpdateProperties.Contains(n) == false);
 
             var updateEntity = await ctrlUpdate.UpdateAsync(actualEntity);
 
@@ -119,7 +119,7 @@ namespace QuickTemplate.Logic.UnitTest
             var actualUpdateEntity = await ctrlUpdateAfter.GetByIdAsync(id);
 
             Assert.IsNotNull(actualUpdateEntity);
-            Assert.IsTrue(changeEntity.AreEqualProperties(actualUpdateEntity, IgnoreUpdateProperties));
+            Assert.IsTrue(changedEntity.AreEqualProperties(actualUpdateEntity, IgnoreUpdateProperties));
             return actualUpdateEntity;
         }
 
@@ -128,9 +128,9 @@ namespace QuickTemplate.Logic.UnitTest
         /// The entity is then read out again and compared with the input.
         /// </summary>
         /// <param name="entity">Entity created in the Database.</param>
-        /// <param name="changeEntity">Entity containing the changes.</param>
+        /// <param name="changedEntity">Entity containing the changes.</param>
         /// <returns>The actuel entity</returns>
-        public async Task<T> CreateUpdate_OfEntity_AndCheck(T entity, T changeEntity)
+        public async Task<T> CreateUpdate_OfEntity_AndCheck(T entity, T changedEntity)
         {
             using var ctrl = CreateController();
             using var ctrlAfter = CreateController();
@@ -147,7 +147,7 @@ namespace QuickTemplate.Logic.UnitTest
             Assert.IsNotNull(actualEntity);
             Assert.IsTrue(insertEntity.AreEqualProperties(actualEntity));
 
-            actualEntity.CopyFrom(changeEntity, n => IgnoreUpdateProperties.Contains(n) == false);
+            actualEntity.CopyFrom(changedEntity, n => IgnoreUpdateProperties.Contains(n) == false);
 
             var updateEntity = await ctrlUpdate.UpdateAsync(actualEntity);
 
@@ -157,7 +157,7 @@ namespace QuickTemplate.Logic.UnitTest
             var actualUpdateEntity = await ctrlUpdateAfter.GetByIdAsync(insertEntity.Id);
 
             Assert.IsNotNull(actualUpdateEntity);
-            Assert.IsTrue(changeEntity.AreEqualProperties(actualUpdateEntity, IgnoreUpdateProperties));
+            Assert.IsTrue(changedEntity.AreEqualProperties(actualUpdateEntity, IgnoreUpdateProperties));
             return actualUpdateEntity;
         }
 
