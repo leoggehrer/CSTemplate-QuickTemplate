@@ -110,6 +110,15 @@ namespace QuickTemplate.Logic.Controllers
 
         }
         /// <summary>
+        /// This method is called before an action is performed.
+        /// </summary>
+        /// <param name="actionType">Action types such as insert, edit, etc.</param>
+        /// <param name="entity">The entity that the action affects.</param>
+        protected virtual Task BeforeActionExecuteAsync(ActionType actionType, TEntity entity)
+        {
+            return Task.FromResult(0);
+        }
+        /// <summary>
         /// This method is called after an action is performed.
         /// </summary>
         /// <param name="actionType">Action types such as insert, edit, etc.</param>
@@ -129,6 +138,7 @@ namespace QuickTemplate.Logic.Controllers
         {
             ValidateEntity(ActionType.Insert, entity);
             BeforeActionExecute(ActionType.Insert, entity);
+            await BeforeActionExecuteAsync(ActionType.Insert, entity).ConfigureAwait(false);
             await EntitySet.AddAsync(entity).ConfigureAwait(false);
             AfterActionExecute(ActionType.Insert);
             return entity;
@@ -144,6 +154,7 @@ namespace QuickTemplate.Logic.Controllers
             {
                 ValidateEntity(ActionType.Insert, entity);
                 BeforeActionExecute(ActionType.Insert, entity);
+                await BeforeActionExecuteAsync(ActionType.Insert, entity).ConfigureAwait(false);
             }
             await EntitySet.AddRangeAsync(entities).ConfigureAwait(false);
             AfterActionExecute(ActionType.InsertArray);
@@ -157,35 +168,31 @@ namespace QuickTemplate.Logic.Controllers
         /// </summary>
         /// <param name="entity">The entity which is to be updated.</param>
         /// <returns>The the modified entity.</returns>
-        public virtual Task<TEntity> UpdateAsync(TEntity entity)
+        public virtual async Task<TEntity> UpdateAsync(TEntity entity)
         {
             ValidateEntity(ActionType.Update, entity);
             BeforeActionExecute(ActionType.Update, entity);
-            return Task.Run(() =>
-            {
-                EntitySet.Update(entity);
-                AfterActionExecute(ActionType.Update);
-                return entity;
-            });
+            await BeforeActionExecuteAsync(ActionType.Update, entity).ConfigureAwait(false);
+            EntitySet.Update(entity);
+            AfterActionExecute(ActionType.Update);
+            return entity;
         }
         /// <summary>
         /// The entities are being tracked by the context and exists in the repository, and some or all of its property values have been modified.
         /// </summary>
         /// <param name="entities">The entities which are to be updated.</param>
         /// <returns>The updated entities.</returns>
-        public virtual Task<IEnumerable<TEntity>> UpdateAsync(IEnumerable<TEntity> entities)
+        public virtual async Task<IEnumerable<TEntity>> UpdateAsync(IEnumerable<TEntity> entities)
         {
             foreach (var entity in entities)
             {
                 ValidateEntity(ActionType.Update, entity);
                 BeforeActionExecute(ActionType.Update, entity);
+                await BeforeActionExecuteAsync(ActionType.Update, entity).ConfigureAwait(false);
             }
-            return Task.Run(() =>
-            {
-                EntitySet.UpdateRange(entities);
-                AfterActionExecute(ActionType.UpdateArray);
-                return entities;
-            });
+            EntitySet.UpdateRange(entities);
+            AfterActionExecute(ActionType.UpdateArray);
+            return entities;
         }
         #endregion Update
 
@@ -194,20 +201,18 @@ namespace QuickTemplate.Logic.Controllers
         /// Removes the entity from the repository with the appropriate identity.
         /// </summary>
         /// <param name="id">The identification.</param>
-        public virtual Task DeleteAsync(int id)
+        public virtual async Task DeleteAsync(int id)
         {
-            return Task.Run(() =>
-            {
-                TEntity? entity = EntitySet.Find(id);
+            TEntity? entity = await EntitySet.FindAsync(id).ConfigureAwait(false);
 
-                if (entity != null)
-                {
-                    ValidateEntity(ActionType.Delete, entity);
-                    BeforeActionExecute(ActionType.Delete, entity);
-                    EntitySet.Remove(entity);
-                    AfterActionExecute(ActionType.Delete);
-                }
-            });
+            if (entity != null)
+            {
+                ValidateEntity(ActionType.Delete, entity);
+                BeforeActionExecute(ActionType.Delete, entity);
+                await BeforeActionExecuteAsync(ActionType.Update, entity).ConfigureAwait(false);
+                EntitySet.Remove(entity);
+                AfterActionExecute(ActionType.Delete);
+            }
         }
         #endregion Delete
 
