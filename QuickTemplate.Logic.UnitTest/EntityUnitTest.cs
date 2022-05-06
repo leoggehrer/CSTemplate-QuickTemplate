@@ -92,13 +92,45 @@ namespace QuickTemplate.Logic.UnitTest
         }
 
         /// <summary>
+        /// This method updates an entity in the database, rereads that entity, modifies it, and saves the change. 
+        /// The entity is then read out again and compared with the input.
+        /// </summary>
+        /// <param name="id">Id form entity updated in the Database.</param>
+        /// <param name="changeEntity">Entity containing the changes.</param>
+        /// <returns>The actuel entity</returns>
+        public async Task<T> Update_OfEntity_AndCheck(int id, T changeEntity)
+        {
+            using var ctrl = CreateController();
+            using var ctrlAfter = CreateController();
+            using var ctrlUpdate = CreateController();
+            using var ctrlUpdateAfter = CreateController();
+
+            var actualEntity = await ctrlAfter.GetByIdAsync(id);
+
+            Assert.IsNotNull(actualEntity);
+
+            actualEntity.CopyFrom(changeEntity, n => IgnoreUpdateProperties.Contains(n) == false);
+
+            var updateEntity = await ctrlUpdate.UpdateAsync(actualEntity);
+
+            Assert.IsNotNull(updateEntity);
+            await ctrlUpdate.SaveChangesAsync();
+
+            var actualUpdateEntity = await ctrlUpdateAfter.GetByIdAsync(id);
+
+            Assert.IsNotNull(actualUpdateEntity);
+            Assert.IsTrue(changeEntity.AreEqualProperties(actualUpdateEntity, IgnoreUpdateProperties));
+            return actualUpdateEntity;
+        }
+
+        /// <summary>
         /// This method creates an entity in the database, rereads that entity, modifies it, and saves the change. 
         /// The entity is then read out again and compared with the input.
         /// </summary>
         /// <param name="entity">Entity created in the Database.</param>
         /// <param name="changeEntity">Entity containing the changes.</param>
         /// <returns>The actuel entity</returns>
-        public async Task<T> Update_OfEntity_AndCheck(T entity, T changeEntity)
+        public async Task<T> CreateUpdate_OfEntity_AndCheck(T entity, T changeEntity)
         {
             using var ctrl = CreateController();
             using var ctrlAfter = CreateController();
@@ -125,7 +157,7 @@ namespace QuickTemplate.Logic.UnitTest
             var actualUpdateEntity = await ctrlUpdateAfter.GetByIdAsync(insertEntity.Id);
 
             Assert.IsNotNull(actualUpdateEntity);
-            Assert.IsTrue(updateEntity.AreEqualProperties(actualUpdateEntity));
+            Assert.IsTrue(changeEntity.AreEqualProperties(actualUpdateEntity, IgnoreUpdateProperties));
             return actualUpdateEntity;
         }
 
@@ -136,7 +168,7 @@ namespace QuickTemplate.Logic.UnitTest
         /// <param name="entities">Entities created in the database.</param>
         /// <param name="changeEntities">Entities containing the changes.</param>
         /// <returns></returns>
-        public async Task UpdateArray_OfEntity_AndCheck(IEnumerable<T> entities, IEnumerable<T> changeEntities)
+        public async Task CreateUpdateArray_OfEntity_AndCheck(IEnumerable<T> entities, IEnumerable<T> changeEntities)
         {
             using var ctrl = CreateController();
             using var ctrlAfter = CreateController();
