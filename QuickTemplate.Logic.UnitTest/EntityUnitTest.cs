@@ -39,8 +39,8 @@ namespace QuickTemplate.Logic.UnitTest
         /// This method creates an entity in the database, reads this entity again and compares it with the input.
         /// </summary>
         /// <param name="entity">Entity created in the database.</param>
-        /// <returns>The actuel entity</returns>
-        public async Task<T> Create_OfEntity_AndCheck(T entity)
+        /// <returns>The actual entity</returns>
+        public async Task<T> Create_Entity_AndCheck(T entity)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace QuickTemplate.Logic.UnitTest
         /// </summary>
         /// <param name="entities">Entities created in the database.</param>
         /// <returns></returns>
-        public async Task CreateArray_OfEntities_AndCheckAll(IEnumerable<T> entities)
+        public async Task CreateArray_Entities_AndCheckAll(IEnumerable<T> entities)
         {
             using var ctrl = CreateController();
             using var ctrlAfter = CreateController();
@@ -97,8 +97,8 @@ namespace QuickTemplate.Logic.UnitTest
         /// </summary>
         /// <param name="id">Id form entity updated in the Database.</param>
         /// <param name="changedEntity">Entity containing the changes.</param>
-        /// <returns>The actuel entity</returns>
-        public async Task<T> Update_OfEntity_AndCheck(int id, T changedEntity)
+        /// <returns>The actual entity</returns>
+        public async Task<T> Update_Entity_AndCheck(int id, T changedEntity)
         {
             using var ctrl = CreateController();
             using var ctrlAfter = CreateController();
@@ -129,8 +129,8 @@ namespace QuickTemplate.Logic.UnitTest
         /// </summary>
         /// <param name="entity">Entity created in the Database.</param>
         /// <param name="changedEntity">Entity containing the changes.</param>
-        /// <returns>The actuel entity</returns>
-        public async Task<T> CreateUpdate_OfEntity_AndCheck(T entity, T changedEntity)
+        /// <returns>The actual entity</returns>
+        public async Task<T> CreateUpdate_Entity_AndCheck(T entity, T changedEntity)
         {
             using var ctrl = CreateController();
             using var ctrlAfter = CreateController();
@@ -166,9 +166,9 @@ namespace QuickTemplate.Logic.UnitTest
         /// The entities are then read out again and compared with the input.
         /// </summary>
         /// <param name="entities">Entities created in the database.</param>
-        /// <param name="changeEntities">Entities containing the changes.</param>
+        /// <param name="changedEntities">Entities containing the changes.</param>
         /// <returns></returns>
-        public async Task CreateUpdateArray_OfEntity_AndCheck(IEnumerable<T> entities, IEnumerable<T> changeEntities)
+        public async Task CreateUpdateArray_Entities_AndCheckAll(IEnumerable<T> entities, IEnumerable<T> changedEntities)
         {
             using var ctrl = CreateController();
             using var ctrlAfter = CreateController();
@@ -176,7 +176,7 @@ namespace QuickTemplate.Logic.UnitTest
             using var ctrlUpdateAfter = CreateController();
             var actualEntities = new List<T>();
 
-            Assert.AreEqual(entities.Count(), changeEntities.Count());
+            Assert.AreEqual(entities.Count(), changedEntities.Count());
 
             var insertEntities = await ctrl.InsertAsync(entities);
 
@@ -192,14 +192,14 @@ namespace QuickTemplate.Logic.UnitTest
                 actualEntities.Add(actualEntity);
             }
 
-            var changeArray = changeEntities.ToArray();
+            var changeArray = changedEntities.ToArray();
 
             for (int i = 0; i < actualEntities.Count; i++)
             {
                 var actualEntity = actualEntities[i];
-                var changeEntity = changeArray[i];
+                var changedEntity = changeArray[i];
 
-                actualEntity.CopyFrom(changeEntity, n => IgnoreUpdateProperties.Contains(n) == false);
+                actualEntity.CopyFrom(changedEntity, n => IgnoreUpdateProperties.Contains(n) == false);
             }
 
             var updateEntities = await ctrlUpdate.UpdateAsync(actualEntities);

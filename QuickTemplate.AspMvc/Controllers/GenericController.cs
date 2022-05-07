@@ -5,9 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace QuickTemplate.AspMvc.Controllers
 {
-    public abstract class GenericController<TEntity, TModel> : Controller
-        where TEntity : Logic.Entities.IdentityEntity, new()
-        where TModel : class, new()
+    /// <summary>
+    /// A generic one for the standard CRUD operations.
+    /// </summary>
+    /// <typeparam name="TAccessModel">The type of access model</typeparam>
+    /// <typeparam name="TViewModel">The type of view model</typeparam>
+    public abstract class GenericController<TAccessModel, TViewModel> : Controller
+        where TAccessModel : Logic.IIdentifyable, new()
+        where TViewModel : class, new()
     {
         public enum ActionMode : int
         {
@@ -20,36 +25,36 @@ namespace QuickTemplate.AspMvc.Controllers
             ViewDelete,
             Delete,
         }
-        protected Logic.Controllers.GenericController<TEntity> Controller { get; init; }
+        protected Logic.IDataAccess<TAccessModel> DataAccess { get; init; }
 
-        protected GenericController(Logic.Controllers.GenericController<TEntity> controller)
+        protected GenericController(Logic.IDataAccess<TAccessModel> controller)
         {
-            this.Controller = controller ?? throw new ArgumentNullException(nameof(controller));
+            this.DataAccess = controller ?? throw new ArgumentNullException(nameof(controller));
         }
 
-        protected virtual TEntity[] AfterQuery(TEntity[] entities) => entities;
-        protected virtual TModel ToModel(TEntity entity, ActionMode actionMode)
+        protected virtual TAccessModel[] AfterQuery(TAccessModel[] accessModels) => accessModels;
+        protected virtual TViewModel ToViewModel(TAccessModel accessModel, ActionMode actionMode)
         {
-            var result = new TModel();
+            var result = new TViewModel();
 
-            result.CopyFrom(entity);
+            result.CopyFrom(accessModel);
             return BeforeView(result, actionMode);
         }
-        protected virtual TEntity ToEntity(TModel model)
+        protected virtual TAccessModel ToAccessModel(TViewModel viewModel)
         {
-            var result = new TEntity();
+            var result = new TAccessModel();
 
-            result.CopyFrom(model);
+            result.CopyFrom(viewModel);
             return result;
         }
-        protected virtual TModel BeforeView(TModel model, ActionMode actionMode) => model;
+        protected virtual TViewModel BeforeView(TViewModel viewModel, ActionMode actionMode) => viewModel;
 
         // GET: Item
         public virtual async Task<IActionResult> Index()
         {
-            var entities = await Controller.GetAllAsync();
+            var accessModels = await DataAccess.GetAllAsync();
 
-            return View(AfterQuery(entities).Select(e => ToModel(e, ActionMode.Index)));
+            return View(AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index)));
         }
 
         // GET: Item/Details/5
@@ -60,20 +65,21 @@ namespace QuickTemplate.AspMvc.Controllers
                 return NotFound();
             }
 
-            var genre = await Controller.GetByIdAsync(id.Value);
-            if (genre == null)
+            var accessModel = await DataAccess.GetByIdAsync(id.Value);
+
+            if (accessModel == null)
             {
                 return NotFound();
             }
-            return View(ToModel(genre, ActionMode.Details));
+            return View(ToViewModel(accessModel, ActionMode.Details));
         }
 
         // GET: Item/Create
         public virtual IActionResult Create()
         {
-            var entity = new TEntity();
+            var accessModel = new TAccessModel();
 
-            return View(ToModel(entity, ActionMode.Create));
+            return View(ToViewModel(accessModel, ActionMode.Create));
         }
 
         // POST: Item/Create
@@ -81,16 +87,16 @@ namespace QuickTemplate.AspMvc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public virtual async Task<IActionResult> Create(TModel model)
+        public virtual async Task<IActionResult> Create(TViewModel viewModel)
         {
-            TEntity entity = ToEntity(model);
+            TAccessModel accessModel = ToAccessModel(viewModel);
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    await Controller.InsertAsync(entity);
-                    await Controller.SaveChangesAsync();
+                    await DataAccess.InsertAsync(accessModel);
+                    await DataAccess.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -103,7 +109,7 @@ namespace QuickTemplate.AspMvc.Controllers
                     }
                 }
             }
-            return View(ToModel(entity, ActionMode.Index));
+            return View(ToViewModel(accessModel, ActionMode.Index));
         }
 
         // GET: Item/Edit/5
@@ -114,13 +120,13 @@ namespace QuickTemplate.AspMvc.Controllers
                 return NotFound();
             }
 
-            var entity = await Controller.GetByIdAsync(id.Value);
+            var accessModel = await DataAccess.GetByIdAsync(id.Value);
 
-            if (entity == null)
+            if (accessModel == null)
             {
                 return NotFound();
             }
-            return View(ToModel(entity, ActionMode.Edit));
+            return View(ToViewModel(accessModel, ActionMode.Edit));
         }
 
         // POST: Item/Edit/5
@@ -128,23 +134,23 @@ namespace QuickTemplate.AspMvc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public virtual async Task<IActionResult> Edit(int id, TModel model)
+        public virtual async Task<IActionResult> Edit(int id, TViewModel viewModel)
         {
-            var entity = await Controller.GetByIdAsync(id);
+            var accessModel = await DataAccess.GetByIdAsync(id);
 
-            if (entity == null)
+            if (accessModel == null)
             {
                 return NotFound();
             }
 
-            entity.CopyFrom(model);
+            accessModel.CopyFrom(viewModel);
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    entity = await Controller.UpdateAsync(entity);
-                    await Controller.SaveChangesAsync();
+                    accessModel = await DataAccess.UpdateAsync(accessModel);
+                    await DataAccess.SaveChangesAsync();
                 }
                 catch (Exception ex)
                 {
@@ -156,7 +162,7 @@ namespace QuickTemplate.AspMvc.Controllers
                     }
                 }
             }
-            return string.IsNullOrEmpty(ViewBag.Error) ? RedirectToAction(nameof(Index)) : View(ToModel(entity, ActionMode.Update));
+            return string.IsNullOrEmpty(ViewBag.Error) ? RedirectToAction(nameof(Index)) : View(ToViewModel(accessModel, ActionMode.Update));
         }
 
         // GET: Item/Delete/5
@@ -167,13 +173,13 @@ namespace QuickTemplate.AspMvc.Controllers
                 return NotFound();
             }
 
-            var entity = await Controller.GetByIdAsync(id.Value);
+            var accessModel = await DataAccess.GetByIdAsync(id.Value);
 
-            if (entity == null)
+            if (accessModel == null)
             {
                 return NotFound();
             }
-            return View(ToModel(entity, ActionMode.ViewDelete));
+            return View(ToViewModel(accessModel, ActionMode.ViewDelete));
         }
 
         // POST: Item/Delete/5
@@ -181,14 +187,14 @@ namespace QuickTemplate.AspMvc.Controllers
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var entity = await Controller.GetByIdAsync(id);
+            var accessModel = await DataAccess.GetByIdAsync(id);
 
-            if (entity != null)
+            if (accessModel != null)
             {
                 try
                 {
-                    await Controller.DeleteAsync(id);
-                    await Controller.SaveChangesAsync();
+                    await DataAccess.DeleteAsync(id);
+                    await DataAccess.SaveChangesAsync();
                 }
                 catch (Exception ex)
                 {
@@ -200,12 +206,12 @@ namespace QuickTemplate.AspMvc.Controllers
                     }
                 }
             }
-            return ViewBag.Error != null ? View(ToModel(entity, ActionMode.Delete)) : RedirectToAction(nameof(Index));
+            return ViewBag.Error != null ? View(ToViewModel(accessModel, ActionMode.Delete)) : RedirectToAction(nameof(Index));
         }
 
         protected override void Dispose(bool disposing)
         {
-            Controller?.Dispose();
+            DataAccess?.Dispose();
             base.Dispose(disposing);
         }
     }

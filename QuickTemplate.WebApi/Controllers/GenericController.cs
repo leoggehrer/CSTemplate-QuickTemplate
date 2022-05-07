@@ -7,36 +7,35 @@ namespace QuickTemplate.WebApi.Controllers
     /// <summary>
     /// A generic one for the standard CRUD operations.
     /// </summary>
-    /// <typeparam name="TEntity">The type of entity</typeparam>
+    /// <typeparam name="TAccessModel">The type of access model</typeparam>
     /// <typeparam name="TEditModel">The type of edit model</typeparam>
-    /// <typeparam name="TModel">The type of model</typeparam>
+    /// <typeparam name="TOutModel">The type of output model</typeparam>
     [ApiController]
     [Route("api/[controller]")]
-    public abstract partial class GenericController<TEntity, TEditModel, TModel> : ControllerBase, IDisposable
-        where TEntity : Logic.Entities.IdentityEntity, new()
+    public abstract partial class GenericController<TAccessModel, TEditModel, TOutModel> : ControllerBase, IDisposable
+        where TAccessModel : class, Logic.IIdentifyable, new()
         where TEditModel : class, new()
-        where TModel : class, new()
+        where TOutModel : class, new()
     {
         private bool disposedValue;
 
-        protected Logic.Controllers.GenericController<TEntity> Controller { get; init; }
+        /// <summary>
+        /// This property controls access to the logic operations.
+        /// </summary>
+        protected Logic.IDataAccess<TAccessModel> DataAccess { get; init; }
 
-        internal GenericController(Logic.Controllers.GenericController<TEntity> controller)
+        internal GenericController(Logic.IDataAccess<TAccessModel> dataAccess)
         {
-            if (controller is null)
-            {
-                throw new ArgumentNullException(nameof(controller));
-            }
-            Controller = controller;
+            DataAccess = dataAccess;
         }
         /// <summary>
         /// Converts an entity to a model and copies all properties of the same name from the entity to the model.
         /// </summary>
         /// <param name="entity">The entity to be converted</param>
         /// <returns>The model with the property values of the same name</returns>
-        protected virtual TModel ToModel(TEntity entity)
+        protected virtual TOutModel ToOutModel(TAccessModel entity)
         {
-            var result = new TModel();
+            var result = new TOutModel();
 
             result.CopyFrom(entity);
             return result;
@@ -44,15 +43,15 @@ namespace QuickTemplate.WebApi.Controllers
         /// <summary>
         /// Converts all entities to models and copies all properties of the same name from an entity to the model.
         /// </summary>
-        /// <param name="entities">The entities to be converted</param>
+        /// <param name="accessModels">The entities to be converted</param>
         /// <returns>The models</returns>
-        protected virtual IEnumerable<TModel> ToModel(IEnumerable<TEntity> entities)
+        protected virtual IEnumerable<TOutModel> ToOutModel(IEnumerable<TAccessModel> accessModels)
         {
-            var result = new List<TModel>();
+            var result = new List<TOutModel>();
 
-            foreach (var entity in entities)
+            foreach (var entity in accessModels)
             {
-                result.Add(ToModel(entity));
+                result.Add(ToOutModel(entity));
             }
             return result;
         }
@@ -63,11 +62,11 @@ namespace QuickTemplate.WebApi.Controllers
         /// <returns>List of models</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public virtual async Task<ActionResult<IEnumerable<TModel>>> GetAsync()
+        public virtual async Task<ActionResult<IEnumerable<TOutModel>>> GetAsync()
         {
-            var entities = await Controller.GetAllAsync();
+            var accessModels = await DataAccess.GetAllAsync();
 
-            return Ok(ToModel(entities));
+            return Ok(ToOutModel(accessModels));
         }
 
         /// <summary>
@@ -79,55 +78,55 @@ namespace QuickTemplate.WebApi.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<ActionResult<TModel?>> GetAsync(int id)
+        public virtual async Task<ActionResult<TOutModel?>> GetAsync(int id)
         {
-            var entity = await Controller.GetByIdAsync(id);
+            var accessModel = await DataAccess.GetByIdAsync(id);
 
-            return entity == null ? NotFound() : Ok(ToModel(entity));
+            return accessModel == null ? NotFound() : Ok(ToOutModel(accessModel));
         }
 
         /// <summary>
         /// Adds a model.
         /// </summary>
-        /// <param name="model">Model to add</param>
+        /// <param name="editModel">Model to add</param>
         /// <returns>Data about the created model (including primary key)</returns>
         /// <response code="201">Model created</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public virtual async Task<ActionResult<TModel>> PostAsync([FromBody] TEditModel model)
+        public virtual async Task<ActionResult<TOutModel>> PostAsync([FromBody] TEditModel editModel)
         {
-            var entity = new TEntity();
+            var accessModel = new TAccessModel();
 
-            entity.CopyFrom(model);
-            var insertEntity = await Controller.InsertAsync(entity);
+            accessModel.CopyFrom(editModel);
+            var insertEntity = await DataAccess.InsertAsync(accessModel);
 
-            await Controller.SaveChangesAsync();
+            await DataAccess.SaveChangesAsync();
 
-            return CreatedAtAction("Get", new { id = entity.Id }, ToModel(insertEntity));
+            return CreatedAtAction("Get", new { id = accessModel.Id }, ToOutModel(insertEntity));
         }
 
         /// <summary>
         /// Updates a model
         /// </summary>
         /// <param name="id">Id of the model to update</param>
-        /// <param name="model">Data to update</param>
+        /// <param name="editModel">Data to update</param>
         /// <returns>Data about the updated model</returns>
         /// <response code="200">Model updated</response>
         /// <response code="404">Model not found</response>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<ActionResult<TModel>> PutAsync(int id, [FromBody] TEditModel model)
+        public virtual async Task<ActionResult<TOutModel>> PutAsync(int id, [FromBody] TEditModel editModel)
         {
-            var entity = await Controller.GetByIdAsync(id);
+            var accessModel = await DataAccess.GetByIdAsync(id);
 
-            if (entity != null)
+            if (accessModel != null)
             {
-                entity.CopyFrom(model);
-                await Controller.UpdateAsync(entity);
-                await Controller.SaveChangesAsync();
+                accessModel.CopyFrom(editModel);
+                await DataAccess.UpdateAsync(accessModel);
+                await DataAccess.SaveChangesAsync();
             }
-            return entity == null ? NotFound() : Ok(ToModel(entity));
+            return accessModel == null ? NotFound() : Ok(ToOutModel(accessModel));
         }
 
         /// <summary>
@@ -141,14 +140,14 @@ namespace QuickTemplate.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public virtual async Task<ActionResult> DeleteAsync(int id)
         {
-            var entity = await Controller.GetByIdAsync(id);
+            var accessModel = await DataAccess.GetByIdAsync(id);
 
-            if (entity != null)
+            if (accessModel != null)
             {
-                await Controller.DeleteAsync(entity.Id);
-                await Controller.SaveChangesAsync();
+                await DataAccess.DeleteAsync(accessModel.Id);
+                await DataAccess.SaveChangesAsync();
             }
-            return entity == null ? NotFound() : NoContent();
+            return accessModel == null ? NotFound() : NoContent();
         }
 
         #region Dispose pattern
@@ -159,7 +158,7 @@ namespace QuickTemplate.WebApi.Controllers
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
-                    Controller.Dispose();
+                    DataAccess.Dispose();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
