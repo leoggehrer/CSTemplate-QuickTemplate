@@ -3,7 +3,7 @@
 
 namespace QuickTemplate.Logic
 {
-    public interface IVersionable : IIdentifyable
+    public partial interface IVersionable : IIdentifyable
     {
         byte[]? RowVersion { get; }
     }

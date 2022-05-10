@@ -3,7 +3,11 @@
 
 namespace QuickTemplate.Logic
 {
-    public interface IDataAccess<T> : IDisposable
+    /// <summary>
+    /// Generic interface for data access.
+    /// </summary>
+    /// <typeparam name="T">The generic type.</typeparam>
+    public partial interface IDataAccess<T> : IDisposable
     {
         /// <summary>
         /// Gets the number of quantity in the collection.

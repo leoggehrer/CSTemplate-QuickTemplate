@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QuickTemplate.WebApi.Models
 {
+    /// <summary>
+    /// The model with the version property.
+    /// </summary>
     public abstract partial class VersionModel : IdentityModel, Logic.IVersionable
     {
         /// <summary>

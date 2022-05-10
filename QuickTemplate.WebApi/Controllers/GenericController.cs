@@ -151,6 +151,16 @@ namespace QuickTemplate.WebApi.Controllers
         }
 
         #region Dispose pattern
+        /// <summary>
+        /// Dispose(bool disposing) executes in two distinct scenarios.
+        /// If disposing equals true, the method has been called directly
+        /// or indirectly by a user's code. Managed and unmanaged resources
+        /// can be disposed.
+        /// If disposing equals false, the method has been called by the
+        /// runtime from inside the finalizer and you should not reference
+        /// other objects. Only unmanaged resources can be disposed.
+        /// </summary>
+        /// <param name="disposing">If true, the method has been called directly or indirectly by a user.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -174,6 +184,9 @@ namespace QuickTemplate.WebApi.Controllers
         //     Dispose(disposing: false);
         // }
 
+        /// <summary>
+        /// A derived class should not be able to override this method.
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace QuickTemplate.WpfApp.ViewModels
 {
-    public class RelayCommand : ICommand
+    public partial class RelayCommand : ICommand
     {
         private readonly Action<object?> execute;
         private readonly Predicate<object?>? canExecute;

@@ -3,7 +3,7 @@
 
 namespace QuickTemplate.Logic
 {
-    public interface IIdentifyable
+    public partial interface IIdentifyable
     {
         int Id { get; }
     }

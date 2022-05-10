@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace QuickTemplate.WpfApp.ViewModels
 {
-    public abstract class BaseViewModel : INotifyPropertyChanged
+    public abstract partial class BaseViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
