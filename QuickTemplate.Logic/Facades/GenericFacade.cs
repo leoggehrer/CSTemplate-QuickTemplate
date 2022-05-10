@@ -2,6 +2,7 @@
 //MdStart
 
 using QuickTemplate.Logic.Controllers;
+using System.Linq.Expressions;
 
 namespace QuickTemplate.Logic.Facades
 {
@@ -47,10 +48,27 @@ namespace QuickTemplate.Logic.Facades
             return result;
         }
 
+        #region Count
+        public virtual Task<int> CountAsync()
+        {
+            return Controller.CountAsync();
+        }
+        public virtual Task<int> CountAsync(string predicate, params string[] includeItems)
+        {
+            return Controller.CountAsync(predicate, includeItems);
+        }
+        #endregion Count
+
         #region Queries
         public virtual async Task<TModel[]> GetAllAsync()
         {
             var entities = await Controller.GetAllAsync().ConfigureAwait(false);
+
+            return entities.Select(e => ToModel(e)).ToArray();
+        }
+        public virtual async Task<TModel[]> GetAllAsync(params string[] includeItems)
+        {
+            var entities = await Controller.GetAllAsync(includeItems).ConfigureAwait(false);
 
             return entities.Select(e => ToModel(e)).ToArray();
         }
@@ -59,6 +77,18 @@ namespace QuickTemplate.Logic.Facades
             var entity = await Controller.GetByIdAsync(id).ConfigureAwait(false);
 
             return entity != null ? ToModel(entity) : null;
+        }
+        public virtual async Task<TModel?> GetByIdAsync(int id, params string[] includeItems)
+        {
+            var entity = await Controller.GetByIdAsync(id, includeItems).ConfigureAwait(false);
+
+            return entity != null ? ToModel(entity) : null;
+        }
+        public virtual async Task<TModel[]> QueryAsync(string predicate, params string[] includeItems)
+        {
+            var entities = await Controller.QueryAsync(predicate, includeItems).ConfigureAwait(false);
+
+            return entities.Select(e => ToModel(e)).ToArray();
         }
         #endregion Queries
 

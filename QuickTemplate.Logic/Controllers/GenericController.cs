@@ -1,6 +1,9 @@
 ﻿//@BaseCode
 //MdStart
 
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
+
 namespace QuickTemplate.Logic.Controllers
 {
     /// <summary>
@@ -62,6 +65,49 @@ namespace QuickTemplate.Logic.Controllers
             }
         }
 
+        #region Count
+        /// <summary>
+        /// Gets the number of quantity in the collection.
+        /// </summary>
+        /// <returns>Number of entities in the collection.</returns>
+        public virtual Task<int> CountAsync()
+        {
+            return EntitySet.CountAsync();
+        }
+        /// <summary>
+        /// Returns the number of quantity in the collection based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>Number of entities in the collection.</returns>
+        public virtual Task<int> CountAsync(string predicate, params string[] includeItems)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in includeItems)
+            {
+                query = query.Include(includeItem);
+            }
+            return query.Where(predicate).CountAsync();
+        }
+        /// <summary>
+        /// Returns the number of quantity in the collection based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>Number of entities in the collection.</returns>
+        internal virtual Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, params string[] includeItems)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in includeItems)
+            {
+                query = query.Include(includeItem);
+            }
+            return query.Where(predicate).CountAsync();
+        }
+        #endregion Count
+
         #region Queries
         /// <summary>
         /// Returns all interfaces of the entities in the collection.
@@ -72,6 +118,53 @@ namespace QuickTemplate.Logic.Controllers
             return EntitySet.AsNoTracking().ToArrayAsync();
         }
         /// <summary>
+        /// Returns all interfaces of the entities in the collection.
+        /// </summary>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>All interfaces of the entity collection (with include).</returns>
+        public virtual Task<TEntity[]> GetAllAsync(params string[] includeItems)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in includeItems)
+            {
+                query = query.Include(includeItem);
+            }
+            return query.AsNoTracking().ToArrayAsync();
+        }
+        /// <summary>
+        /// Filters a sequence of values based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>The filter result.</returns>
+        public virtual Task<TEntity[]> QueryAsync(string predicate, params string[] includeItems)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in includeItems)
+            {
+                query = query.Include(includeItem);
+            }
+            return query.Where(predicate).ToArrayAsync();
+        }
+        /// <summary>
+        /// Filters a sequence of values based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>The filter result.</returns>
+        internal virtual Task<TEntity[]> QueryAsync(Expression<Func<TEntity, bool>> predicate, params string[] includeItems)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in includeItems)
+            {
+                query = query.Include(includeItem);
+            }
+            return query.Where(predicate).ToArrayAsync();
+        }
+        /// <summary>
         /// Returns the element of type T with the identification of id.
         /// </summary>
         /// <param name="id">The identification.</param>
@@ -79,6 +172,22 @@ namespace QuickTemplate.Logic.Controllers
         public virtual ValueTask<TEntity?> GetByIdAsync(int id)
         {
             return EntitySet.FindAsync(id);
+        }
+        /// <summary>
+        /// Returns the element of type T with the identification of id.
+        /// </summary>
+        /// <param name="id">The identification.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>The element of the type T with the corresponding identification (with includes).</returns>
+        public virtual Task<TEntity?> GetByIdAsync(int id, params string[] includeItems)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in includeItems)
+            {
+                query = query.Include(includeItem);
+            }
+            return query.FirstOrDefaultAsync(e => e.Id == id);
         }
         #endregion Queries
 
