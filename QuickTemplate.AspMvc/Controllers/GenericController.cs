@@ -27,9 +27,9 @@ namespace QuickTemplate.AspMvc.Controllers
         }
         protected Logic.IDataAccess<TAccessModel> DataAccess { get; init; }
 
-        protected GenericController(Logic.IDataAccess<TAccessModel> controller)
+        protected GenericController(Logic.IDataAccess<TAccessModel> dataAccess)
         {
-            this.DataAccess = controller ?? throw new ArgumentNullException(nameof(controller));
+            this.DataAccess = dataAccess ?? throw new ArgumentNullException(nameof(dataAccess));
         }
 
         protected virtual TAccessModel[] AfterQuery(TAccessModel[] accessModels) => accessModels;
