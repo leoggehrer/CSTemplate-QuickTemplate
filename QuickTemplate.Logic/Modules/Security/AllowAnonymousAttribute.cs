@@ -5,7 +5,7 @@ using System;
 
 namespace QuickTemplate.Logic.Modules.Security
 {
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     internal partial class AllowAnonymousAttribute : AuthorizeAttribute
     {
         public AllowAnonymousAttribute()

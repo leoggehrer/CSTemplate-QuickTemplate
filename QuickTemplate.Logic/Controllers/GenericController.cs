@@ -3,7 +3,6 @@
 
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace QuickTemplate.Logic.Controllers
 {
@@ -11,6 +10,10 @@ namespace QuickTemplate.Logic.Controllers
     /// This class provides the CRUD operations for an entity type.
     /// </summary>
     /// <typeparam name="TEntity">The entity type for which the operations are available.</typeparam>
+#if ACCOUNT_ON
+    using System.Reflection;
+    [Modules.Security.Authorize]
+#endif
     public abstract partial class GenericController<TEntity> : ControllerObject, IDataAccess<TEntity>
         where TEntity : Entities.IdentityEntity, new()
     {

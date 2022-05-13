@@ -108,7 +108,7 @@ namespace QuickTemplate.Logic.Modules.Security
 
                 do
                 {
-                    result = runType.GetCustomAttribute<AuthorizeAttribute>();
+                    result = runType.GetCustomAttributes<AuthorizeAttribute>().FirstOrDefault();
                     runType = runType.BaseType;
                 } while (result == null && runType != null);
                 return result;
