@@ -24,10 +24,10 @@ namespace QuickTemplate.Logic.Entities.Account
 
         [Required]
         [MaxLength(512)]
-        internal byte[] PasswordHash { get; set; } = Array.Empty<byte>();
+        public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
         [Required]
         [MaxLength(512)]
-        internal byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
+        public byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
 
         #region transient properties
         [NotMapped]
@@ -35,6 +35,7 @@ namespace QuickTemplate.Logic.Entities.Account
         #endregion transient properties
 
         // Navigation properties
+        public List<LoginSession> LoginSessions { get; set; } = new();
         public List<IdentityXRole> IdentityXRoles { get; set; } = new();
     }
 }

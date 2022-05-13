@@ -4,6 +4,7 @@
 namespace QuickTemplate.Logic.Entities.Account
 {
     [Table("Roles", Schema = "Account")]
+    [Index(nameof(Designation), IsUnique = true)]
     public partial class Role : VersionEntity
     {
         [Required]

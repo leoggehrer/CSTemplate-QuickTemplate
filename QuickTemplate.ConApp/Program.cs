@@ -1,9 +1,5 @@
 ﻿//@BaseCode
 //MdStart
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace QuickTemplate.ConApp
 {
     public partial class Program
@@ -22,12 +18,19 @@ namespace QuickTemplate.ConApp
             Console.WriteLine(nameof(QuickTemplate));
             Console.WriteLine(DateTime.Now);
             BeforeRun();
-
+#if ACCOUNT_ON
+            CreateAccount();
+#endif
+            CreateImport();
             AfterRun();
             Console.WriteLine(DateTime.Now);
         }
         static partial void BeforeRun();
         static partial void AfterRun();
+#if ACCOUNT_ON
+        static partial void CreateAccount();
+#endif
+        static partial void CreateImport();
     }
 }
 //MdEnd

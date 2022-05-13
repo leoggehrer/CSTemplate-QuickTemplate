@@ -13,8 +13,8 @@ namespace QuickTemplate.Logic.Entities.Account
         [Required]
         [MaxLength(128)]
         public string SessionToken { get; internal set; } = string.Empty;
-        public DateTime LoginTime { get; internal set; }
-        public DateTime LastAccess { get; internal set; }
+        public DateTime LoginTime { get; internal set; } = DateTime.UtcNow;
+        public DateTime LastAccess { get; internal set; } = DateTime.UtcNow;
         public DateTime? LogoutTime
         {
             get
@@ -34,7 +34,7 @@ namespace QuickTemplate.Logic.Entities.Account
             }
         }
         partial void OnLogoutTimeReading();
-        partial void OnLogoutTimeChanging(ref bool handled, System.DateTime? value, ref System.DateTime? _logoutTime);
+        partial void OnLogoutTimeChanging(ref bool handled, DateTime? value, ref DateTime? _logoutTime);
         partial void OnLogoutTimeChanged();
         [MaxLength(4096)]
         public string? OptionalInfo { get; internal set; }

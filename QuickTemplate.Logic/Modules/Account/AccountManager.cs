@@ -30,7 +30,7 @@ namespace QuickTemplate.Logic.Modules.Account
         private static DateTime LastLoginUpdate { get; set; } = DateTime.Now;
         private static ThreadSafeList<LoginSession> LoginSessions { get; } = new ThreadSafeList<LoginSession>();
 
-        #region Public logon
+        #region Public methodes
         public static async Task InitAppAccessAsync(string name, string email, string password, bool enableJwtAuth)
         {
             using var identitiesCtrl = new Controllers.Account.IdentitiesController()
@@ -78,6 +78,61 @@ namespace QuickTemplate.Logic.Modules.Account
             else
             {
                 throw new AuthorizationException(ErrorType.InitAppAccess);
+            }
+        }
+        public static async Task AddAppAccessAsync(string sessionToken, string name, string email, string password, bool enableJwtAuth, params string[] roles)
+        {
+            using var identitiesCtrl = new Controllers.Account.IdentitiesController()
+            {
+                SessionToken = sessionToken,
+            };
+
+            try
+            {
+                var (Hash, Salt) = CreatePasswordHash(password);
+
+                var identity = new Identity
+                {
+                    Guid = Guid.NewGuid().ToString(),
+                    Name = name,
+                    Email = email,
+                    PasswordHash = Hash,
+                    PasswordSalt = Salt,
+                    EnableJwtAuth = enableJwtAuth,
+                };
+
+                if (roles.Length > 0)
+                {
+                    using var rolesCtrl = new Controllers.Account.RolesController(identitiesCtrl);
+                    using var identityXRolesCtrl = new Controllers.Account.IdentityXRolesController(identitiesCtrl);
+                    var dbRoles = await rolesCtrl.GetAllAsync().ConfigureAwait(false);
+
+                    foreach (var role in roles)
+                    {
+                        var accRole = role.Trim();
+                        var dbRole = dbRoles.FirstOrDefault(r => r.Designation.Equals(accRole, StringComparison.CurrentCultureIgnoreCase));
+                        var identityXRole = new IdentityXRole() { Identity = identity };
+
+                        if (dbRole != null)
+                        {
+                            identityXRole.Role = dbRole;
+                        }
+                        else
+                        {
+                            identityXRole.Role = new Role() { Designation = accRole };
+                        }
+                        await identityXRolesCtrl.InsertAsync(identityXRole).ConfigureAwait(false);
+                    }
+                }
+                else
+                {
+                    await identitiesCtrl.InsertAsync(identity).ConfigureAwait(false);
+                }
+                await identitiesCtrl.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
         public static async Task<LoginSession> LogonAsync(string jsonWebToken)
@@ -400,7 +455,9 @@ namespace QuickTemplate.Logic.Modules.Account
                     using var sessionsCtrl = new Controllers.Account.LoginSessionsController(identitiesCtrl);
                     var session = new LoginSession
                     {
-                        Identity = identity
+                        IdentityId = identity.Id,
+                        TimeOutInMinutes = identity.TimeOutInMinutes,
+                        Identity = identity,
                     };
                     session.Roles.AddRange(identity.IdentityXRoles.Select(e => e.Role!));
                     session.JsonWebToken = JsonWebToken.GenerateToken(new Claim[]
