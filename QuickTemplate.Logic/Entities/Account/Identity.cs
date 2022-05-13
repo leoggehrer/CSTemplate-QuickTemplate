@@ -24,10 +24,10 @@ namespace QuickTemplate.Logic.Entities.Account
 
         [Required]
         [MaxLength(512)]
-        internal byte[] PasswordHash { get; set; } = System.Array.Empty<byte>();
+        internal byte[] PasswordHash { get; set; } = Array.Empty<byte>();
         [Required]
         [MaxLength(512)]
-        internal byte[] PasswordSalt { get; set; } = System.Array.Empty<byte>();
+        internal byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
 
         #region transient properties
         [NotMapped]

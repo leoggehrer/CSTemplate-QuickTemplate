@@ -4,17 +4,17 @@
 namespace QuickTemplate.Logic.Entities.Account
 {
     [Table("LoginSessions", Schema = "Account")]
-    internal partial class LoginSession : VersionEntity
+    public partial class LoginSession : VersionEntity
     {
         private DateTime? _logoutTime;
 
-        public int IdentityId { get; set; }
-        public int TimeOutInMinutes { get; set; }
+        public int IdentityId { get; internal set; }
+        public int TimeOutInMinutes { get; internal set; }
         [Required]
         [MaxLength(128)]
-        public string SessionToken { get; set; } = string.Empty;
-        public DateTime LoginTime { get; set; }
-        public DateTime LastAccess { get; set; }
+        public string SessionToken { get; internal set; } = string.Empty;
+        public DateTime LoginTime { get; internal set; }
+        public DateTime LastAccess { get; internal set; }
         public DateTime? LogoutTime
         {
             get
@@ -22,7 +22,7 @@ namespace QuickTemplate.Logic.Entities.Account
                 OnLogoutTimeReading();
                 return _logoutTime;
             }
-            set
+            internal set
             {
                 bool handled = false;
                 OnLogoutTimeChanging(ref handled, value, ref _logoutTime);
@@ -37,7 +37,7 @@ namespace QuickTemplate.Logic.Entities.Account
         partial void OnLogoutTimeChanging(ref bool handled, System.DateTime? value, ref System.DateTime? _logoutTime);
         partial void OnLogoutTimeChanged();
         [MaxLength(4096)]
-        public string? OptionalInfo { get; set; }
+        public string? OptionalInfo { get; internal set; }
 
         #region transient properties
         [NotMapped]
@@ -61,15 +61,15 @@ namespace QuickTemplate.Logic.Entities.Account
             }
         }
         [NotMapped]
-        public bool IsRemoteAuth { get; set;  }
+        public bool IsRemoteAuth { get; internal set;  }
         [NotMapped]
-        public string Origin { get; set; } = string.Empty;
+        public string Origin { get; internal set; } = string.Empty;
         [NotMapped]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; internal set; } = string.Empty;
         [NotMapped]
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; internal set; } = string.Empty;
         [NotMapped]
-        public string JsonWebToken { get; set; } = string.Empty;
+        public string JsonWebToken { get; internal set; } = string.Empty;
 
         internal bool IsActive => IsTimeout == false;
         [NotMapped]
@@ -89,7 +89,7 @@ namespace QuickTemplate.Logic.Entities.Account
         #endregion transient properties
 
         // Navigation properties
-        public Identity? Identity { get; set; }
+        internal Identity? Identity { get; set; }
     }
 }
 #endif
