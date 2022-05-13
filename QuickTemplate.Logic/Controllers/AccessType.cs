@@ -3,7 +3,7 @@
 
 namespace QuickTemplate.Logic.Controllers
 {
-    internal enum AccessType
+    public enum AccessType
     {
         GetBy = 1,
         GetAll = 2 * GetBy,
