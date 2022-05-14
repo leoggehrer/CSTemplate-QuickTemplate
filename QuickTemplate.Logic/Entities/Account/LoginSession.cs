@@ -90,6 +90,21 @@ namespace QuickTemplate.Logic.Entities.Account
 
         // Navigation properties
         internal Identity? Identity { get; set; }
+
+        public LoginSession Clone()
+        {
+            var result = new LoginSession();
+
+            result.CopyFrom(this);
+            foreach (var role in Roles)
+            {
+                var cRole = new Role();
+
+                cRole.CopyFrom(role);
+                result.Roles.Add(cRole);
+            }
+            return result;
+        }
     }
 }
 #endif

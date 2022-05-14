@@ -1,8 +1,6 @@
 ﻿//@BaseCode
 //MdStart
 #if ACCOUNT_ON
-using QuickTemplate.Logic.Entities.Account;
-
 namespace QuickTemplate.Logic.Controllers.Account
 {
     internal sealed partial class LoginSessionsController : GenericController<Entities.Account.LoginSession>
@@ -15,7 +13,7 @@ namespace QuickTemplate.Logic.Controllers.Account
         {
         }
 
-        protected override void BeforeActionExecute(ActionType actionType, LoginSession entity)
+        protected override void BeforeActionExecute(ActionType actionType, Entities.Account.LoginSession entity)
         {
             if (actionType == ActionType.Insert)
             {
@@ -24,7 +22,7 @@ namespace QuickTemplate.Logic.Controllers.Account
             }
             base.BeforeActionExecute(actionType, entity);
         }
-        public Task<LoginSession[]> QueryOpenLoginSessionsAsync()
+        public Task<Entities.Account.LoginSession[]> QueryOpenLoginSessionsAsync()
         {
             return EntitySet.Where(e => e.LogoutTime.HasValue == false)
                             .Include(e => e.Identity)

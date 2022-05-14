@@ -17,19 +17,34 @@ namespace QuickTemplate.WebApi.Controllers
         where TEditModel : class, new()
         where TOutModel : class, new()
     {
-        private bool disposedValue;
+        private bool disposedValue = false;
+#if ACCOUNT_ON
+        private bool initSessionToken = false;
+#endif
+        private Logic.IDataAccess<TAccessModel>? _dataAccess;
 
         /// <summary>
         /// This property controls access to the logic operations.
         /// </summary>
-        protected Logic.IDataAccess<TAccessModel> DataAccess { get; init; }
+        protected Logic.IDataAccess<TAccessModel> DataAccess
+        {
+            get
+            {
+#if ACCOUNT_ON
+                if (initSessionToken == false)
+                {
+                    initSessionToken = true;
+                    _dataAccess!.SessionToken = GetSessionToken();
+                }
+#endif
+                return _dataAccess!;
+            }
+            init => _dataAccess = value;
+        }
 
         internal GenericController(Logic.IDataAccess<TAccessModel> dataAccess)
         {
             DataAccess = dataAccess;
-#if ACCOUNT_ON
-            DataAccess.SessionToken = GetSessionToken();
-#endif
         }
         /// <summary>
         /// Converts an entity to a model and copies all properties of the same name from the entity to the model.
@@ -171,7 +186,8 @@ namespace QuickTemplate.WebApi.Controllers
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
-                    DataAccess.Dispose();
+                    _dataAccess?.Dispose();
+                    _dataAccess = null;
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer

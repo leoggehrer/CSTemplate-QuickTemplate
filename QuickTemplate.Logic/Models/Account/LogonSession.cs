@@ -1,6 +1,6 @@
 ﻿//@BaseCode
 //MdStart
-namespace QuickTemplate.WebApi.Models.Account
+namespace QuickTemplate.Logic.Models.Account
 {
 #if ACCOUNT_ON
     /// <summary>
@@ -33,6 +33,10 @@ namespace QuickTemplate.WebApi.Models.Account
         /// The login info (optional).
         /// </summary>
         public string? OptionalInfo { get; set; }
+        /// <summary>
+        /// The login roles.
+        /// </summary>
+        public Role[] Roles { get; set; } = Array.Empty<Role>();
     }
 #endif
 }

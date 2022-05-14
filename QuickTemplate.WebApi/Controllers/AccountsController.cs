@@ -13,7 +13,7 @@ namespace QuickTemplate.WebApi.Controllers
     public class AccountsController : ControllerBase
     {
         /// <summary>  
-        /// This query determines the payments depending on the parameters.  
+        /// This method checks the login data email/password and, if correct, returns a logon session.  
         /// </summary>  
         /// <param name="email">The user email.</param>  
         /// <param name="password">The password.</param>  
@@ -36,6 +36,17 @@ namespace QuickTemplate.WebApi.Controllers
                 result.CopyFrom(entity);
             }
             return Ok(result);
+        }
+
+        /// <summary>  
+        /// This query determines the payments depending on the parameters.  
+        /// </summary>  
+        /// <param name="sessionToken">The sessionToken.</param>  
+        /// <returns>The logon session object.</returns>  
+        [HttpGet("logout", Name = nameof(LogoutByAsync))]
+        public Task LogoutByAsync([FromQuery(Name = "sessionToken")] string sessionToken)
+        {
+            return Logic.AccountAccess.LogoutAsync(sessionToken);
         }
     }
 }

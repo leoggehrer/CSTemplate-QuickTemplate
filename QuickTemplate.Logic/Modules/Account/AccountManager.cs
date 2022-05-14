@@ -356,8 +356,8 @@ namespace QuickTemplate.Logic.Modules.Account
         #region Internal logon
         internal static async Task<LoginSession?> QueryAliveSessionAsync(string sessionToken)
         {
-            LoginSession? result = LoginSessions.FirstOrDefault(ls => ls.IsActive
-                                                                   && ls.SessionToken.Equals(sessionToken));
+            var result = LoginSessions.FirstOrDefault(ls => ls.IsActive
+                                                         && ls.SessionToken.Equals(sessionToken));
 
             if (result == null)
             {
@@ -380,6 +380,10 @@ namespace QuickTemplate.Logic.Modules.Account
                     {
                         session.Name = identity.Name;
                         session.Email = identity.Email;
+                        session.TimeOutInMinutes = identity.TimeOutInMinutes;
+                        session.PasswordHash = identity.PasswordHash;
+                        session.PasswordSalt = identity.PasswordSalt;
+                        session.Identity = identity;
                         session.Roles.AddRange(await QueryIdentityRolesAsync(sessionsCtrl, identity.Id).ConfigureAwait(false));
                         session.JsonWebToken = JsonWebToken.GenerateToken(new Claim[]
                         {
@@ -387,8 +391,7 @@ namespace QuickTemplate.Logic.Modules.Account
                             new Claim(ClaimTypes.System, nameof(QuickTemplate)),
                         }.Union(session.Roles.Select(e => new Claim(ClaimTypes.Role, e.Designation))));
 
-                        result = new LoginSession();
-                        result.CopyFrom(session);
+                        result = session.Clone();
                         LoginSessions.Add(session);
                     }
                 }
@@ -422,6 +425,11 @@ namespace QuickTemplate.Logic.Modules.Account
 
                     if (session != null && session.IsActive)
                     {
+                        session.Name = identity.Name;
+                        session.Email = identity.Email;
+                        session.TimeOutInMinutes = identity.TimeOutInMinutes;
+                        session.PasswordHash = identity.PasswordHash;
+                        session.PasswordSalt = identity.PasswordSalt;
                         session.Identity = identity;
                         session.Roles.AddRange(await QueryIdentityRolesAsync(sessionsCtrl, identity.Id).ConfigureAwait(false));
                         session.JsonWebToken = JsonWebToken.GenerateToken(new Claim[]
@@ -430,8 +438,7 @@ namespace QuickTemplate.Logic.Modules.Account
                             new Claim(ClaimTypes.System, nameof(QuickTemplate)),
                         }.Union(session.Roles.Select(e => new Claim(ClaimTypes.Role, e.Designation))));
 
-                        result = new LoginSession();
-                        result.CopyFrom(session);
+                        result = session.Clone();
                         LoginSessions.Add(session);
                     }
                 }
@@ -457,7 +464,12 @@ namespace QuickTemplate.Logic.Modules.Account
                     var session = new LoginSession
                     {
                         IdentityId = identity.Id,
+                        Name = identity.Name,
+                        Email = identity.Email,
                         TimeOutInMinutes = identity.TimeOutInMinutes,
+                        PasswordHash = identity.PasswordHash,
+                        PasswordSalt = identity.PasswordSalt,
+                        OptionalInfo = optionalInfo,
                         Identity = identity,
                     };
                     session.Roles.AddRange(identity.IdentityXRoles.Select(e => e.Role!));
@@ -466,7 +478,6 @@ namespace QuickTemplate.Logic.Modules.Account
                         new Claim(ClaimTypes.Email, identity.Email),
                         new Claim(ClaimTypes.System, nameof(QuickTemplate)),
                     }.Union(session.Roles.Select(e => new Claim(ClaimTypes.Role, e.Designation))));
-                    session.OptionalInfo = optionalInfo;
 
                     var entity = await sessionsCtrl.InsertAsync(session).ConfigureAwait(false);
 
@@ -477,15 +488,13 @@ namespace QuickTemplate.Logic.Modules.Account
                     }
                     await sessionsCtrl.SaveChangesAsync().ConfigureAwait(false);
 
-                    result = new LoginSession();
-                    result.CopyFrom(entity);
+                    result = entity.Clone();
                     LoginSessions.Add(entity);
                 }
             }
             else if (VerifyPasswordHash(password, querySession.PasswordHash, querySession.PasswordSalt))
             {
-                result = new LoginSession();
-                result.CopyFrom(querySession);
+                result = querySession.Clone();
             }
             return result;
         }

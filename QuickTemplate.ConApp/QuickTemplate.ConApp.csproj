@@ -8,7 +8,7 @@
   </PropertyGroup>
 
 	<PropertyGroup>
-		<DefineConstants>ACCOUNT_OFF;LOGGING_ON;REVISION_ON</DefineConstants>
+		<DefineConstants>ACCOUNT_ON;LOGGING_ON;REVISION_ON</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
