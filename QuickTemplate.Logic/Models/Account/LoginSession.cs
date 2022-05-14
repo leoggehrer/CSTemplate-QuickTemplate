@@ -6,7 +6,7 @@ namespace QuickTemplate.Logic.Models.Account
     /// <summary>
     /// A model class for the login data.
     /// </summary>
-    public class LogonSession
+    public class LoginSession
     {
         /// <summary>
         /// The reference to the identity.
@@ -37,6 +37,15 @@ namespace QuickTemplate.Logic.Models.Account
         /// The login roles.
         /// </summary>
         public Role[] Roles { get; set; } = Array.Empty<Role>();
+
+        internal static LoginSession Create(Entities.Account.LoginSession loginSession)
+        {
+            var result = new LoginSession();
+
+            result.CopyFrom(loginSession);
+            result.Roles = loginSession.Roles.Select(r => Role.Create(r)).ToArray();
+            return result;
+        }
     }
 #endif
 }

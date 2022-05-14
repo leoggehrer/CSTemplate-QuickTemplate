@@ -4,7 +4,7 @@
 namespace QuickTemplate.Logic.Entities.Account
 {
     [Table("LoginSessions", Schema = "Account")]
-    public partial class LoginSession : VersionEntity
+    internal partial class LoginSession : VersionEntity
     {
         private DateTime? _logoutTime;
 

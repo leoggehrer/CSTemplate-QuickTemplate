@@ -1,7 +1,7 @@
 ﻿//@BaseCode
 //MdStart
 #if ACCOUNT_ON
-using QuickTemplate.Logic.Entities.Account;
+using QuickTemplate.Logic.Models.Account;
 using QuickTemplate.Logic.Modules.Account;
 
 namespace QuickTemplate.Logic
@@ -22,26 +22,34 @@ namespace QuickTemplate.Logic
             return AccountManager.AddAppAccessAsync(sessionToken, name, email, password, timeOutInMinutes, enableJwtAuth, roles);
         }
 
-        public static Task<LoginSession> LogonAsync(string jsonWebToken)
+        public static async Task<LoginSession> LogonAsync(string jsonWebToken)
         {
-            return AccountManager.LogonAsync(jsonWebToken);
+            var result = await AccountManager.LogonAsync(jsonWebToken).ConfigureAwait(false);
+
+            return LoginSession.Create(result);
         }
-        public static Task<LoginSession> LogonAsync(string email, string password)
+        public static async Task<LoginSession> LogonAsync(string email, string password)
         {
-            return AccountManager.LogonAsync(email, password);
+            var result = await AccountManager.LogonAsync(email, password).ConfigureAwait(false);
+
+            return LoginSession.Create(result);
         }
-        public static Task<LoginSession> LogonAsync(string email, string password, string optionalInfo)
+        public static async Task<LoginSession> LogonAsync(string email, string password, string optionalInfo)
         {
-            return AccountManager.LogonAsync(email, password, optionalInfo);
+            var result = await AccountManager.LogonAsync(email, password, optionalInfo).ConfigureAwait(false);
+
+            return LoginSession.Create(result);
+        }
+        public static async Task<LoginSession?> QueryLoginAsync(string sessionToken)
+        {
+            var result = await AccountManager.QueryLoginAsync(sessionToken).ConfigureAwait(false);
+
+            return result != null ? LoginSession.Create(result) : null;
         }
 
         public static Task<bool> HasRoleAsync(string sessionToken, string role)
         {
             return AccountManager.HasRoleAsync(sessionToken, role);
-        }
-        public static Task<LoginSession?> QueryLoginAsync(string sessionToken)
-        {
-            return AccountManager.QueryLoginAsync(sessionToken);
         }
         public static Task<IEnumerable<string>> QueryRolesAsync(string sessionToken)
         {

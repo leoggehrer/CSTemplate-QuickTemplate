@@ -73,7 +73,7 @@ namespace QuickTemplate.WebApi.Controllers
                     var useridPassword = encoding.GetString(Convert.FromBase64String(encodedUseridPassword));
 
                     var seperatorIndex = useridPassword.IndexOf(':');
-                    var userid = useridPassword.Substring(0, seperatorIndex);
+                    var userid = useridPassword[..seperatorIndex];
                     var password = useridPassword[(seperatorIndex + 1)..];
                     var login = await Logic.AccountAccess.LogonAsync(userid, password, string.Empty).ConfigureAwait(false);
 
