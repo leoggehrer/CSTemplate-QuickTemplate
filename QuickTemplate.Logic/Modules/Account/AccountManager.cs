@@ -80,7 +80,7 @@ namespace QuickTemplate.Logic.Modules.Account
                 throw new AuthorizationException(ErrorType.InitAppAccess);
             }
         }
-        public static async Task AddAppAccessAsync(string sessionToken, string name, string email, string password, bool enableJwtAuth, params string[] roles)
+        public static async Task AddAppAccessAsync(string sessionToken, string name, string email, string password, int timeOutInMinutes, bool enableJwtAuth, params string[] roles)
         {
             using var identitiesCtrl = new Controllers.Account.IdentitiesController()
             {
@@ -98,6 +98,7 @@ namespace QuickTemplate.Logic.Modules.Account
                     Email = email,
                     PasswordHash = Hash,
                     PasswordSalt = Salt,
+                    TimeOutInMinutes = timeOutInMinutes,
                     EnableJwtAuth = enableJwtAuth,
                 };
 
@@ -512,7 +513,7 @@ namespace QuickTemplate.Logic.Modules.Account
                         {
                             SessionToken = Authorization.SystemAuthorizationToken,
                         };
-                        bool saveChanges = false;
+                        var saveChanges = false;
                         var dbSessions = await sessionsCtrl.QueryOpenLoginSessionsAsync().ConfigureAwait(false);
                         var uncheckSessions = LoginSessions.Where(i => dbSessions.Any() == false
                                                                     || dbSessions.Any(e => e.Id != i.Id));

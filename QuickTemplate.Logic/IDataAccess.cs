@@ -9,6 +9,12 @@ namespace QuickTemplate.Logic
     /// <typeparam name="T">The generic type.</typeparam>
     public partial interface IDataAccess<T> : IDisposable
     {
+#if ACCOUNT_ON
+        /// <summary>
+        /// Sets the authorization token.
+        /// </summary>
+        string SessionToken { set; }
+#endif
         /// <summary>
         /// Gets the number of quantity in the collection.
         /// </summary>

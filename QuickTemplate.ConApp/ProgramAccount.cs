@@ -19,11 +19,11 @@
 
         private static bool EnableJwt => true;
 
-        private static async Task AddAppAccessAsync(string loginEmail, string loginPwd, string user, string email, string pwd, bool enableJwtAuth, params string[] roles)
+        private static async Task AddAppAccessAsync(string loginEmail, string loginPwd, string user, string email, string pwd, int timeOutInMinutes, bool enableJwtAuth, params string[] roles)
         {
             var login = await Logic.AccountAccess.LogonAsync(loginEmail, loginPwd, string.Empty);
 
-            await Logic.AccountAccess.AddAppAccessAsync(login!.SessionToken, user, email, pwd, enableJwtAuth, roles);
+            await Logic.AccountAccess.AddAppAccessAsync(login!.SessionToken, user, email, pwd, timeOutInMinutes, enableJwtAuth, roles);
             await Logic.AccountAccess.LogoutAsync(login!.SessionToken);
         }
 
@@ -32,8 +32,8 @@
             Task.Run(async () =>
             {
                 await Logic.AccountAccess.InitAppAccessAsync(SaUser, SaEmail, SaPwd, true);
-                await AddAppAccessAsync(SaEmail, SaPwd, AaUser, AaEmail, AaPwd, EnableJwt, AaRole);
-                await AddAppAccessAsync(SaEmail, SaPwd, AppUser, AppEmail, AppPwd, EnableJwt, AppRole);
+                await AddAppAccessAsync(SaEmail, SaPwd, AaUser, AaEmail, AaPwd, 30, EnableJwt, AaRole);
+                await AddAppAccessAsync(SaEmail, SaPwd, AppUser, AppEmail, AppPwd, 35, EnableJwt, AppRole);
             }).Wait();
         }
 #endif

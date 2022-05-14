@@ -7,7 +7,11 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup>
+	<PropertyGroup>
+		<DefineConstants>ACCOUNT_OFF;LOGGING_ON;REVISION_ON</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
   </ItemGroup>
 

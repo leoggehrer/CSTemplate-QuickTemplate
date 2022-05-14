@@ -47,6 +47,21 @@ namespace QuickTemplate.Logic.Facades
             return result;
         }
 
+#if ACCOUNT_ON
+        #region SessionToken
+        /// <summary>
+        /// Sets the session token.
+        /// </summary>
+        public string SessionToken
+        {
+            set
+            {
+                Controller.SessionToken = value;
+            }
+        }
+        #endregion SessionToken
+#endif
+
         #region Count
         public virtual Task<int> CountAsync()
         {

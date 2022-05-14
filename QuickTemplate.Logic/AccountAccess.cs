@@ -17,9 +17,9 @@ namespace QuickTemplate.Logic
         {
             return AccountManager.InitAppAccessAsync(name, email, password, enableJwtAuth);
         }
-        public static Task AddAppAccessAsync(string sessionToken, string name, string email, string password, bool enableJwtAuth, params string[] roles)
+        public static Task AddAppAccessAsync(string sessionToken, string name, string email, string password, int timeOutInMinutes, bool enableJwtAuth, params string[] roles)
         {
-            return AccountManager.AddAppAccessAsync(sessionToken, name, email, password, enableJwtAuth, roles);
+            return AccountManager.AddAppAccessAsync(sessionToken, name, email, password, timeOutInMinutes, enableJwtAuth, roles);
         }
 
         public static Task<LoginSession> LogonAsync(string jsonWebToken)

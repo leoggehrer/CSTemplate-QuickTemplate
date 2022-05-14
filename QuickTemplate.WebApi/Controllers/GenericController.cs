@@ -12,7 +12,7 @@ namespace QuickTemplate.WebApi.Controllers
     /// <typeparam name="TOutModel">The type of output model</typeparam>
     [ApiController]
     [Route("api/[controller]")]
-    public abstract partial class GenericController<TAccessModel, TEditModel, TOutModel> : ControllerBase, IDisposable
+    public abstract partial class GenericController<TAccessModel, TEditModel, TOutModel> : ApiControllerBase, IDisposable
         where TAccessModel : class, Logic.IIdentifyable, new()
         where TEditModel : class, new()
         where TOutModel : class, new()
@@ -27,6 +27,9 @@ namespace QuickTemplate.WebApi.Controllers
         internal GenericController(Logic.IDataAccess<TAccessModel> dataAccess)
         {
             DataAccess = dataAccess;
+#if ACCOUNT_ON
+            DataAccess.SessionToken = GetSessionToken();
+#endif
         }
         /// <summary>
         /// Converts an entity to a model and copies all properties of the same name from the entity to the model.

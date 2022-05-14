@@ -1,0 +1,43 @@
+﻿//@BaseCode
+//MdStart
+#if ACCOUNT_ON
+using Microsoft.AspNetCore.Mvc;
+
+namespace QuickTemplate.WebApi.Controllers
+{
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AccountsController : ControllerBase
+    {
+        /// <summary>  
+        /// This query determines the payments depending on the parameters.  
+        /// </summary>  
+        /// <param name="email">The user email.</param>  
+        /// <param name="password">The password.</param>  
+        /// <param name="info">Logoninfo (optional)</param>  
+        /// <returns>The logon session object.</returns>  
+        [HttpGet("logon", Name = nameof(LogonByAsync))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Models.Account.LogonSession>> LogonByAsync(
+            [FromQuery(Name = "email")] string email,
+            [FromQuery(Name = "password")] string password,
+            [FromQuery(Name = "info")] string? info)
+        {
+            var result = default(Models.Account.LogonSession);
+            var entity = await Logic.AccountAccess.LogonAsync(email, password, info ?? string.Empty);
+
+            if (entity != null)
+            {
+                result = new Models.Account.LogonSession();
+
+                result.CopyFrom(entity);
+            }
+            return Ok(result);
+        }
+    }
+}
+#endif
+//MdEnd
