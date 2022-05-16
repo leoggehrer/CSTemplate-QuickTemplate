@@ -24,8 +24,6 @@
         private static string TargetPath { get; set; }
         private static void Main(/*string[] args*/)
         {
-            Console.WriteLine(nameof(TemplateCopier));
-
             RunApp();
         }
 
@@ -41,8 +39,8 @@
                                                    .Concat(StaticLiterals.ProjectExtensions.Select(e => $"{sourceSolutionName}{e}"));
 
                 Console.Clear();
-                Console.WriteLine("Solution copier!");
-                Console.WriteLine("================");
+                Console.WriteLine("Template Copier");
+                Console.WriteLine("===============");
                 Console.WriteLine();
                 Console.WriteLine($"Copy '{sourceSolutionName}' from: {SourcePath}");
                 Console.WriteLine($"Copy to '{targetSolutionName}':   {Path.Combine(TargetPath, targetSolutionName)}");

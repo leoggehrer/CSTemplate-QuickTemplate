@@ -38,10 +38,10 @@ namespace TemplateComparison.ConApp
 
         private static void Main(/*string[] args*/)
         {
-            DoBalancing();
+            RunApp();
         }
 
-        private static void DoBalancing()
+        private static void RunApp()
         {
             bool running = false;
 
@@ -113,8 +113,8 @@ namespace TemplateComparison.ConApp
             var index = 0;
             Console.Clear();
             Console.SetCursorPosition(0, 0);
-            Console.WriteLine($"{nameof(TemplateComparison)}:");
-            Console.WriteLine("==========================================");
+            Console.WriteLine("Template Comparison");
+            Console.WriteLine("===================");
             Console.WriteLine();
             Console.WriteLine($"Source: {sourcePath}");
             Console.WriteLine();

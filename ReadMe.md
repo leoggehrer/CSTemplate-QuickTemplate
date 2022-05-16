@@ -48,8 +48,9 @@ Dem Entwickler stehen unterschiedliche Hilfsmittel fuer die Erstellung von Proje
   
 |Projekt|Beschreibung|Typ|Abhaengigkeit  
 |---|---|---|---|  
-|**TemplateCopier.ConApp**|Diese Anwendung dient zum Kopieren des ***QuickTemplate***. Die Vorlage dient als Basis fuer viele zukuenftige Projekte und muss dementsprechend kopiert werden. Der *TemplateCopier* kopiert alle Teilprojekte in den Zielordner und fuehrt eine Umbenennung der Komponenten durch.|Console|CommonBase  
-|**TemplateComparsion.ConApp**|Dieses Projekt dient zum Abgleich aller mit dem Template erstellten Domaen-Projekten.|Console|CommonBase  
+|**TemplateCopier.ConApp**|Diese Anwendung dient zum Kopieren der Vorlage ***'QuickTemplate'***. Die Vorlage dient als Basis fuer viele zukuenftige Projekte und muss dementsprechend kopiert werden. Der *TemplateCopier* kopiert alle Teilprojekte in den Zielordner und fuehrt eine Umbenennung der Komponenten durch.|Console|CommonBase  
+|**TemplateComparsion.ConApp**|Dieses Projekt dient zum Abgleich der Vorlage ***'QuickTemplate'*** mit den bereits erstellten Domaen-Projekten. Alle Dateien mit dem Label `@BaseCode` im Template und dem Label `@CodeCopy` im Domaen-Projekt werden abgeglichen.|Console|CommonBase  
+|**TemplatePreprocessor.ConApp**|Dieses Projekt dient zum Setzen der Direktiven (z.B. ACCOUNT_ON usw.) in der entspechenden Solution.|Console|CommonBase  
   
 # Verwendung der Vorlage  
   
