@@ -7,6 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DefineConstants>ACCOUNT_OFF;LOGGING_OFF;REVISION_OFF</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\CommonBase\CommonBase.csproj" />
   </ItemGroup>

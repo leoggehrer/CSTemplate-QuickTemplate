@@ -57,10 +57,14 @@ namespace TemplatePreprocessor.ConApp
                 Console.WriteLine("Solution Preprocessor");
                 Console.WriteLine("=====================");
                 Console.WriteLine();
+                Console.WriteLine($"Directives: {string.Join(" ", Directives)}");
+                Console.WriteLine();
                 Console.WriteLine($"Set directives '{sourceSolutionName}' from: {SourcePath}");
                 Console.WriteLine();
                 Console.WriteLine("[1] Change source path");
-                Console.WriteLine("[2] Start copy process");
+                Console.WriteLine("[2] Set directives ON");
+                Console.WriteLine("[3] Set directives OFF");
+                Console.WriteLine("[4] Start assignment process...");
                 Console.WriteLine("[x|X] Exit");
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -78,6 +82,20 @@ namespace TemplatePreprocessor.ConApp
                     }
                 }
                 else if (input.Equals("2"))
+                {
+                    for (int i = 0; i < Directives.Length; i++)
+                    {
+                        Directives[i] = Directives[i].Replace("_OFF", "_ON");
+                    }
+                }
+                else if (input.Equals("3"))
+                {
+                    for (int i = 0; i < Directives.Length; i++)
+                    {
+                        Directives[i] = Directives[i].Replace("_ON", "_OFF");
+                    }
+                }
+                else if (input.Equals("4"))
                 {
                     SetPreprocessorDirectivesInProjectFiles(SourcePath, Directives);
                     EditPreprocessorDirectivesInRazorFiles(SourcePath, Directives);

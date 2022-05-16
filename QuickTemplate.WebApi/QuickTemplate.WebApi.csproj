@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -8,7 +8,7 @@
   </PropertyGroup>
 
 	<PropertyGroup>
-		<DefineConstants>ACCOUNT_ON;LOGGING_ON;REVISION_ON</DefineConstants>
+		<DefineConstants>ACCOUNT_OFF;LOGGING_OFF;REVISION_OFF</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

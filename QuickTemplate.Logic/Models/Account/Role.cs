@@ -1,6 +1,6 @@
 ﻿//@BaseCode
 //MdStart
-
+#if ACCOUNT_ON
 namespace QuickTemplate.Logic.Models.Account
 {
     public class Role
@@ -17,4 +17,5 @@ namespace QuickTemplate.Logic.Models.Account
         }
     }
 }
+#endif
 //MdEnd
