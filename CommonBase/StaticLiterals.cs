@@ -22,6 +22,7 @@
         {
             "TemplateComparsion.ConApp",
             "TemplateCopier.ConApp",
+            "TemplatePreprocessor.ConApp",
         };
 
         public static string GeneratedCodeLabel => "@GeneratedCode";
