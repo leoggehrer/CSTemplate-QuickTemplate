@@ -21,20 +21,13 @@ namespace QuickTemplate.WebApi.Controllers
         /// <returns>The logon session object.</returns>  
         [HttpGet("logon", Name = nameof(LogonByAsync))]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Models.Account.LogonSession>> LogonByAsync(
+        public async Task<ActionResult<Logic.Models.Account.LoginSession>> LogonByAsync(
             [FromQuery(Name = "email")] string email,
             [FromQuery(Name = "password")] string password,
             [FromQuery(Name = "info")] string? info)
         {
-            var result = default(Models.Account.LogonSession);
-            var entity = await Logic.AccountAccess.LogonAsync(email, password, info ?? string.Empty);
+            var result = await Logic.AccountAccess.LogonAsync(email, password, info ?? string.Empty);
 
-            if (entity != null)
-            {
-                result = new Models.Account.LogonSession();
-
-                result.CopyFrom(entity);
-            }
             return Ok(result);
         }
 

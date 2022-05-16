@@ -3,6 +3,7 @@
 #if ACCOUNT_ON
 namespace QuickTemplate.Logic.Controllers.Account
 {
+    [Modules.Security.Authorize("SysAdmin", "AppAdmin")]
     internal sealed partial class IdentitiesController : GenericController<Entities.Account.Identity>
     {
         public IdentitiesController()

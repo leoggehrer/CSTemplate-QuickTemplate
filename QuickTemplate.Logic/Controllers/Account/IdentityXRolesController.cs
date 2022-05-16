@@ -5,6 +5,7 @@ using QuickTemplate.Logic.Entities.Account;
 
 namespace QuickTemplate.Logic.Controllers.Account
 {
+    [Modules.Security.Authorize("SysAdmin", "AppAdmin")]
     internal sealed partial class IdentityXRolesController : GenericController<Entities.Account.IdentityXRole>
     {
         public IdentityXRolesController()

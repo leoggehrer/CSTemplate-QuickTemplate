@@ -163,12 +163,10 @@ namespace QuickTemplate.Logic.Modules.Account
 
                         if (identity != null)
                         {
-                            var login = await QueryLoginByEmailAsync(identity.Email, identity.Password, string.Empty).ConfigureAwait(false);
+                            result = await QueryLoginByEmailAsync(identity.Email, identity.Password, string.Empty).ConfigureAwait(false);
 
-                            if (login != null)
+                            if (result != null)
                             {
-                                result = new LoginSession();
-                                result.CopyFrom(login);
                                 result.IsRemoteAuth = true;
                             }
                         }
@@ -187,14 +185,8 @@ namespace QuickTemplate.Logic.Modules.Account
         }
         public static async Task<LoginSession> LogonAsync(string email, string password, string optionalInfo)
         {
-            var result = default(LoginSession);
-            var login = await QueryLoginByEmailAsync(email, password, optionalInfo).ConfigureAwait(false);
+            var result = await QueryLoginByEmailAsync(email, password, optionalInfo).ConfigureAwait(false);
 
-            if (login != null)
-            {
-                result = new LoginSession();
-                result.CopyFrom(login);
-            }
             return result ?? throw new AuthorizationException(ErrorType.InvalidAccount);
         }
         public static async Task<bool> IsSessionAliveAsync(string sessionToken)

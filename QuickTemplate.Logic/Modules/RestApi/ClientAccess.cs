@@ -31,7 +31,18 @@ namespace QuickTemplate.Logic.Modules.RestApi
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaType));
             return client;
         }
+#if ACCOUNT_ON
+        protected static HttpClient CreateClient(string baseAddress, string sessionToken)
+        {
+            HttpClient client =CreateClient(baseAddress);
 
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer",
+                    Convert.ToBase64String(Encoding.ASCII.GetBytes($"{sessionToken}")));
+
+            return client;
+        }
+#endif
         public static async Task<T[]> GetAsync<T>(string baseUri, string extUri)
         {
             using var client = CreateClient(baseUri);

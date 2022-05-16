@@ -26,6 +26,11 @@
         {
             Console.WriteLine(nameof(TemplateCopier));
 
+            RunApp();
+        }
+
+        private static void RunApp()
+        {
             var input = string.Empty;
             var targetSolutionName = "TargetSolution";
 
