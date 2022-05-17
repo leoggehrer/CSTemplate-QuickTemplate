@@ -1,0 +1,65 @@
+@*@BaseCode*@
+@*#if ACCOUNT_ON*@@*
+@{
+    @using Microsoft.AspNetCore.Mvc.Rendering
+    @using QuickTemplate.AspMvc.Modules.Session
+
+    var sessionInfo = new SessionWrapper(Context.Session);
+    var mnoLogon = ("Logon");
+    var mnuLogout = ("Logout");
+    var mnuAccessAuth = ("Access-Authorization");
+    var mnuIdentityUser = ("Identity-User");
+    var mnuRoleMngr = ("Role-Management");
+    var mnuPwdChange = ("Change password");
+    var mnuPwdReset = ("Reset password");
+    var mnuUser = string.Empty;
+
+    if (sessionInfo.IsAuthenticated)
+    {
+        mnuUser = sessionInfo.LoginSession?.Name;
+    }
+
+    @if (sessionInfo.IsAuthenticated && sessionInfo.IsSessionAlive)
+    {
+        using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">@mnuUser</a>
+                    <ul class="dropdown-menu">
+                        @if (sessionInfo.HasRole(QuickTemplate.Logic.StaticLiterals.RoleSysAdmin) == true)
+                        {
+                            <li class="dropdown-item">@Html.ActionLink(mnuAccessAuth, "Index", "AppAccesses", routeValues: null, htmlAttributes: null)</li>
+                            <li class="dropdown-item">@Html.ActionLink(mnuIdentityUser, "Index", "IdentityUsers", routeValues: null, htmlAttributes: null)</li>
+                            <li class="dropdown-item">@Html.ActionLink(mnuRoleMngr, "Index", "Roles", routeValues: null, htmlAttributes: null)</li>
+                            <li class="dropdown-item">@Html.ActionLink(mnuPwdChange, "ChangePassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+                            <li class="dropdown-item">@Html.ActionLink(mnuPwdReset, "ResetPassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+                        }
+                        else if (sessionInfo.HasRole(QuickTemplate.Logic.StaticLiterals.RoleAppAdmin) == true)
+                        {
+                            <li class="dropdown-item">@Html.ActionLink(mnuAccessAuth, "Index", "AppAccesses", routeValues: null, htmlAttributes: null)</li>
+                            <li class="dropdown-item">@Html.ActionLink(mnuIdentityUser, "Index", "IdentityUsers", routeValues: null, htmlAttributes: null)</li>
+                            <li class="dropdown-item">@Html.ActionLink(mnuRoleMngr, "Index", "Roles", routeValues: null, htmlAttributes: null)</li>
+                            <li class="dropdown-item">@Html.ActionLink(mnuPwdChange, "ChangePassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+                            <li class="dropdown-item">@Html.ActionLink(mnuPwdReset, "ResetPassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+                        }
+                        else
+                        {
+                            <li class="dropdown-item">@Html.ActionLink(mnuPwdChange, "ChangePassword", "Account", routeValues: null, htmlAttributes: new { title = "Manage" })</li>
+                        }
+                        <li class="dropdown-item"><a href="javascript:document.getElementById('logoutForm').submit()">@mnuLogout<i style="margin-left: 1em;" class="fas fa-sign-out-alt"></i></a></li>
+                    </ul>
+                </li>
+            </ul>
+        }
+    }
+    else
+    {
+        <ul class="nav navbar-nav navbar-right">
+            <li>@Html.ActionLink(mnoLogon, "Logon", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+        </ul>
+    }
+}
+*@@*#endif*@

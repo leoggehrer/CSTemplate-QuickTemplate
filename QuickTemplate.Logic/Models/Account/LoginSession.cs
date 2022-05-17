@@ -20,7 +20,10 @@ namespace QuickTemplate.Logic.Models.Account
         /// The time of registration.
         /// </summary>
         public DateTime LoginTime { get; set; }
-
+        /// <summary>
+        /// The time of logout.
+        /// </summary>
+        public DateTime? LogoutTime { get; set; }
         /// <summary>
         /// The user name.
         /// </summary>

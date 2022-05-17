@@ -22,6 +22,11 @@ namespace QuickTemplate.AspMvc.Models.Account
         public DateTime LoginTime { get; set; }
 
         /// <summary>
+        /// The time of logout.
+        /// </summary>
+        public DateTime? LogoutTime { get; set; }
+
+        /// <summary>
         /// The user name.
         /// </summary>
         public string Name { get; set; } = string.Empty;
