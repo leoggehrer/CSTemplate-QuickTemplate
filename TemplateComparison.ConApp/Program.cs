@@ -14,15 +14,7 @@ namespace TemplateComparison.ConApp
 
             UserPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             SourcePath = GetCurrentSolutionPath();
-
-            // Project: QuickTemplate-Projects
-            var directoryInfo = new DirectoryInfo(SourcePath);
-            var parentDirectory = directoryInfo.Parent != null ? directoryInfo.Parent.FullName : SourcePath;
-            var qtDirectories = Directory.GetDirectories(parentDirectory, "QT*", SearchOption.AllDirectories)
-                                         .Where(d => d.Replace(UserPath, String.Empty).Contains('.') == false)
-                                         .ToList();
-            TargetPaths = qtDirectories.ToArray();
-            // End: QuickTemplate-Projects
+            TargetPaths = Array.Empty<string>();
             ClassConstructed();
         }
         static partial void ClassConstructing();
@@ -48,6 +40,18 @@ namespace TemplateComparison.ConApp
             do
             {
                 var input = string.Empty;
+                var handled = false;
+                var targetPaths = new List<string>();
+
+                BeforeGetTargetPaths(SourcePath, targetPaths, ref handled);
+                if (handled == false)
+                {
+                    TargetPaths = GetQuickTemplateProjects(SourcePath);
+                }
+                else
+                {
+                    TargetPaths = TargetPaths.ToArray();
+                }
                 PrintHeader(SourcePath, TargetPaths);
 
                 Console.Write($"Balancing [1..{TargetPaths.Length}|X...Quit]: ");
@@ -310,5 +314,16 @@ namespace TemplateComparison.ConApp
 
             return AppContext.BaseDirectory[..endPos];
         }
+        private static string[] GetQuickTemplateProjects(string sourcePath)
+        {
+            var directoryInfo = new DirectoryInfo(sourcePath);
+            var parentDirectory = directoryInfo.Parent != null ? directoryInfo.Parent.FullName : SourcePath;
+            var qtDirectories = Directory.GetDirectories(parentDirectory, "QT*", SearchOption.AllDirectories)
+                                         .Where(d => d.Replace(UserPath, String.Empty).Contains('.') == false)
+                                         .ToList();
+            return qtDirectories.ToArray();
+        }
+        static partial void BeforeGetTargetPaths(string sourcePath, List<string> targetPaths, ref bool handled);
+        static partial void AfterGetTargetPaths(string sourcePath, List<string> targetPaths);
     }
 }

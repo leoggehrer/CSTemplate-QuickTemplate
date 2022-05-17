@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using QuickTemplate.AspMvc.Modules.Session;
 #if ACCOUNT_ON
+using Microsoft.AspNetCore.Mvc.Filters;
 using QuickTemplate.AspMvc.Controllers.Account;
 #endif
 namespace QuickTemplate.AspMvc.Controllers
