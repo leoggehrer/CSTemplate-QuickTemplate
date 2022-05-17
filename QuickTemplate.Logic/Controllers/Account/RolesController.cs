@@ -4,7 +4,7 @@
 namespace QuickTemplate.Logic.Controllers.Account
 {
     [Modules.Security.Authorize("SysAdmin", "AppAdmin")]
-    internal sealed partial class RolesController : GenericController<Entities.Account.Role>
+    public sealed partial class RolesController : GenericController<Entities.Account.Role>
     {
         public RolesController()
         {

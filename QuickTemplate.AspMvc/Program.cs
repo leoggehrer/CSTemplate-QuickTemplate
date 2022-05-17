@@ -6,6 +6,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 
+// Add logic data access components
+#if ACCOUNT_ON
+builder.Services.AddTransient<QuickTemplate.Logic.IDataAccess<QuickTemplate.Logic.Entities.Account.Role>, QuickTemplate.Logic.Controllers.Account.RolesController>();
+#endif
+
 // Add session cookie
 builder.Services.AddSession(options =>
 {
