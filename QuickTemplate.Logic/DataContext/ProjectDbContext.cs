@@ -29,13 +29,6 @@ namespace QuickTemplate.Logic.DataContext
         static partial void BeforeClassInitialize();
         static partial void AfterClassInitialize();
 
-#if ACCOUNT_ON
-        public DbSet<Entities.Account.Identity>? IdentitySet { get; set; }
-        public DbSet<Entities.Account.Role>? RoleSet { get; set; }
-        public DbSet<Entities.Account.IdentityXRole>? IdentityXRoleSet { get; set; }
-        public DbSet<Entities.Account.User>? UserSet { get; set; }
-        public DbSet<Entities.Account.LoginSession>? LoginSessionSet { get; set; }
-#endif
         public ProjectDbContext()
         {
             Constructing();
@@ -66,33 +59,6 @@ namespace QuickTemplate.Logic.DataContext
             GetDbSet(ref result, ref handled);
             if (handled == false || result == null)
             {
-#if ACCOUNT_ON
-                if (typeof(E) == typeof(Entities.Account.Identity))
-                {
-                    handled = true;
-                    result = IdentitySet as DbSet<E>;
-                }
-                else if (typeof(E) == typeof(Entities.Account.Role))
-                {
-                    handled = true;
-                    result = RoleSet as DbSet<E>;
-                }
-                else if (typeof(E) == typeof(Entities.Account.IdentityXRole))
-                {
-                    handled = true;
-                    result = IdentityXRoleSet as DbSet<E>;
-                }
-                else if (typeof(E) == typeof(Entities.Account.User))
-                {
-                    handled = true;
-                    result = UserSet as DbSet<E>;
-                }
-                else if (typeof(E) == typeof(Entities.Account.LoginSession))
-                {
-                    handled = true;
-                    result = LoginSessionSet as DbSet<E>;
-                }
-#endif
             }
             return result ?? Set<E>();
         }

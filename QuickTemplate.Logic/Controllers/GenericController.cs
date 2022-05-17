@@ -10,10 +10,6 @@ namespace QuickTemplate.Logic.Controllers
     /// This class provides the CRUD operations for an entity type.
     /// </summary>
     /// <typeparam name="TEntity">The entity type for which the operations are available.</typeparam>
-#if ACCOUNT_ON
-    using System.Reflection;
-    [Modules.Security.Authorize]
-#endif
     public abstract partial class GenericController<TEntity> : ControllerObject, IDataAccess<TEntity>
         where TEntity : Entities.IdentityEntity, new()
     {
@@ -76,9 +72,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>Number of entities in the collection.</returns>
         public virtual async Task<int> CountAsync()
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.QueryCount).ConfigureAwait(false);
-#endif
             return await ExecuteCountAsync().ConfigureAwait(false);
         }
         /// <summary>
@@ -97,9 +90,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>Number of entities in the collection.</returns>
         public virtual async Task<int> CountAsync(string predicate, params string[] includeItems)
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.QueryCountBy).ConfigureAwait(false);
-#endif
             return await ExecuteCountAsync(predicate, includeItems).ConfigureAwait(false);
         }
         /// <summary>
@@ -144,9 +134,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>All interfaces of the entity collection.</returns>
         public virtual async Task<TEntity[]> GetAllAsync()
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetAll).ConfigureAwait(false);
-#endif
             return await ExecuteGetAllAsync().ConfigureAwait(false);
         }
         /// <summary>
@@ -164,9 +151,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>All interfaces of the entity collection (with include).</returns>
         public virtual async Task<TEntity[]> GetAllAsync(params string[] includeItems)
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetAll).ConfigureAwait(false);
-#endif
             return await ExecuteGetAllAsync(includeItems).ConfigureAwait(false);
         }
         /// <summary>
@@ -193,9 +177,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The filter result.</returns>
         public virtual async Task<TEntity[]> QueryAsync(string predicate, params string[] includeItems)
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.QueryBy).ConfigureAwait(false);
-#endif
             return await ExecuteQueryAsync(predicate, includeItems).ConfigureAwait(false);
         }
         /// <summary>
@@ -238,9 +219,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The element of the type T with the corresponding identification.</returns>
         public virtual async ValueTask<TEntity?> GetByIdAsync(int id)
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetBy).ConfigureAwait(false);
-#endif
             return await ExecuteGetByIdAsync(id).ConfigureAwait(false);
         }
         /// <summary>
@@ -260,9 +238,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The element of the type T with the corresponding identification (with includes).</returns>
         public virtual async Task<TEntity?> GetByIdAsync(int id, params string[] includeItems)
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetBy).ConfigureAwait(false);
-#endif
             return await ExecuteGetByIdAsync(id, includeItems).ConfigureAwait(false);
         }
         /// <summary>
@@ -337,9 +312,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The inserted entity.</returns>
         public virtual async Task<TEntity> InsertAsync(TEntity entity)
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.Insert).ConfigureAwait(false);
-#endif
             return await ExecuteInsertAsync(entity).ConfigureAwait(false);
         }
         /// <summary>
@@ -363,9 +335,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The inserted entities.</returns>
         public virtual async Task<IEnumerable<TEntity>> InsertAsync(IEnumerable<TEntity> entities)
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.InsertArray).ConfigureAwait(false);
-#endif
             return await ExecuteInsertAsync(entities).ConfigureAwait(false);
         }
         /// <summary>
@@ -395,9 +364,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The the modified entity.</returns>
         public virtual async Task<TEntity> UpdateAsync(TEntity entity)
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.Update).ConfigureAwait(false);
-#endif
             return await ExecuteUpdateAsync(entity).ConfigureAwait(false);
         }
         /// <summary>
@@ -421,9 +387,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The updated entities.</returns>
         public virtual async Task<IEnumerable<TEntity>> UpdateAsync(IEnumerable<TEntity> entities)
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.UpdateArray).ConfigureAwait(false);
-#endif
             return await ExecuteUpdateAsync(entities).ConfigureAwait(false);
         }
         /// <summary>
@@ -452,9 +415,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <param name="id">The identification.</param>
         public virtual async Task DeleteAsync(int id)
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.Delete).ConfigureAwait(false);
-#endif
             await ExecuteDeleteAsync(id).ConfigureAwait(false);
         }
         /// <summary>
@@ -483,9 +443,6 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The number of state entries written to the underlying database.</returns>
         public async Task<int> SaveChangesAsync()
         {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.Save).ConfigureAwait(false);
-#endif
             return await ExecuteSaveChangesAsync().ConfigureAwait(false);
         }
         /// <summary>
