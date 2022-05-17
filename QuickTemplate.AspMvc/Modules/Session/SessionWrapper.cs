@@ -123,9 +123,9 @@ namespace QuickTemplate.AspMvc.Modules.Session
 
 #if ACCOUNT_ON
         #region Authentication
-        public Models.Persistence.Account.LoginSession? LoginSession
+        public Models.Account.LoginSession? LoginSession
         {
-            get => Session.Get<Models.Persistence.Account.LoginSession>(nameof(LoginSession));
+            get => Session.Get<Models.Account.LoginSession>(nameof(LoginSession));
             set => Session.Set(nameof(LoginSession), value);
         }
         public string SessionToken
@@ -153,9 +153,7 @@ namespace QuickTemplate.AspMvc.Modules.Session
 
                 if (IsAuthenticated)
                 {
-                    var accMngr = new Adapters.Modules.Account.AccountManager();
-
-                    result = Task.Run(async () => await accMngr.IsSessionAliveAsync(SessionToken).ConfigureAwait(false)).Result;
+                    result = Task.Run(async () => await Logic.AccountAccess.IsSessionAliveAsync(SessionToken).ConfigureAwait(false)).Result;
                 }
                 return result;
             }
@@ -167,12 +165,10 @@ namespace QuickTemplate.AspMvc.Modules.Session
 
             if (loginSession != null)
             {
-                var accMngr = new Adapters.Modules.Account.AccountManager();
-
-                result = Task.Run(async () => await accMngr.HasRoleAsync(loginSession.SessionToken, role).ConfigureAwait(false)).Result;
+                result = Task.Run(async () => await Logic.AccountAccess.HasRoleAsync(loginSession.SessionToken, role).ConfigureAwait(false)).Result;
                 for (int i = 0; result == false && i < further.Length; i++)
                 {
-                    result = Task.Run(async () => await accMngr.HasRoleAsync(loginSession.SessionToken, further[i]).ConfigureAwait(false)).Result;
+                    result = Task.Run(async () => await Logic.AccountAccess.HasRoleAsync(loginSession.SessionToken, further[i]).ConfigureAwait(false)).Result;
                 }
             }
             return result;

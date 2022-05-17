@@ -35,7 +35,7 @@ namespace QuickTemplate.AspMvc.Modules.Session
 
 #if ACCOUNT_ON
         #region Authentication
-        Models.Persistence.Account.LoginSession? LoginSession { get; set; }
+        Models.Account.LoginSession? LoginSession { get; set; }
         string SessionToken => LoginSession?.SessionToken ?? string.Empty;
         bool IsAuthenticated { get; }
         bool IsSessionAlive { get; }

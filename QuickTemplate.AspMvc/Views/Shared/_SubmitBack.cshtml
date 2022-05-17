@@ -1,0 +1,29 @@
+@*@BaseCode*@
+@{
+    @model QuickTemplate.AspMvc.Models.View.SubmitBackCmd
+
+    <div class="d-flex bg-transparent">
+        @if (Model.RightAlign)
+        {
+            <div class="mr-auto"></div>
+        }
+        @if (Model.FromSubmitToBack)
+        {
+            <div class="p-sm-2">
+                <input type="submit" value="@Model.SubmitText" class="@Model.SubmitCss" style="@Model.SubmitStyle" />
+            </div>
+            <div class="p-sm-2" style="margin-left: 0.2em">
+                @Html.ActionLink(Model.BackText, Model.BackAction, Model.BackController, null, new { @class = Model.BackCss, style = Model.BackStyle })
+            </div>
+        }
+        else
+        {
+            <div class="p-sm-2">
+                @Html.ActionLink(Model.BackText, Model.BackAction, Model.BackController, Model.BackRouteValues, new { @class = Model.BackCss, style = Model.BackStyle })
+            </div>
+            <div class="p-sm-2" style="margin-left: 0.2em">
+                <input type="submit" value="@Model.SubmitText" class="@Model.SubmitCss" style="@Model.SubmitStyle" />
+            </div>
+        }
+    </div>
+}
