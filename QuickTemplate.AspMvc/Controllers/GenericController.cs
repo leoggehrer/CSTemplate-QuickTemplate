@@ -2,6 +2,9 @@
 //MdStart
 #nullable disable
 using Microsoft.AspNetCore.Mvc;
+#if ACCOUNT_ON
+using Microsoft.AspNetCore.Mvc.Filters;
+#endif
 
 namespace QuickTemplate.AspMvc.Controllers
 {
@@ -32,6 +35,14 @@ namespace QuickTemplate.AspMvc.Controllers
             this.DataAccess = dataAccess ?? throw new ArgumentNullException(nameof(dataAccess));
         }
 
+#if ACCOUNT_ON
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+
+            DataAccess.SessionToken = SessionInfo.SessionToken;
+        }
+#endif
         protected virtual TAccessModel[] AfterQuery(TAccessModel[] accessModels) => accessModels;
         protected virtual TViewModel ToViewModel(TAccessModel accessModel, ActionMode actionMode)
         {

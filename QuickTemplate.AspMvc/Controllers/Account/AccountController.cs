@@ -72,10 +72,7 @@ namespace QuickTemplate.AspMvc.Controllers.Account
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(viewModel.IdentityUrl))
-                    {
-                        await ExecuteLogonAsync(viewModel).ConfigureAwait(false);
-                    }
+                    await ExecuteLogonAsync(viewModel).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {

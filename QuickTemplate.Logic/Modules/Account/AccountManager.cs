@@ -372,9 +372,6 @@ namespace QuickTemplate.Logic.Modules.Account
                     {
                         session.Name = identity.Name;
                         session.Email = identity.Email;
-                        session.TimeOutInMinutes = identity.TimeOutInMinutes;
-                        session.PasswordHash = identity.PasswordHash;
-                        session.PasswordSalt = identity.PasswordSalt;
                         session.Identity = identity;
                         session.Roles.AddRange(await QueryIdentityRolesAsync(sessionsCtrl, identity.Id).ConfigureAwait(false));
                         session.JsonWebToken = JsonWebToken.GenerateToken(new Claim[]
@@ -419,9 +416,6 @@ namespace QuickTemplate.Logic.Modules.Account
                     {
                         session.Name = identity.Name;
                         session.Email = identity.Email;
-                        session.TimeOutInMinutes = identity.TimeOutInMinutes;
-                        session.PasswordHash = identity.PasswordHash;
-                        session.PasswordSalt = identity.PasswordSalt;
                         session.Identity = identity;
                         session.Roles.AddRange(await QueryIdentityRolesAsync(sessionsCtrl, identity.Id).ConfigureAwait(false));
                         session.JsonWebToken = JsonWebToken.GenerateToken(new Claim[]
@@ -458,9 +452,6 @@ namespace QuickTemplate.Logic.Modules.Account
                         IdentityId = identity.Id,
                         Name = identity.Name,
                         Email = identity.Email,
-                        TimeOutInMinutes = identity.TimeOutInMinutes,
-                        PasswordHash = identity.PasswordHash,
-                        PasswordSalt = identity.PasswordSalt,
                         OptionalInfo = optionalInfo,
                         Identity = identity,
                     };

@@ -7,9 +7,10 @@ namespace QuickTemplate.Logic.Entities.Account
     internal partial class LoginSession : VersionEntity
     {
         private DateTime? _logoutTime;
+        private Identity? identity;
 
         public int IdentityId { get; internal set; }
-        public int TimeOutInMinutes { get; internal set; }
+        public int TimeOutInMinutes { get; private set; }
         [Required]
         [MaxLength(128)]
         public string SessionToken { get; internal set; } = string.Empty;
@@ -41,27 +42,11 @@ namespace QuickTemplate.Logic.Entities.Account
 
         #region transient properties
         [NotMapped]
-        internal byte[] PasswordHash
-        {
-            get => Identity != null ? Identity.PasswordHash : Array.Empty<byte>();
-            set
-            {
-                if (Identity != null)
-                    Identity.PasswordHash = value;
-            }
-        }
+        public byte[] PasswordHash { get; private set; } = Array.Empty<byte>();
         [NotMapped]
-        internal byte[] PasswordSalt
-        {
-            get => Identity != null ? Identity.PasswordSalt : Array.Empty<byte>();
-            set
-            {
-                if (Identity != null)
-                    Identity.PasswordSalt = value;
-            }
-        }
+        public byte[] PasswordSalt { get; private set; } = Array.Empty<byte>();
         [NotMapped]
-        public bool IsRemoteAuth { get; internal set;  }
+        public bool IsRemoteAuth { get; internal set; }
         [NotMapped]
         public string Origin { get; internal set; } = string.Empty;
         [NotMapped]
@@ -71,9 +56,9 @@ namespace QuickTemplate.Logic.Entities.Account
         [NotMapped]
         public string JsonWebToken { get; internal set; } = string.Empty;
 
-        internal bool IsActive => IsTimeout == false;
+        public bool IsActive => IsTimeout == false;
         [NotMapped]
-        internal bool IsTimeout
+        public bool IsTimeout
         {
             get
             {
@@ -83,14 +68,23 @@ namespace QuickTemplate.Logic.Entities.Account
             }
         }
         [NotMapped]
-        internal bool HasChanged { get; set; }
+        public bool HasChanged { get; set; }
         [NotMapped]
-        internal List<Role> Roles { get; } = new();
+        public List<Role> Roles { get; } = new();
         #endregion transient properties
 
         // Navigation properties
-        internal Identity? Identity { get; set; }
-
+        public Identity? Identity
+        {
+            get => identity;
+            set
+            {
+                identity = value;
+                TimeOutInMinutes = identity != null ? identity.TimeOutInMinutes : 0;
+                PasswordHash = identity != null ? identity.PasswordHash : Array.Empty<byte>();
+                PasswordSalt = identity != null ? identity.PasswordSalt : Array.Empty<byte>();
+            }
+        }
         public LoginSession Clone()
         {
             var result = new LoginSession();
