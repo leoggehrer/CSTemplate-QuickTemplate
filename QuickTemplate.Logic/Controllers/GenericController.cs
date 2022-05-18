@@ -429,7 +429,7 @@ namespace QuickTemplate.Logic.Controllers
             {
                 ValidateEntity(ActionType.Delete, entity);
                 BeforeActionExecute(ActionType.Delete, entity);
-                await BeforeActionExecuteAsync(ActionType.Update, entity).ConfigureAwait(false);
+                await BeforeActionExecuteAsync(ActionType.Delete, entity).ConfigureAwait(false);
                 EntitySet.Remove(entity);
                 AfterActionExecute(ActionType.Delete);
             }
