@@ -1,8 +1,7 @@
 ﻿QuickTemplate  
 =============  
   
-Das Projekt ***QuickTemplate*** ist eine Vorlage fuer die Erstellung von datenzentrierten Anwendungen. Ausgehend von dieser Vorlage  
-koennen neue Anwendungen erstellt und erweitert werden.   
+Das Projekt ***QuickTemplate*** ist eine Vorlage fuer die Erstellung von datenzentrierten Anwendungen. Ausgehend von dieser Vorlage koennen neue Anwendungen, sogenannte Domain-Projekte, erstellt und erweitert werden.  
   
 # Inhaltsverzeichnis  
 1. [Infrastruktur](#infrastruktur)  
@@ -17,40 +16,40 @@ koennen neue Anwendungen erstellt und erweitert werden.
   
 Zur Umsetzung des Projektes wird DotNetCore (6.0 und hoeher) als Framework, die Programmiersprache CSharp (C#) und die Entwicklungsumgebung Visual Studio 2022 Community verwendet. Alle Komponenten koennen kostenlos aus dem Internet heruntergeladen werden.  
   
-In diese Dokumentation werden unterschiedlichste Begriffe verwendet. In der nachfolgenden Tabelle werden die wichtigsten Begriffe zusammengefasst und erlaeutert:  
+In diese Dokumentation werden unterschiedliche Begriffe verwendet. In der nachfolgenden Tabelle werden die wichtigsten Begriffe zusammengefasst und erlaeutert:  
   
-|Begriff|Bedeutung|Synonym(e)|  
-|---|---|---|  
-|**Solution**|Ist der Zusammenschluss von verschiedenen Teilprojekten zu einer Gesamtloesung.|Gesamtloesung, Loesung, Projekt|  
-|**Domain Solution**|Hier ist eine Gesamtloesung gemeint, welches fuer einen bestimmten Problembereich eine Loesung darstellt.|Problemloesung, Projekt|  
-|**Teilprojekt**|Ist die Zusammenstellung von Klassen und/oder Algorithmen, welches eine logische Einheit fuer die Loesungen bestimmter Teilprobleme bildet.|Teilloesung, Projekteinheit, Projekt|  
-|**Projekttyp**|Unter Projekttyp wird die physikalische Beschaffenheit eines Projektes bezeichnet. Es gibt zwei grundlegende Typen von Projekten. Zum einen gibt es einen wiederverwendbaren und zum anderen einen ausfuehrbaren Projekttyp. <br>**Als Regel gilt:**<br> Alle Programmteile werden in wiederverwendbare Projekte implementiert. Die ausfuehrbaren Einheiten dienen nur als Startprojekte und leiten die Anfragen an die wiederverwendbaren Projekt-Komponenten weiter.|Bibliothekstyp, Consolentyp|  
-|**Libray**|Kennzeichnet einen wiederverwendbaren Projekttyp.|Bibliothek|  
-|**Console**|Kennzeichnet einen ausfuehrbaren Projekttyp. Dieser Typ startet eine Konsole fuer die Ausfuehrung.|Konsole|  
-|**Host**|Dieser Typ kennzeichnet ein ausfuehrbares Projekt, welches zum Starten den IIS verwendet oder im Modus 'selfhosting' gestartet werden kann.|Web-Application |  
-|**Abhaengigkeit**|Die Abhaengikeit beschreibt die Beziehungen von Projekten untereinander. Benoetigt ein Projekt Funktionalitaeten aus einem andern Projekt, so wird eine Projektreferenz zum anderen Projekt benoetigt.|Projektreferenz, Referenz, Dependency, Projektverweis|  
+|Begriff|Bedeutung|Synonym(e)|
+|---|---|---|
+|**Solution**|Ist eine Zusammenstellung von verschiedenen Teilprojekten zu einer Gesamtloesung.|Gesamtloesung, Loesung, Projekt|
+|**Domain Solution**|Hier ist eine Gesamtloesung gemeint, welches fuer einen bestimmten Problembereich eine Loesung darstellt.|Problemloesung, Projekt|
+|**Teilprojekt**|Ist die Zusammenstellung von Klassen und/oder Algorithmen, welches eine logische Einheit fuer die Loesungen bestimmter Teilprobleme bildet.|Teilloesung, Projekteinheit, Projekt|
+|**Projekttyp**|Unter Projekttyp wird die physikalische Beschaffenheit eines Projektes bezeichnet. Es gibt zwei grundlegende Typen von Projekten:<br>   - Ein wiederverwendbares Projekt (wie eine Bibliothek) und <br>  - ein ausfuehrbares Projekt (Konsolenanwendung, WepApi, AspMvc usw.). <br>**Als Regel gilt:**<br> Alle Programmteile werden in `wiederverwendbaren Projekten` implementiert. Die ausfuehrbaren Einheiten dienen nur als Startprojekte und leiten die Anfragen an die `wiederverwendbaren Projekt-Komponenten` weiter.|Bibliothekstyp, Consolentyp|
+|**Library oder Bibliothek**|Kennzeichnet einen `wiederverwendbaren Projekttyp`.|Bibliothek|
+|**Console**|Kennzeichnet einen ausfuehrbaren Projekttyp. Dieser Typ startet eine Konsole fuer die Ausfuehrung.|Konsole|
+|**Host**|Dieser Typ kennzeichnet ein ausfuehrbares Projekt, welches zum Starten den IIS verwendet oder im Modus 'selfhosting' gestartet werden kann.|Web-Application |
+|**Abhaengigkeit**|Die Abhaengikeit beschreibt die Beziehungen von Projekten untereinander. Benoetigt ein Projekt Funktionalitaeten aus einem andern Projekt, so wird eine Projektreferenz zum anderen Projekt benoetigt.|Projektreferenz, Referenz, Dependency, Projektverweis|
   
 ## Template  
 Die Struktur vom 'QuickTemplate' besteht aus unterschiedlichen Teilprojekten und diese in einer Gesamtloesung (im Kontext von Visual Studio ist das eine Solution) zusammengefasst. Eine Erlaeuterung der einzelnen Projekte, deren Typ und die Abhaengigkeit finden sie in der folgenden Tabelle:  
   
-|Projekt|Beschreibung|Typ|Abhaengigkeit|  
-|---|---|---|---|  
-|**CommonBase**|In diesem Projekt werden alle Hilfsfunktionen und allgemeine Erweiterungen zusammengefasst. Diese sind unabhaengig vom Problembereich und koennen auch in andere Domaen-Projekte wiederverwendet werden.|Library|keine|  
-|**QuickTemplate.Logic**|Dieses Projekt beinhaltet den vollstaendigen Datenzugriff, die gesamte Geschaeftslogik und stellt somit den zentralen Baustein des Systems dar.|Library|CommonBase|  
-|**QuickTemplate.WebApi**|In diesem Projekt ist die REST-Schnittstelle implementiert. Diese Modul stellt eine API (Aplication Programming Interface) fuer den Zugriff auf das System ueber das Netzwerk zur Verfuegung.|Host|CommonBase, QuickTemplate.Logic|  
-|**QuickTemplate.ConApp**|Dieses Projekt dient als Initial-Anwendung zum Erstellen der Datenbank, das Anlegen von Anmeldedaten falls die Authentifizierung aktiv ist und zum Importieren von bestehenden Daten. Nach der Initialisierung wird diese Anwendung kaum verwendet.|Console|CommonBase, QuickTemplate.Logic|  
-|**QuickTemplate.AspMvc**|Diese Projekt beinhaltet die Basisfunktionen fuer eine AspWeb-Anwendung und kann als Vorlage fuer die Entwicklung einer einer AspWeb-Anwendung mit dem QuickTemplate verwendet werden.|Host|CommonBase, QuickTemplate.Logic|  
-|**QuickTemplate.WpfApp**|Diese Projekt beinhaltet die Basisfunktionen fuer eine Wpf-Anwendung und kann als Vorlage fuer die Entwicklung einer einer Wpf-Anwendung mit dem QuickTemplate Framework verwendet werden.|Host|CommonBase, QuickTemplate.Logic|  
-|**QuickTemplate.XxxYyy**|Es folgen noch weitere Vorlagen von Client-Anwendungen wie Angular, Blazor und mobile Apps. Zum jetzigen Zeitpunkt existiert nur die AspMvc-Anwendung. Die Erstellung und Beschreibung der anderen Client-Anwendungen erfolgt zu einem spaeteren Zeitpunkt.|Host|CommonBase, QuickTemplate.Logic|  
+|Projekt|Beschreibung|Typ|Abhaengigkeit|
+|---|---|---|---|
+|**CommonBase**|In diesem Projekt werden alle Hilfsfunktionen und allgemeine Erweiterungen zusammengefasst. Diese sind unabhaengig vom Problembereich und koennen auch in andere Domaen-Projekte wiederverwendet werden.|Library|keine|
+|**QuickTemplate.Logic**|Dieses Projekt beinhaltet den vollstaendigen Datenzugriff, die gesamte Geschaeftslogik und stellt somit den zentralen Baustein des Systems dar.|Library|CommonBase|
+|**QuickTemplate.WebApi**|In diesem Projekt ist die REST-Schnittstelle implementiert. Diese Modul stellt eine API (Aplication Programming Interface) fuer den Zugriff auf das System ueber das Netzwerk zur Verfuegung.|Host|CommonBase, QuickTemplate.Logic|
+|**QuickTemplate.ConApp**|Dieses Projekt dient als Initial-Anwendung zum Erstellen der Datenbank, das Anlegen von Anmeldedaten falls die Authentifizierung aktiv ist und zum Importieren von bestehenden Daten. Nach der Initialisierung wird diese Anwendung kaum verwendet.|Console|CommonBase, QuickTemplate.Logic|
+|**QuickTemplate.AspMvc**|Diese Projekt beinhaltet die Basisfunktionen fuer eine AspWeb-Anwendung und kann als Vorlage fuer die Entwicklung einer einer AspWeb-Anwendung mit dem QuickTemplate verwendet werden.|Host|CommonBase, QuickTemplate.Logic|
+|**QuickTemplate.WpfApp**|Diese Projekt beinhaltet die Basisfunktionen fuer eine Wpf-Anwendung und kann als Vorlage fuer die Entwicklung einer einer Wpf-Anwendung mit dem QuickTemplate Framework verwendet werden.|Host|CommonBase, QuickTemplate.Logic|
+|**QuickTemplate.XxxYyy**|Es folgen noch weitere Vorlagen von Client-Anwendungen wie Angular, Blazor und mobile Apps. Zum jetzigen Zeitpunkt existiert nur die AspMvc-Anwendung. Die Erstellung und Beschreibung der anderen Client-Anwendungen erfolgt zu einem spaeteren Zeitpunkt.|Host|CommonBase, QuickTemplate.Logic|
   
 ## Entwicklerwerkzeuge  
 Dem Entwickler stehen unterschiedliche Hilfsmittel fuer die Erstellung von Projekten zur Seite. Die wichtigsten Werkzeuge sind in der nachfolgenden Tabelle zusammengefasst:  
   
 |Projekt|Beschreibung|Typ|Abhaengigkeit  
-|---|---|---|---|  
-|**TemplateCopier.ConApp**|Diese Anwendung dient zum Kopieren der Vorlage ***'QuickTemplate'***. Die Vorlage dient als Basis fuer viele zukuenftige Projekte und muss dementsprechend kopiert werden. Der *TemplateCopier* kopiert alle Teilprojekte in den Zielordner und fuehrt eine Umbenennung der Komponenten durch.|Console|CommonBase  
-|**TemplateComparsion.ConApp**|Dieses Projekt dient zum Abgleich der Vorlage ***'QuickTemplate'*** mit den bereits erstellten Domaen-Projekten. Alle Dateien mit dem Label `@BaseCode` im Template und dem Label `@CodeCopy` im Domaen-Projekt werden abgeglichen.|Console|CommonBase  
-|**TemplatePreprocessor.ConApp**|Dieses Projekt dient zum Setzen der Direktiven (z.B. ACCOUNT_ON usw.) in der entspechenden Solution.|Console|CommonBase  
+|---|---|---|---|
+|**TemplateCopier.ConApp**|Diese Anwendung dient zum Kopieren der Vorlage ***'QuickTemplate'***. Diese Vorlage dient als Basis fuer zukuenftige Projekte und muss entsprechend kopiert werden. Die Anwendung ***TemplateCopier.ConApp*** kopiert alle Teilprojekte aus der Vorlage ***'QuickTemplate'*** in das angegebenen Zielverzeichnis und fuehrt eine Umbenennung der Komponenten durch.|Console|CommonBase  
+|**TemplateComparsion.ConApp**|Dieses Projekt dient zum Abgleich der Vorlage ***'QuickTemplate'*** mit den bereits erstellten ***'Domain-Projekten'***. Alle Dateien welche dem Label `@BaseCode` in der Vorlage ***'QuickTemplate'*** gekennzeichnet sind werden mit den Dateien im ***'Domain-Projekten'*** mit dem Label `@CodeCopy` abgeglichen.|Console|CommonBase  
+|**TemplatePreprocessor.ConApp**|Dieses Projekt dient zum Setzen der Definitionen (z.B. ACCOUNT_ON usw.) in der entspechenden Solution.|Console|CommonBase  
   
 # Verwendung der Vorlage  
   
@@ -63,7 +62,7 @@ Wenn nun ein einfacher Service oder eine Anwendung entwickelt werden soll, dann 
 ### Vorbereitungen  
   
 - Erstellen eines Ordners (z.B.: Develop)  
-- Herunterladen des Repositories ***QuickTemplate*** vom [GitHub](<https://github.com/leoggehrer/CSSoftwareEngineering-QuickTemplate>) und in einem Ordner speichern.  
+- Herunterladen des Repositories ***QuickTemplate*** vom [GitHub](<https://github.com/leoggehrer/CSTemplate-QuickTemplate>) und in einem Ordner speichern.  
   
 > **ACHTUNG:** Der Solution-Ordner von der Vorlage muss ***QuickTemplate*** heißen.  
   
