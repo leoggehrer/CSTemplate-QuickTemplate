@@ -22,11 +22,12 @@ namespace TemplatePreprocessor.ConApp
 
             UserPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             SourcePath = GetCurrentSolutionPath();
-            Directives = new string[]
+            Defines = new string[]
             {
                 "ACCOUNT_OFF",
                 "LOGGING_OFF",
-                "REVISION_OFF"
+                "REVISION_OFF",
+                "DEVELOP_OFF",
             };
             ClassConstructed();
         }
@@ -36,7 +37,7 @@ namespace TemplatePreprocessor.ConApp
         private static string? HomePath { get; set; }
         private static string UserPath { get; set; }
         private static string SourcePath { get; set; }
-        private static string[] Directives { get; set; }
+        private static string[] Defines { get; set; }
 
         private static void Main(/*string[] args*/)
         {
@@ -51,54 +52,59 @@ namespace TemplatePreprocessor.ConApp
 
             while (input.Equals("x") == false)
             {
+                var menuIndex = 0;
                 var sourceSolutionName = GetSolutionNameByPath(SourcePath);
 
                 Console.Clear();
                 Console.WriteLine("Solution Preprocessor");
                 Console.WriteLine("=====================");
                 Console.WriteLine();
-                Console.WriteLine($"Directives: {string.Join(" ", Directives)}");
+                Console.WriteLine($"Define-Values: {string.Join(" ", Defines)}");
                 Console.WriteLine();
-                Console.WriteLine($"Set directives '{sourceSolutionName}' from: {SourcePath}");
+                Console.WriteLine($"Set define-values '{sourceSolutionName}' from: {SourcePath}");
                 Console.WriteLine();
-                Console.WriteLine("[1] Change source path");
-                Console.WriteLine("[2] Set directives ON");
-                Console.WriteLine("[3] Set directives OFF");
-                Console.WriteLine("[4] Start assignment process...");
+                Console.WriteLine($"[{++menuIndex}] Change source path");
+
+                for (int i = 0; i < Defines.Length; i++)
+                {
+                    Console.WriteLine($"[{++menuIndex}] Set directive {(Defines[i].EndsWith("_ON") ? Defines[i].Replace("_ON", "_OFF") : Defines[i].Replace("_OFF", "_ON"))}");
+                }
+
+                Console.WriteLine($"[{++menuIndex}] Start assignment process...");
                 Console.WriteLine("[x|X] Exit");
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write("Choose: ");
                 input = Console.ReadLine()?.ToLower() ?? String.Empty;
 
-                if (input.Equals("1"))
+                if (Int32.TryParse(input, out var select))
                 {
-                    Console.Write("Enter source path: ");
-                    var path = Console.ReadLine();
+                    if (select == 1)
+                    {
+                        Console.Write("Enter source path: ");
+                        var path = Console.ReadLine();
 
-                    if (string.IsNullOrEmpty(path) == false)
-                    {
-                        SourcePath = path;
+                        if (string.IsNullOrEmpty(path) == false)
+                        {
+                            SourcePath = path;
+                        }
                     }
-                }
-                else if (input.Equals("2"))
-                {
-                    for (int i = 0; i < Directives.Length; i++)
+                    else if ((select - 2) >= 0 && (select - 2) < Defines.Length)
                     {
-                        Directives[i] = Directives[i].Replace("_OFF", "_ON");
+                        if (Defines[select - 2].EndsWith("_ON"))
+                        {
+                            Defines[select - 2] = Defines[select - 2].Replace("_ON", "_OFF");
+                        }
+                        else
+                        {
+                            Defines[select - 2] = Defines[select - 2].Replace("_OFF", "_ON");
+                        }
                     }
-                }
-                else if (input.Equals("3"))
-                {
-                    for (int i = 0; i < Directives.Length; i++)
+                    else if ((select - 2) == Defines.Length)
                     {
-                        Directives[i] = Directives[i].Replace("_ON", "_OFF");
+                        SetPreprocessorDirectivesInProjectFiles(SourcePath, Defines);
+                        EditPreprocessorDirectivesInRazorFiles(SourcePath, Defines);
                     }
-                }
-                else if (input.Equals("4"))
-                {
-                    SetPreprocessorDirectivesInProjectFiles(SourcePath, Directives);
-                    EditPreprocessorDirectivesInRazorFiles(SourcePath, Directives);
                 }
                 Console.ResetColor();
             }
