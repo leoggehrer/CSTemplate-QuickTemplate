@@ -47,9 +47,9 @@ Dem Entwickler stehen unterschiedliche Hilfsmittel fuer die Erstellung von Proje
   
 |Projekt|Beschreibung|Typ|Abhaengigkeit  
 |---|---|---|---|
-|**TemplateCopier.ConApp**|Diese Anwendung dient zum Kopieren der Vorlage ***'QuickTemplate'***. Die Vorlage dient als Basis fuer viele zukuenftige Projekte und muss dementsprechend kopiert werden. Der *TemplateCopier* kopiert alle Teilprojekte in den Zielordner und fuehrt eine Umbenennung der Komponenten durch.|Console|CommonBase  
-|**TemplateComparsion.ConApp**|Dieses Projekt dient zum Abgleich der Vorlage ***'QuickTemplate'*** mit den bereits erstellten Domaen-Projekten. Alle Dateien mit dem Label `@BaseCode` im Template und dem Label `@CodeCopy` im Domaen-Projekt werden abgeglichen.|Console|CommonBase  
-|**TemplatePreprocessor.ConApp**|Dieses Projekt dient zum Setzen der Direktiven (z.B. ACCOUNT_ON usw.) in der entspechenden Solution.|Console|CommonBase  
+|**TemplateCopier.ConApp**|Diese Anwendung dient zum Kopieren der Vorlage ***'QuickTemplate'***. Diese Vorlage dient als Basis fuer zukuenftige Projekte und muss entsprechend kopiert werden. Die Anwendung ***TemplateCopier.ConApp*** kopiert alle Teilprojekte aus der Vorlage ***'QuickTemplate'*** in das angegebenen Zielverzeichnis und fuehrt eine Umbenennung der Komponenten durch.|Console|CommonBase  
+|**TemplateComparsion.ConApp**|Dieses Projekt dient zum Abgleich der Vorlage ***'QuickTemplate'*** mit den bereits erstellten ***'Domain-Projekten'***. Alle Dateien welche dem Label `@BaseCode` in der Vorlage ***'QuickTemplate'*** gekennzeichnet sind werden mit den Dateien im ***'Domain-Projekten'*** mit dem Label `@CodeCopy` abgeglichen.|Console|CommonBase  
+|**TemplatePreprocessor.ConApp**|Dieses Projekt dient zum Setzen der Definitionen (z.B. ACCOUNT_ON usw.) in der entspechenden Solution.|Console|CommonBase  
   
 # Verwendung der Vorlage  
   
@@ -62,7 +62,7 @@ Wenn nun ein einfacher Service oder eine Anwendung entwickelt werden soll, dann 
 ### Vorbereitungen  
   
 - Erstellen eines Ordners (z.B.: Develop)  
-- Herunterladen des Repositories ***QuickTemplate*** vom [GitHub](<https://github.com/leoggehrer/CSSoftwareEngineering-QuickTemplate>) und in einem Ordner speichern.  
+- Herunterladen des Repositories ***QuickTemplate*** vom [GitHub](<https://github.com/leoggehrer/CSTemplate-QuickTemplate>) und in einem Ordner speichern.  
   
 > **ACHTUNG:** Der Solution-Ordner von der Vorlage muss ***QuickTemplate*** heißen.  
   
