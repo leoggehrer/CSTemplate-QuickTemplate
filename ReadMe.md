@@ -76,7 +76,7 @@ Als Ausgangsbasis wird die Vorlage ***QuickTemplate*** verwendet. Diese Vorlage 
 Zum Beispiel soll ein Projekt mit dem Namen 'QTMusicStoreLight' erstellt werden. Im 'TemplateCopier' werden folgende Parameter eingestellt:  
   
 ```csharp  
-Solution copier!  
+Solution copier:  
 ================  
   
 Copy 'QuickTemplate' from: ...\source\repos\HtlLeo\CSSoftwareEngineering\QuickTemplate  
@@ -126,7 +126,7 @@ Im naechsten Schritt wird die Anwendung ***TemplateComparsion.ConApp*** gestarte
   
 ```csharp  
 TemplateComparison:  
-==========================================  
+===================  
   
 Source: ...\source\repos\HtlLeo\CSSoftwareEngineering\QuickTemplate\  
   
@@ -137,7 +137,7 @@ Source: ...\source\repos\HtlLeo\CSSoftwareEngineering\QuickTemplate\
 Balancing [1..1|X...Quit]:  
 ```  
   
-Wird nun die Option **[1 oder a]** aktiviert, dann werden alle Dateien im Projekt **QuickTemplate** mit der Kennzeichnung **@BaseCopy** mit den Dateien im Projekt **QTMusicStoreLight** mit der Kennzeichnung **@CodeCopy** abgeglichen.  
+Wird nun die Option **[1 oder a]** aktiviert, dann werden alle Dateien im Projekt **QuickTemplate** mit der Kennzeichnung `@BaseCopy` mit den Dateien im Projekt **QTMusicStoreLight** mit der Kennzeichnung `@CodeCopy` abgeglichen.  
   
 # Umsetzungsschritte  
   
