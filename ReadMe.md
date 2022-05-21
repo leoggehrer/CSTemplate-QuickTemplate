@@ -21,13 +21,13 @@ In diese Dokumentation werden unterschiedliche Begriffe verwendet. In der nachfo
 |Begriff|Bedeutung|Synonym(e)|
 |---|---|---|
 |**Solution**|Ist eine Zusammenstellung von verschiedenen Teilprojekten zu einer Gesamtloesung.|Gesamtloesung, Loesung, Projekt|
-|**Domain Solution**|Hier ist eine Gesamtloesung gemeint, welches fuer einen bestimmten Problembereich eine Loesung darstellt.|Problemloesung, Projekt|
+|**Domain Solution**|Damit ist eine Gesamtloesung gemeint, welches fuer einen bestimmten Problembereich eine Loesung darstellt.|Problemloesung, Projekt|
 |**Teilprojekt**|Ist die Zusammenstellung von Klassen und/oder Algorithmen, welches eine logische Einheit fuer die Loesungen bestimmter Teilprobleme bildet.|Teilloesung, Projekteinheit, Projekt|
-|**Projekttyp**|Unter Projekttyp wird die physikalische Beschaffenheit eines Projektes bezeichnet. Es gibt zwei grundlegende Typen von Projekten:<br>   - Ein wiederverwendbares Projekt (wie eine Bibliothek) und <br>  - ein ausfuehrbares Projekt (Konsolenanwendung, WepApi, AspMvc usw.). <br>**Als Regel gilt:**<br> Alle Programmteile werden in `wiederverwendbaren Projekten` implementiert. Die ausfuehrbaren Einheiten dienen nur als Startprojekte und leiten die Anfragen an die `wiederverwendbaren Projekt-Komponenten` weiter.|Bibliothekstyp, Consolentyp|
-|**Library oder Bibliothek**|Kennzeichnet einen `wiederverwendbaren Projekttyp`.|Bibliothek|
-|**Console**|Kennzeichnet einen ausfuehrbaren Projekttyp. Dieser Typ startet eine Konsole fuer die Ausfuehrung.|Konsole|
-|**Host**|Dieser Typ kennzeichnet ein ausfuehrbares Projekt, welches zum Starten den IIS verwendet oder im Modus 'selfhosting' gestartet werden kann.|Web-Application |
-|**Abhaengigkeit**|Die Abhaengikeit beschreibt die Beziehungen von Projekten untereinander. Benoetigt ein Projekt Funktionalitaeten aus einem andern Projekt, so wird eine Projektreferenz zum anderen Projekt benoetigt.|Projektreferenz, Referenz, Dependency, Projektverweis|
+|**Projekttyp**|Unter Projekttyp wird die physikalische Beschaffenheit eines Projektes bezeichnet. Es gibt zwei grundlegende Typen von Projekten:<br>   - Ein wiederverwendbares Projekt (wie eine Bibliothek) und <br>  - ein ausfuehrbares Projekt (Konsolenanwendung, WepApi, AspMvc usw.). <br>**Als Regel gilt:**<br> Alle Programmteile werden in *wiederverwendbaren Projekten* implementiert. Die ausfuehrbaren Einheiten dienen nur als Startprojekte und leiten die Anfragen an die *wiederverwendbaren Projekt-Komponenten* weiter.|Bibliothekstyp, Consolentyp|
+|**Library oder Bibliothek**|Kennzeichnet einen *wiederverwendbaren Projekttyp*.|Bibliothek|
+|**Console**|Kennzeichnet einen *ausfuehrbaren Projekttyp*. Dieser Typ startet eine Konsole fuer die Ausfuehrung.|Konsole|
+|**Host**|Dieser Typ kennzeichnet ein *ausfuehrbares Projekt*, welches zum Starten den IIS verwendet oder im Modus `selfhosting` gestartet werden kann.|Web-Application |
+|**Abhaengigkeit**|Die Abhaengikeit beschreibt die Beziehungen von Projekten untereinander. Benoetigt ein *Projekt A* Funktionalitaeten aus einem andern *Projekt B*, so wird eine Projektreferenz vom *Projekt B* in *Projekt A* benoetigt.|Projektreferenz, Referenz, Dependency, Projektverweis|
   
 ## Template  
 Die Struktur vom 'QuickTemplate' besteht aus unterschiedlichen Teilprojekten und diese in einer Gesamtloesung (im Kontext von Visual Studio ist das eine Solution) zusammengefasst. Eine Erlaeuterung der einzelnen Projekte, deren Typ und die Abhaengigkeit finden sie in der folgenden Tabelle:  
@@ -71,28 +71,29 @@ Die nachfolgenden Abbildung zeigt den schematischen Erstellungs-Prozess fuer ein
   
 ![Create domain project overview](CreateProjectOverview.png)  
   
-Als Ausgangsbasis wird die Vorlage ***QuickTemplate*** verwendet. Diese Vorlage wird mit Hilfe dem Hilfsprogramm ***'TemplateCopier.ConApp'*** in ein Verzeichnis eigener Wahl kopiert. In diesem Verzeichnis werden alle Projektteile (mit Ausnahme der Hilfsprogramme *TemplateCopier.ConApp* und *TemplateComparison.ConApp*) von der Vorlage kopiert und die Namen der Projekte und Komponenten werden entsprechend angepasst. Alle Projekte mit dem Prefix ***QuickTemplate*** werden mit dem domainspezifischen Namen des Verzeichnisses ersetzt. Beim Kopieren der Dateien von der Vorlage werden alle Dateien mit dem Label ***@BaseCode*** durch den Label ***@CodeCopy*** ersetzt. Diese Label werden fuer den Abgleich-Prozess verwendet.  
+Als Ausgangsbasis wird die Vorlage ***QuickTemplate*** verwendet. Diese Vorlage wird mit Hilfe dem Hilfsprogramm ***'TemplateCopier.ConApp'*** in ein Verzeichnis eigener Wahl kopiert. In diesem Verzeichnis werden alle Projektteile (mit Ausnahme der Hilfsprogramme *TemplateCopier.ConApp*, *TemplateComparison.ConApp* und *TemplatePreprocessor.ConApp*) von der Vorlage kopiert und die Namen der Projekte und Komponenten werden entsprechend angepasst. Alle Projekte mit dem Prefix ***QuickTemplate*** werden mit dem domainspezifischen Namen des Verzeichnisses ersetzt. Beim Kopieren der Dateien von der Vorlage werden alle Dateien mit dem Label ***@BaseCode*** durch den Label ***@CodeCopy*** gekennzeichnet. Diese Label werden fuer den Abgleich-Prozess verwendet.  
   
 Zum Beispiel soll ein Projekt mit dem Namen 'QTMusicStoreLight' erstellt werden. Im 'TemplateCopier' werden folgende Parameter eingestellt:  
   
 ```csharp  
-Solution copier:  
-================  
-  
-Copy 'QuickTemplate' from: ...\source\repos\HtlLeo\CSSoftwareEngineering\QuickTemplate  
-Copy to 'QTMusicStoreLight':   ...\source\repos\HtlLeo\CSSoftwareEngineering\QTMusicStoreLight  
-  
-[1] Change target path  
-[2] Change target solution name  
-[3] Start copy process  
-[x|X] Exit  
-  
-Choose: 3  
+Template Copier
+===============
+
+Copy 'QuickTemplate' from: ...\source\repos\HtlLeo\CSSoftwareEngineering\QuickTemplate
+Copy to 'QTMusicStoreLight':   ...\source\repos\HtlLeo\CSSoftwareEngineering\QTMusicStoreLight
+
+[1] Change source path
+[2] Change target path
+[3] Change target solution name
+[4] Start copy process
+[x|X] Exit
+
+Choose: 4
 ```  
   
 **Hinweis:** Die Vorlage muss im Ordner (*QuickTemplate*) gespeichert sein.  
   
-Nach der Ausfuehren der Option ***'[3] Start copy process'*** befindet sich folgende Projektstruktur im Ordner **...\QTMusicStoreLight**:  
+Nach der Ausfuehren der Option ***'[4] Start copy process'*** befindet sich folgende Projektstruktur im Ordner **...\QTMusicStoreLight**:  
   
 - CommonBase  
 - QTMusicStoreLight.AspMvc  
@@ -103,11 +104,12 @@ Nach der Ausfuehren der Option ***'[3] Start copy process'*** befindet sich folg
   
 Im Projekt ***QuickTemplate*** sind alle Code-Teile, welche als Basis-Code in andere Projekte verwendet werden, mit einem Label ***@BaseCode*** markiert. Dieser Label wird im Zielprojekt mit dem Label ***@CodeCopy*** ersetzt. Das hat den Vorteil, dass Aenderungen in der Vorlage auf die bereits bestehenden Projekte uebertragen werden koennen (naehere Informationen dazu gibt es spaeter).  
   
-> **ACHTUNG:** Im Domain-Projekt duerfen keine Aenderungen von Dateien mit dem Label ***@CodeCopy*** durchgefuehrt werden, da diesen beim naechsten Abgleich wieder ueberschrieben werden. Sollen dennoch Aenderungen vorgenommen werden, dann muss der Label ***@CodeCopy*** geaendert (z.B.: @CustomCode) oder entfernt werden. Damit wird diese Datei vom Abgleich, mit der Verlage, ausgeschlossen.  
+> **ACHTUNG:** Im Domain-Projekt duerfen keine Aenderungen von Dateien mit dem Label ***@CodeCopy*** durchgefuehrt werden, da diesen beim naechsten Abgleich wieder ueberschrieben werden. Sollen dennoch Aenderungen vorgenommen werden, dann muss der Label ***@CodeCopy*** geaendert (z.B.: @CustomCode) oder entfernt werden. Damit wird diese Datei vom Abgleich mit der Verlage ausgeschlossen.  
   
 ## Abgleich mit dem QuickTemplate  
   
-In der Software-Entwicklung gibt es immer wieder Verbesserungen und Erweiterungen. Das betrifft die Vorlage ***QuickTemplate*** genauso wie alle anderen Projekte. Nun stellt sich die Frage: Wie koennen Verbesserungen und/oder Erweiterungen von der Vorlage auf die Domain-Projekte uebertragen werden? In der Vorlage sind die Quellcode-Dateien mit den Labels ***@BaseCode*** gekennzeichnet. Beim Kopieren werden diese Labels durch den Label ***@CodeCopy*** ersetzt. Mit dem Hilfsprogramm *TemplateComparison.ConApp* werden die Dateien mit dem Label ***@BaseCode*** und ***@CodeCopy*** abgeglichen. In der folgenden Skizze ist dieser Prozess dargestellt:  
+In der Software-Entwicklung gibt es immer wieder Verbesserungen und Erweiterungen. Das betrifft die Vorlage ***QuickTemplate*** genauso wie alle anderen Projekte. Nun stellt sich die Frage: Wie koennen Verbesserungen und/oder Erweiterungen von der Vorlage auf die *Domain-Projekte* uebertragen werden?  
+In der Vorlage sind die Quellcode-Dateien mit den Labels ***@BaseCode*** gekennzeichnet. Beim Kopieren werden diese Labels durch den Label ***@CodeCopy*** ersetzt. Mit dem Hilfsprogramm *TemplateComparison.ConApp* werden die Dateien mit dem Label ***@BaseCode*** und ***@CodeCopy*** abgeglichen. In der folgenden Skizze ist dieser Prozess dargestellt:  
   
 ![Template-Comparsion-Overview](TemplateComparsionOverview.png)  
   
@@ -137,7 +139,7 @@ Source: ...\source\repos\HtlLeo\CSSoftwareEngineering\QuickTemplate\
 Balancing [1..1|X...Quit]:  
 ```  
   
-Wird nun die Option **[1 oder a]** aktiviert, dann werden alle Dateien im Projekt **QuickTemplate** mit der Kennzeichnung `@BaseCopy` mit den Dateien im Projekt **QTMusicStoreLight** mit der Kennzeichnung `@CodeCopy` abgeglichen.  
+Wird nun die Option **[1 oder a]** aktiviert, dann werden alle Dateien in der Solution **QuickTemplate** mit der Kennzeichnung `@BaseCopy` mit den Dateien in der Solution  **QTMusicStoreLight** mit der Kennzeichnung `@CodeCopy` abgeglichen.  
   
 # Umsetzungsschritte  
   
