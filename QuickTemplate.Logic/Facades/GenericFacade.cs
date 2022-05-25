@@ -86,7 +86,7 @@ namespace QuickTemplate.Logic.Facades
 
             return entities.Select(e => ToModel(e)).ToArray();
         }
-        public virtual async ValueTask<TModel?> GetByIdAsync(int id)
+        public virtual async Task<TModel?> GetByIdAsync(int id)
         {
             var entity = await Controller.GetByIdAsync(id).ConfigureAwait(false);
 

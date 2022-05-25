@@ -52,7 +52,7 @@ namespace QuickTemplate.Logic
         /// </summary>
         /// <param name="id">The identification.</param>
         /// <returns>The element of the type T with the corresponding identification.</returns>
-        ValueTask<T?> GetByIdAsync(int id);
+        Task<T?> GetByIdAsync(int id);
         /// <summary>
         /// Returns the element of type T with the identification of id.
         /// </summary>

@@ -236,7 +236,7 @@ namespace QuickTemplate.Logic.Controllers
         /// </summary>
         /// <param name="id">The identification.</param>
         /// <returns>The element of the type T with the corresponding identification.</returns>
-        public virtual async ValueTask<TEntity?> GetByIdAsync(int id)
+        public virtual async Task<TEntity?> GetByIdAsync(int id)
         {
 #if ACCOUNT_ON
             await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetBy).ConfigureAwait(false);
