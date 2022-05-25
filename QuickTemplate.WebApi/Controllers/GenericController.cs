@@ -75,6 +75,32 @@ namespace QuickTemplate.WebApi.Controllers
         }
 
         /// <summary>
+        /// Gets the number of quantity in the collection.
+        /// </summary>
+        /// <returns>Number of elements in the collection.</returns>
+        [HttpGet("/api/[controller]/Count")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<int>> GetCountAsync()
+        {
+            var result = await DataAccess.CountAsync();
+
+            return Ok(result);
+        }
+        /// <summary>
+        /// Returns the number of quantity in the collection based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <returns>Number of entities in the collection.</returns>
+        [HttpGet("/api/[controller]/Count/{predicate}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<int>> GetCountByAsync(string predicate)
+        {
+            var result = await DataAccess.CountAsync(predicate);
+
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Gets a list of models
         /// </summary>
         /// <returns>List of models</returns>
@@ -101,6 +127,20 @@ namespace QuickTemplate.WebApi.Controllers
             var accessModel = await DataAccess.GetByIdAsync(id);
 
             return accessModel == null ? NotFound() : Ok(ToOutModel(accessModel));
+        }
+
+        /// <summary>
+        /// Filters a sequence of values based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <returns>The filter result.</returns>
+        [HttpGet("/api/[controller]/Query/{predicate}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAllAsync(string predicate)
+        {
+            var entities = await DataAccess.QueryAsync(predicate);
+
+            return Ok(entities.Select(e => ToOutModel(e)));
         }
 
         /// <summary>
