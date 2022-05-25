@@ -1,0 +1,23 @@
+﻿@*@BaseCode*@
+@model QuickTemplate.AspMvc.Models.IdentityModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>@Model.GetType().Name</h4>
+    <hr />
+    @await Html.PartialAsync("_DisplayModel", Model)
+</div>
+
+<div class="d-flex bg-transparent">
+    <div class="p-sm-2">
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class="btn btn-outline-primary" ,@style="min-width: 8em;"})
+    </div>
+    <div class="p-sm-2" style="margin-left: 0.2em">
+        <a class="btn btn-outline-secondary" style="min-width: 8em;" asp-action="Index">Back to List</a>
+    </div>
+</div>

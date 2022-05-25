@@ -1,0 +1,32 @@
+﻿@*@BaseCode*@
+@model QuickTemplate.AspMvc.Models.IdentityModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Edit</h1>
+
+<h4>@Model!.GetType().Name</h4>
+<hr />
+
+@if (string.IsNullOrEmpty(ViewBag.Error) == false)
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.Error
+    </div>
+}
+
+<form asp-action="Create">
+    @await Html.PartialAsync("_EditModel", Model)
+    <p></p>
+    <div class="form-group">
+        @await Html.PartialAsync("_SubmitBack", new QuickTemplate.AspMvc.Models.View.SubmitBackCmd() { SubmitAction="Create" })
+    </div>
+</form>
+
+@section Scripts {
+    @{
+    //await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+}

@@ -1,0 +1,25 @@
+﻿@*@BaseCode*@
+@model QuickTemplate.AspMvc.Models.IdentityModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>@Model!.GetType().Name</h4>
+    <hr />
+    @if (string.IsNullOrEmpty(ViewBag.Error) == false)
+    {
+        <div class="alert alert-danger" role="alert">
+            @ViewBag.Error
+        </div>
+    }
+    @await Html.PartialAsync("_DisplayModel", Model)
+
+    <form asp-action="Delete">
+        @await Html.PartialAsync("_SubmitBack", new QuickTemplate.AspMvc.Models.View.SubmitBackCmd() { SubmitAction="Delete", SubmitText="Delete", SubmitCss="btn btn-danger", FromSubmitToBack=true })
+    </form>
+</div>
