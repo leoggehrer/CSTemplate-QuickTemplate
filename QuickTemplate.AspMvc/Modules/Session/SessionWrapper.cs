@@ -24,6 +24,17 @@ namespace QuickTemplate.AspMvc.Modules.Session
         }
         #endregion General
 
+        #region Type-Access
+        public void Set<T>(string key, T value)
+        {
+            Session.Set<T>(key, value);
+        }
+        public T? Get<T>(string key)
+        {
+            return Session.Get<T>(key);
+        }
+        #endregion Type-Access
+
         #region Object-Access
         public void SetValue(string key, object value)
         {

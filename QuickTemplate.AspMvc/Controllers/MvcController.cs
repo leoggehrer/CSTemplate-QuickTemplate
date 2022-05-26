@@ -28,8 +28,8 @@ namespace QuickTemplate.AspMvc.Controllers
 
 #region SessionInfo
         public bool IsSessionAvailable => HttpContext?.Session != null;
-        private ISessionWrapper? sessionInfo = null;
-        internal ISessionWrapper SessionInfo => sessionInfo ??= new SessionWrapper(HttpContext.Session);
+        private ISessionWrapper? sessionWrapper = null;
+        internal ISessionWrapper SessionWrapper => sessionWrapper ??= new SessionWrapper(HttpContext.Session);
 #endregion SessionInfo
 
 #if ACCOUNT_ON
@@ -38,12 +38,12 @@ namespace QuickTemplate.AspMvc.Controllers
         {
             if (CheckSessionToken && context.Controller?.GetType().Name.Equals(nameof(AccountController)) == false)
             {
-                if (SessionInfo.IsAuthenticated == false)
+                if (SessionWrapper.IsAuthenticated == false)
                 {
                     ViewBag.Error = ("You are not yet registered. Please log in to the system.");
                     context.Result = new RedirectToActionResult("Logon", "Account", null);
                 }
-                else if (SessionInfo.IsSessionAlive == false)
+                else if (SessionWrapper.IsSessionAlive == false)
                 {
                     ViewBag.Error = ("Your session has expired. Please sign in again.");
                     context.Result = new RedirectToActionResult("Logon", "Account", null);

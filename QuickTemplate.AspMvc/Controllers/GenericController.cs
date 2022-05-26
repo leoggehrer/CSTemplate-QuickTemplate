@@ -40,7 +40,7 @@ namespace QuickTemplate.AspMvc.Controllers
         {
             base.OnActionExecuting(context);
 
-            DataAccess.SessionToken = SessionInfo.SessionToken;
+            DataAccess.SessionToken = SessionWrapper.SessionToken;
         }
 #endif
         protected virtual TAccessModel[] AfterQuery(TAccessModel[] accessModels) => accessModels;
@@ -120,6 +120,12 @@ namespace QuickTemplate.AspMvc.Controllers
                     }
                 }
             }
+            else
+            {
+                ViewBag.Error = string.Join("; ", ModelState.Values
+                                      .SelectMany(x => x.Errors)
+                                      .Select(x => x.ErrorMessage));
+            }
             return View(ToViewModel(accessModel, ActionMode.Index));
         }
 
@@ -172,6 +178,12 @@ namespace QuickTemplate.AspMvc.Controllers
                         ViewBag.Error = ex.InnerException.Message;
                     }
                 }
+            }
+            else
+            {
+                ViewBag.Error = string.Join("; ", ModelState.Values
+                                      .SelectMany(x => x.Errors)
+                                      .Select(x => x.ErrorMessage));
             }
             return string.IsNullOrEmpty(ViewBag.Error) ? RedirectToAction(nameof(Index)) : View(ToViewModel(accessModel, ActionMode.Update));
         }

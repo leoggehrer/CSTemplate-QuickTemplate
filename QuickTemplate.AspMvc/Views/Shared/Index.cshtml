@@ -2,23 +2,29 @@
 @model IEnumerable<QuickTemplate.AspMvc.Models.IdentityModel>
 
 @{
-    ViewData["Title"] = "Index";
+    var title = "Index";
+    var type = Model.GetType();
+    var filter = ViewBag.Filter as object;
+
+    if (type != null)
+    {
+        title = type.GetGenericArguments()[0].Name;
+    }
+    ViewData["Title"] = title;
 }
 
-<h1>Index</h1>
+<h1>@title</h1>
 
 <p>
     <a asp-action="Create" class="btn btn-outline-success">Create New</a>
 </p>
 
-@if (ViewBag.Filter != null)
+@if (filter != null)
 {
-    object filter = ViewBag.Filter as object;
-
     <div class="row">
         <div class="btn-group" role="group" aria-label="Basic outlined example">
-            <button type="button" class="btn btn-outline-primary col-md-1" title="Sort"><i class="fa fa-sort"></i></button>
-            <button type="button" class="btn btn-outline-secondary col-md-10" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">@filter.ToString()</button>
+            @*<button type="button" class="btn btn-outline-primary col-md-1" title="Sort"><i class="fa fa-sort"></i></button>*@
+            <button type="button" class="btn btn-outline-secondary col-md-11" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">@filter.ToString()</button>
             <button type="button" class="btn btn-outline-primary col-md-1" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter" title="Filter"><i class="fa fa-filter"></i></button>
         </div>
     </div>

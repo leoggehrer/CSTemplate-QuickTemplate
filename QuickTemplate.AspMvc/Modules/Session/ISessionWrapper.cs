@@ -9,6 +9,11 @@ namespace QuickTemplate.AspMvc.Modules.Session
         void Remove(string key);
         #endregion General
 
+        #region Type-Access
+        void Set<T>(string key, T value);
+        T? Get<T>(string key);
+        #endregion Type-Access
+
         #region Object-Access
         void SetValue(string key, object value);
         object? GetValue(string key);

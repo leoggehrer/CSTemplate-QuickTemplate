@@ -37,7 +37,7 @@ namespace QuickTemplate.AspMvc.Controllers.Account
             BeforeLogon(viewModel, ref handled);
             if (handled == false)
             {
-                SessionInfo.ReturnUrl = returnUrl;
+                SessionWrapper.ReturnUrl = returnUrl;
                 if (error.HasContent())
                     ViewBag.Error = error;
             }
@@ -64,8 +64,8 @@ namespace QuickTemplate.AspMvc.Controllers.Account
                 return View(viewModel);
             }
             bool handled = false;
-            var action = SessionInfo.ReturnAction ?? "Index";
-            var controller = SessionInfo.ReturnController ?? "Home";
+            var action = SessionWrapper.ReturnAction ?? "Index";
+            var controller = SessionWrapper.ReturnController ?? "Home";
 
             BeforeDoLogon(viewModel, ref handled);
             if (handled == false)
@@ -102,7 +102,7 @@ namespace QuickTemplate.AspMvc.Controllers.Account
             BeforeLogonRemote(viewModel, ref handled);
             if (handled == false)
             {
-                SessionInfo.ReturnUrl = returnUrl;
+                SessionWrapper.ReturnUrl = returnUrl;
                 if (error.HasContent())
                     ViewBag.Error = error;
             }
@@ -115,15 +115,15 @@ namespace QuickTemplate.AspMvc.Controllers.Account
         [ActionName("Logout")]
         public async Task<IActionResult> LogoutAsync()
         {
-            if (SessionInfo.LoginSession != null)
+            if (SessionWrapper.LoginSession != null)
             {
                 bool handled = false;
 
                 BeforeLogout(ref handled);
                 if (handled == false)
                 {
-                    await Logic.AccountAccess.LogoutAsync(SessionInfo.LoginSession.SessionToken).ConfigureAwait(false);
-                    SessionInfo.LoginSession = null;
+                    await Logic.AccountAccess.LogoutAsync(SessionWrapper.LoginSession.SessionToken).ConfigureAwait(false);
+                    SessionWrapper.LoginSession = null;
                 }
                 AfterLogout();
             }
@@ -141,13 +141,13 @@ namespace QuickTemplate.AspMvc.Controllers.Account
             BeforeChangePassword(viewModel, ref handled);
             if (handled == false)
             {
-                if (SessionInfo.LoginSession == null
-                    || SessionInfo.LoginSession.LogoutTime.HasValue)
+                if (SessionWrapper.LoginSession == null
+                    || SessionWrapper.LoginSession.LogoutTime.HasValue)
                 {
                     return RedirectToAction("Logon", new { returnUrl = "ChangePassword" });
                 }
-                viewModel.UserName = SessionInfo.LoginSession?.Name ?? string.Empty;
-                viewModel.Email = SessionInfo.LoginSession?.Email ?? String.Empty;
+                viewModel.UserName = SessionWrapper.LoginSession?.Name ?? string.Empty;
+                viewModel.Email = SessionWrapper.LoginSession?.Email ?? String.Empty;
             }
             AfterChangePassword(viewModel, ref viewName);
             return View(viewName, viewModel);
@@ -170,15 +170,15 @@ namespace QuickTemplate.AspMvc.Controllers.Account
             BeforeDoChangePassword(viewModel, ref handled);
             if (handled == false)
             {
-                if (SessionInfo.LoginSession == null
-                    || SessionInfo.LoginSession.LogoutTime.HasValue)
+                if (SessionWrapper.LoginSession == null
+                    || SessionWrapper.LoginSession.LogoutTime.HasValue)
                 {
                     return RedirectToAction("Logon", new { returnUrl = "ChangePassword" });
                 }
 
                 try
                 {
-                    await Logic.AccountAccess.ChangePasswordAsync(SessionInfo.LoginSession?.SessionToken ?? string.Empty, viewModel.OldPassword, viewModel.NewPassword).ConfigureAwait(false);
+                    await Logic.AccountAccess.ChangePasswordAsync(SessionWrapper.LoginSession?.SessionToken ?? string.Empty, viewModel.OldPassword, viewModel.NewPassword).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -201,8 +201,8 @@ namespace QuickTemplate.AspMvc.Controllers.Account
             BeforeResetPassword(viewModel, ref handled);
             if (handled == false)
             {
-                if (SessionInfo.LoginSession == null
-                    || SessionInfo.LoginSession.LogoutTime.HasValue)
+                if (SessionWrapper.LoginSession == null
+                    || SessionWrapper.LoginSession.LogoutTime.HasValue)
                 {
                     return RedirectToAction("Logon", new { returnUrl = "ChangePassword" });
                 }
@@ -226,15 +226,15 @@ namespace QuickTemplate.AspMvc.Controllers.Account
             var viewName = "ConfirmationResetPassword";
 
             BeforeDoResetPassword(viewModel, ref handled);
-            if (SessionInfo.LoginSession == null
-                || SessionInfo.LoginSession.LogoutTime.HasValue)
+            if (SessionWrapper.LoginSession == null
+                || SessionWrapper.LoginSession.LogoutTime.HasValue)
             {
                 return RedirectToAction("Logon", new { returnUrl = "ResetPassword" });
             }
 
             try
             {
-                await Logic.AccountAccess.ChangePasswordForAsync(SessionInfo.SessionToken, viewModel.Email, viewModel.ConfirmPassword).ConfigureAwait(false);
+                await Logic.AccountAccess.ChangePasswordForAsync(SessionWrapper.SessionToken, viewModel.Email, viewModel.ConfirmPassword).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -258,7 +258,7 @@ namespace QuickTemplate.AspMvc.Controllers.Account
                 {
                     loginSession.CopyFrom(internLogin);
                 }
-                SessionInfo.LoginSession = loginSession;
+                SessionWrapper.LoginSession = loginSession;
             }
             catch (Exception ex)
             {
