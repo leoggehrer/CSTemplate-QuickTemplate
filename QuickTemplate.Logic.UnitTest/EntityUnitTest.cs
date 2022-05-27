@@ -13,7 +13,9 @@ namespace QuickTemplate.Logic.UnitTest
     [TestClass]
     public abstract class EntityUnitTest<T> where T : Entities.IdentityEntity, new()
     {
+#pragma warning disable CA2211 // Non-constant fields should not be visible
         public static int Counter = 0;
+#pragma warning restore CA2211 // Non-constant fields should not be visible
 
         public abstract Controllers.GenericController<T> CreateController();
 

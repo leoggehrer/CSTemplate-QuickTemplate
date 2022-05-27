@@ -1,6 +1,6 @@
 ﻿//@BaseCode
 //MdStart
-#if DEVELOP_ON
+#if DEBUG && DEVELOP_ON
 using QuickTemplate.Logic.DataContext;
 
 namespace QuickTemplate.Logic.Modules.Database
