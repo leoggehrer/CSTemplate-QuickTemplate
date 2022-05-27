@@ -35,6 +35,12 @@ namespace QuickTemplate.Logic.DataContext
         public DbSet<Entities.Account.IdentityXRole>? IdentityXRoleSet { get; set; }
         public DbSet<Entities.Account.User>? UserSet { get; set; }
         public DbSet<Entities.Account.LoginSession>? LoginSessionSet { get; set; }
+#if LOGGING_ON
+        public DbSet<Entities.Logging.ActionLog>? ActionLogSet { get; set; }
+#endif
+#if REVISION_ON
+        public DbSet<Entities.Revision.History>? HistorySet { get; set; }
+#endif
 #endif
         public ProjectDbContext()
         {
@@ -92,6 +98,20 @@ namespace QuickTemplate.Logic.DataContext
                     handled = true;
                     result = LoginSessionSet as DbSet<E>;
                 }
+#if LOGGING_ON
+                else if (typeof(E) == typeof(Entities.Logging.ActionLog))
+                {
+                    handled = true;
+                    result = ActionLogSet as DbSet<E>;
+                }
+#endif
+#if REVISION_ON
+                else if (typeof(E) == typeof(Entities.Revision.History))
+                {
+                    handled = true;
+                    result = HistorySet as DbSet<E>;
+                }
+#endif
 #endif
             }
             return result ?? Set<E>();

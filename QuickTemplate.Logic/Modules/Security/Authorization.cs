@@ -79,7 +79,9 @@ namespace QuickTemplate.Logic.Modules.Security
                         throw new AuthorizationException(ErrorType.NotAuthorized);
 
                     curSession.LastAccess = DateTime.UtcNow;
+#if LOGGING_ON
                     Logging(curSession.IdentityId, originalMethodBase.DeclaringType, originalMethodBase, accessType, infoData);
+#endif
                 }
             }
         }
@@ -147,7 +149,9 @@ namespace QuickTemplate.Logic.Modules.Security
                         throw new AuthorizationException(ErrorType.NotAuthorized);
 
                     curSession.LastAccess = DateTime.UtcNow;
+#if LOGGING_ON
                     Logging(curSession.IdentityId, subjectType, originalMethodBase, accessType, infoData);
+#endif
                 }
             }
         }
@@ -155,9 +159,9 @@ namespace QuickTemplate.Logic.Modules.Security
         static partial void BeforeCheckAuthorization(string? sessionToken, Type subjectType, MethodBase methodBase, AccessType accessType, ref bool handled);
         static partial void AfterCheckAuthorization(string? sessionToken, Type subjectType, MethodBase methodBase, AccessType accessType);
 
+#if LOGGING_ON
         private static void Logging(int identityId, Type? subjectType, MethodBase methodBase, AccessType accessType, string info)
         {
-#if LOGGING_ON
             Task.Run(async () =>
             {
                 bool handled = false;
@@ -169,7 +173,7 @@ namespace QuickTemplate.Logic.Modules.Security
                     {
                         SessionToken = SystemAuthorizationToken
                     };
-                    var entity = new Entities.Account.ActionLog
+                    var entity = new Entities.Logging.ActionLog
                     {
                         IdentityId = identityId,
                         Time = DateTime.Now,
@@ -182,9 +186,7 @@ namespace QuickTemplate.Logic.Modules.Security
                 }
                 AfterLogging(subjectType, methodBase, accessType);
             });
-#endif
         }
-#if LOGGING_ON
         static partial void BeforeLogging(Type? subjectType, MethodBase methodBase, AccessType accessType, ref bool handled);
         static partial void AfterLogging(Type? subjectType, MethodBase methodBase, AccessType accessType);
 #endif

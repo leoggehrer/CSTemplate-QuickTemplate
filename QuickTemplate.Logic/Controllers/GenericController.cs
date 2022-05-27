@@ -352,7 +352,9 @@ namespace QuickTemplate.Logic.Controllers
             ValidateEntity(ActionType.Insert, entity);
             BeforeActionExecute(ActionType.Insert, entity);
             await BeforeActionExecuteAsync(ActionType.Insert, entity).ConfigureAwait(false);
+            BeforeExecuteInsert(entity);
             await EntitySet.AddAsync(entity).ConfigureAwait(false);
+            AfterExecuteInsert(entity);
             AfterActionExecute(ActionType.Insert);
             return entity;
         }
@@ -385,6 +387,9 @@ namespace QuickTemplate.Logic.Controllers
             AfterActionExecute(ActionType.InsertArray);
             return entities;
         }
+        partial void BeforeExecuteInsert(TEntity entity);
+        partial void AfterExecuteInsert(TEntity entity);
+
         #endregion Insert
 
         #region Update
@@ -410,7 +415,9 @@ namespace QuickTemplate.Logic.Controllers
             ValidateEntity(ActionType.Update, entity);
             BeforeActionExecute(ActionType.Update, entity);
             await BeforeActionExecuteAsync(ActionType.Update, entity).ConfigureAwait(false);
+            BeforeExecuteUpdate(entity);
             EntitySet.Update(entity);
+            AfterExecuteUpdate(entity);
             AfterActionExecute(ActionType.Update);
             return entity;
         }
@@ -443,6 +450,8 @@ namespace QuickTemplate.Logic.Controllers
             AfterActionExecute(ActionType.UpdateArray);
             return entities;
         }
+        partial void BeforeExecuteUpdate(TEntity entity);
+        partial void AfterExecuteUpdate(TEntity entity);
         #endregion Update
 
         #region Delete
@@ -470,10 +479,14 @@ namespace QuickTemplate.Logic.Controllers
                 ValidateEntity(ActionType.Delete, entity);
                 BeforeActionExecute(ActionType.Delete, entity);
                 await BeforeActionExecuteAsync(ActionType.Delete, entity).ConfigureAwait(false);
+                BeforeExecuteDelete(entity);
                 EntitySet.Remove(entity);
+                AfterExecuteDelete(entity);
                 AfterActionExecute(ActionType.Delete);
             }
         }
+        partial void BeforeExecuteDelete(TEntity entity);
+        partial void AfterExecuteDelete(TEntity entity);
         #endregion Delete
 
         #region SaveChanges
@@ -499,11 +512,15 @@ namespace QuickTemplate.Logic.Controllers
             if (Context != null)
             {
                 BeforeActionExecute(ActionType.Save);
+                BeforeExecuteSaveChanges();
                 result = await Context.SaveChangesAsync().ConfigureAwait(false);
+                AfterExecuteSaveChanges();
                 AfterActionExecute(ActionType.Save);
             }
             return result;
         }
+        partial void BeforeExecuteSaveChanges();
+        partial void AfterExecuteSaveChanges();
         #endregion SaveChanges
     }
 }

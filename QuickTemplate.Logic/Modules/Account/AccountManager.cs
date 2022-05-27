@@ -346,6 +346,11 @@ namespace QuickTemplate.Logic.Modules.Account
         #endregion Public logon
 
         #region Internal logon
+        internal static LoginSession? QueryLoginSession(string sessionToken)
+        {
+            return LoginSessions.FirstOrDefault(ls => ls.IsActive
+                                                   && ls.SessionToken.Equals(sessionToken));
+        }
         internal static async Task<LoginSession?> QueryAliveSessionAsync(string sessionToken)
         {
             var result = LoginSessions.FirstOrDefault(ls => ls.IsActive

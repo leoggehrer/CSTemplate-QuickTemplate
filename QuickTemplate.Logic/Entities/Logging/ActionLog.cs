@@ -1,10 +1,11 @@
 ﻿//@BaseCode
 //MdStart
 #if ACCOUNT_ON
-namespace QuickTemplate.Logic.Entities.Account
+
+namespace QuickTemplate.Logic.Entities.Logging
 {
-    [Table("ActionLogs", Schema = "Account")]
-    public partial class ActionLog : VersionEntity
+    [Table("ActionLogs", Schema = "Logging")]
+    public partial class ActionLog : IdentityEntity
     {
         public int IdentityId { get; internal set; }
         public DateTime Time { get; internal set; }
