@@ -1,28 +1,37 @@
-﻿#if DEVELOP_ON
+﻿//@BaseCode
+//MdStart
+#if DEVELOP_ON
 using QuickTemplate.Logic.DataContext;
 
 namespace QuickTemplate.Logic.Modules.Database
 {
     public static class DbManager
     {
-        public static Task DeleteDatabaseAsync()
+        public static async Task DeleteDatabaseAsync()
         {
-            var dbContext = new ProjectDbContext();
+            using var dbContext = new ProjectDbContext();
 
-            return dbContext.Database.EnsureDeletedAsync();
+            await dbContext.Database.EnsureDeletedAsync();
         }
-        public static Task MigrateDatabaseAsync()
+        public static async Task MigrateDatabaseAsync()
         {
-            var dbContext = new ProjectDbContext();
+            using var dbContext = new ProjectDbContext();
 
-            return dbContext.Database.MigrateAsync();
+            await dbContext.Database.MigrateAsync();
         }
-        public static Task CreateDatabaseAsync()
+        public static async Task CreateDatabaseAsync()
         {
-            var dbContext = new ProjectDbContext();
+            using var dbContext = new ProjectDbContext();
 
-            return dbContext.Database.EnsureCreatedAsync();
+            await dbContext.Database.EnsureCreatedAsync();
+        }
+        public static async Task ExecuteRawSqlAsync(string sql)
+        {
+            using var dbContext = new ProjectDbContext();
+
+            await dbContext.Database.ExecuteSqlRawAsync(sql);
         }
     }
 }
 #endif
+//MdEnd
