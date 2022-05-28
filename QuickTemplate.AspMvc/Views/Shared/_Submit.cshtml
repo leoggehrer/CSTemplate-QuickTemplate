@@ -1,0 +1,14 @@
+@*@BaseCode*@
+@{
+    @model QuickTemplate.AspMvc.Models.View.SubmitCmd
+
+    <div class="d-flex bg-transparent">
+        @if (Model.RightAlign)
+        {
+            <div class="mr-auto"></div>
+        }
+        <div class="p-sm-2">
+            <input type="submit" value="@Model.SubmitText" class="@Model.SubmitCss" style="@Model.SubmitStyle" />
+        </div>
+    </div>
+}
