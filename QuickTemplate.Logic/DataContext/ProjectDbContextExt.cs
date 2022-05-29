@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace QuickTemplate.Logic.DataContext
+﻿namespace QuickTemplate.Logic.DataContext
 {
+    /// <summary>
+    /// This part is for the domain specific extensions
+    /// </summary>
     partial class ProjectDbContext
     {
     }

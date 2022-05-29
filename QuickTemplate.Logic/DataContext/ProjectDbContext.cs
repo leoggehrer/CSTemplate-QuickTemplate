@@ -4,9 +4,15 @@ using Microsoft.Extensions.Configuration;
 
 namespace QuickTemplate.Logic.DataContext
 {
+    /// <summary>
+    /// Entity Framework data context for the domain project
+    /// </summary>
     internal partial class ProjectDbContext : DbContext
     {
         private static readonly string ConnectionString = "Data Source=(localdb)\\MSSQLLocalDB;Database=QuickTemplateDb;Integrated Security=True";
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProjectDbContext"/> class
+        /// </summary>
         static ProjectDbContext()
         {
             BeforeClassInitialize();
@@ -29,6 +35,9 @@ namespace QuickTemplate.Logic.DataContext
         static partial void BeforeClassInitialize();
         static partial void AfterClassInitialize();
 
+        /// <summary>
+        /// Data sets for account entities
+        /// </summary>
 #if ACCOUNT_ON
         public DbSet<Entities.Account.Identity>? IdentitySet { get; set; }
         public DbSet<Entities.Account.Role>? RoleSet { get; set; }
@@ -64,6 +73,11 @@ namespace QuickTemplate.Logic.DataContext
         static partial void BeforeOnConfiguring(DbContextOptionsBuilder optionsBuilder, ref bool handled);
         static partial void AfterOnConfiguring(DbContextOptionsBuilder optionsBuilder);
 
+        /// <summary>
+        /// Determines the DbSet depending on the type E
+        /// </summary>
+        /// <typeparam name="E">The entity type E</typeparam>
+        /// <returns>The DbSet depending on the type E</returns>
         public DbSet<E> GetDbSet<E>() where E : Entities.IdentityEntity
         {
             var handled = false;
@@ -72,6 +86,7 @@ namespace QuickTemplate.Logic.DataContext
             GetDbSet(ref result, ref handled);
             if (handled == false || result == null)
             {
+                // if the ACCOUNT switched ON
 #if ACCOUNT_ON
                 if (typeof(E) == typeof(Entities.Account.Identity))
                 {
@@ -116,6 +131,12 @@ namespace QuickTemplate.Logic.DataContext
             }
             return result ?? Set<E>();
         }
+        /// <summary>
+        /// Determines the domain project DbSet depending on the type E
+        /// </summary>
+        /// <typeparam name="E">The entity type E</typeparam>
+        /// <param name="dbSet">The DbSet depending on the type E</param>
+        /// <param name="handled">Indicates whether the method found the DbSet</param>
         partial void GetDbSet<E>(ref DbSet<E>? dbSet, ref bool handled) where E : Entities.IdentityEntity;
     }
 }
