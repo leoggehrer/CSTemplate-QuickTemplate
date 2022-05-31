@@ -1,10 +1,5 @@
 ﻿//@BaseCode
 //MdStart
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace TemplatePreprocessor.ConApp
@@ -81,12 +76,30 @@ namespace TemplatePreprocessor.ConApp
                 {
                     if (select == 1)
                     {
-                        Console.Write("Enter source path: ");
-                        var path = Console.ReadLine();
+                        var solutionPath = GetCurrentSolutionPath();
+                        var qtProjects = GetQuickTemplateProjects(solutionPath).Union(new[] { solutionPath }).ToArray();
 
-                        if (string.IsNullOrEmpty(path) == false)
+                        for (int i = 0; i < qtProjects.Length; i++)
                         {
-                            SourcePath = path;
+                            if (i == 0)
+                                Console.WriteLine();
+
+                            Console.WriteLine($"Change path to: [{i + 1}] {qtProjects[i]}");
+                        }
+                        Console.WriteLine();
+                        Console.Write("Select or enter source path: ");
+                        var selectOrPath = Console.ReadLine();
+
+                        if (Int32.TryParse(selectOrPath, out int number))
+                        {
+                            if ((number - 1) >= 0 && (number - 1) < qtProjects.Length)
+                            {
+                                SourcePath = qtProjects[number - 1];
+                            }
+                        }
+                        else if (string.IsNullOrEmpty(selectOrPath) == false)
+                        {
+                            SourcePath = selectOrPath;
                         }
                     }
                     else if ((select - 2) >= 0 && (select - 2) < Defines.Length)
@@ -167,6 +180,15 @@ namespace TemplatePreprocessor.ConApp
                                                           .SingleOrDefault(f => f.Extension.Equals(".sln", StringComparison.CurrentCultureIgnoreCase));
 
             return fileInfo != null ? Path.GetFileNameWithoutExtension(fileInfo.Name) : string.Empty;
+        }
+        private static string[] GetQuickTemplateProjects(string sourcePath)
+        {
+            var directoryInfo = new DirectoryInfo(sourcePath);
+            var parentDirectory = directoryInfo.Parent != null ? directoryInfo.Parent.FullName : SourcePath;
+            var qtDirectories = Directory.GetDirectories(parentDirectory, "QT*", SearchOption.AllDirectories)
+                                         .Where(d => d.Replace(UserPath, String.Empty).Contains('.') == false)
+                                         .ToList();
+            return qtDirectories.ToArray();
         }
 
         private static int SetPreprocessorDirectivesInProjectFiles(string path, params string[] directiveItems)
