@@ -36,11 +36,18 @@ namespace QuickTemplate.Logic.Controllers
         static partial void AfterClassInitialize();
 
         private DbSet<TEntity>? dbSet = null;
+        /// <summary>
+        /// Creates an instance
+        /// </summary>
         public GenericController()
             : base(new DataContext.ProjectDbContext())
         {
 
         }
+        /// <summary>
+        /// Creates an instance
+        /// </summary>
+        /// <param name="other">A reference to an other controller</param>
         public GenericController(ControllerObject other)
             : base(other)
         {
@@ -139,9 +146,9 @@ namespace QuickTemplate.Logic.Controllers
 
         #region Queries
         /// <summary>
-        /// Returns all interfaces of the entities in the collection.
+        /// Returns all of the entities in the collection.
         /// </summary>
-        /// <returns>All interfaces of the entity collection.</returns>
+        /// <returns>All of the entitities in the collection.</returns>
         public virtual async Task<TEntity[]> GetAllAsync()
         {
 #if ACCOUNT_ON
