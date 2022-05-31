@@ -18,6 +18,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7D1E32D0-6289-41AB-B44D-31F87C0C21A2}"
 	ProjectSection(SolutionItems) = preProject
 		AspMvcDataFlow.md = AspMvcDataFlow.md
+		AspMvcDefaultViews.md = AspMvcDefaultViews.md
 		MultiTierArchitecture.md = MultiTierArchitecture.md
 		Nuget.md = Nuget.md
 		ReadMe.md = ReadMe.md
@@ -30,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickTemplate.AspMvc", "Qui
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickTemplate.Logic.UnitTest", "QuickTemplate.Logic.UnitTest\QuickTemplate.Logic.UnitTest.csproj", "{DA2BE746-8EFA-48EB-BE54-F27E3ED868C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplatePreprocessor.ConApp", "TemplatePreprocessor.ConApp\TemplatePreprocessor.ConApp.csproj", "{823A43FC-1128-4EDA-A553-31CA75C29915}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemplatePreprocessor.ConApp", "TemplatePreprocessor.ConApp\TemplatePreprocessor.ConApp.csproj", "{823A43FC-1128-4EDA-A553-31CA75C29915}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
