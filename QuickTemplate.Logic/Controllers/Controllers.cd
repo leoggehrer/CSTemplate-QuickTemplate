@@ -1,9 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
   <Class Name="QuickTemplate.Logic.Controllers.ControllerObject">
-    <Position X="1.75" Y="2.25" Width="2" />
+    <Position X="1.5" Y="0.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAiAAAAAAAAAAAAAAAAAAAACAAAAAAgAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAiAAAAAAAAEAAAAAAAABAACABAAAAgAAAgA=</HashCode>
       <FileName>Controllers\ControllerObject.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -12,24 +16,35 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="QuickTemplate.Logic.DataContext.ProjectDbContext">
-    <Position X="5.25" Y="2.25" Width="1.75" />
+    <Position X="5.75" Y="0.5" Width="2.5" />
     <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAQAAAAAAAAECAEAAAAABAAAABCAAAAAAAgA=</HashCode>
       <FileName>DataContext\ProjectDbContext.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="QuickTemplate.Logic.Controllers.GenericController&lt;E&gt;">
-    <Position X="1.75" Y="5.5" Width="2" />
+  <Class Name="QuickTemplate.Logic.Controllers.GenericController&lt;TEntity&gt;">
+    <Position X="1.5" Y="3.25" Width="2.5" />
     <Compartments>
       <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
     </Compartments>
+    <NestedTypes>
+      <Enum Name="QuickTemplate.Logic.Controllers.GenericController&lt;TEntity&gt;.ActionType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Controllers\GenericController.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>BAkACgQACAgUAFBBCAAQGAIAAABBEAgACAAAAEAAKoA=</HashCode>
       <FileName>Controllers\GenericController.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
