@@ -8,7 +8,7 @@ Die Index-View im Bereich *'Views/Shared'* ist eine Standard-View fuer die Ueber
 
 ### Ein Beispiel fuer die Verwendung der Default Index Ansicht
 
-Im folgenden wird die Verwendung der Standard Index Ansicht fuer das Model *'Person'* mit Filter demonstriert.
+Im folgenden wird die Verwendung der Standard-Index-Ansicht fuer das Model *'Person'* mit Filter demonstriert.
 
 #### Das Model *'Person'*  
 
@@ -35,6 +35,45 @@ public class PersonFilter
     }
 }
 ```  
+#### Die Ansicht *_TableHeader.cshtml* im Ordner */Views/Person*
+
+```csharp  
+@model ...Person
+
+<thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LastName)
+        </th>
+        <th></th>
+    </tr>
+</thead>
+```  
+
+#### Die Ansicht *_TableRow.cshtml* im Ordner */Views/Person*
+
+```csharp  
+@model ...Person
+
+<tr>
+    <td>
+        @Html.DisplayFor(model => model.FirstName)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.LastName)
+    </td>
+    <td>
+        @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
+        @Html.ActionLink("Details", "Details", new { id=Model.Id }) |
+        @Html.ActionLink("Delete", "Delete", new { id=Model.Id })
+    </td>
+</tr>
+```  
+
+Nun kann die Standard-Index-Ansicht ohne Filter verwendet werden. Fuer die Verwendung mit Filter sind weitere Schritte notwendig. Die zusaetzlichen Schritte sind nachfolgen definiert.  
 
 #### Erweiterung des Kontrollers *'PersonsController'* fuer die Filter-Funktion
 
@@ -92,6 +131,38 @@ public class PersonsController : GenericController<Logic.Entities.Person, Models
 }
 ```  
 
+Die Kontroller-Klasse `PersonsController` in der Logic ist um die Abfrage `QueryByAsync(...)` erweitert. Die Implementierung fuer diese Abfrage ist in der Klasse ist wie folgt definiert:
+
+```csharp  
+public sealed partial class PersonsController : GenericController<Entities.Person>
+{
+    public PersonsController()
+    {
+    }
+
+    public PersonsController(ControllerObject other) : base(other)
+    {
+    }
+
+    public Task<Entities.Person[]> QueryByAsync(string? firstName, string? lastName)
+    {
+        var query = EntitySet.AsQueryable();
+
+        if (firstName != null)
+        {
+            query = query.Where(e => e.FirstName.Contains(firstName));
+        }
+        if (lastName != null)
+        {
+            query = query.Where(e => e.LastName.Contains(lastName));
+        }
+        return query.AsNoTracking().ToArrayAsync();
+    }
+}
+```  
+
+
+
 #### Die Ansicht *_Filter.cshtml* im Ordner */Views/Person*
 
 ```csharp  
@@ -117,46 +188,6 @@ public class PersonsController : GenericController<Logic.Entities.Person, Models
     </div>
 </div>
 ```  
-
-#### Die Ansicht *_TableHeader.cshtml* im Ordner */Views/Person*
-
-```csharp  
-@model ...Person
-
-<thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.FirstName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LastName)
-        </th>
-        <th></th>
-    </tr>
-</thead>
-```  
-
-#### Die Ansicht *_TableRow.cshtml* im Ordner */Views/Person*
-
-```csharp  
-@model ...Person
-
-<tr>
-    <td>
-        @Html.DisplayFor(model => model.FirstName)
-    </td>
-    <td>
-        @Html.DisplayFor(model => model.LastName)
-    </td>
-    <td>
-        @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
-        @Html.ActionLink("Details", "Details", new { id=Model.Id }) |
-        @Html.ActionLink("Delete", "Delete", new { id=Model.Id })
-    </td>
-</tr>
-```  
-
-Nun kann die Standard Index Ansicht mit Filter verwendet werden.
 
 ## Default Create View  
 
