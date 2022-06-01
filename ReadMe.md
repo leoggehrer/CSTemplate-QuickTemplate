@@ -167,16 +167,23 @@ Nachdem nun das Domain-Projekt **QTMusicStoreLight** erstellt wurde, werden nun 
 - Importieren von Daten (optional)  
   
 **Erstellen der AspMvc-Anwendung**  
-  
+
+Mit wenigen Schritte kann fuer das *Backend* eine AspMvc Web-Anwendung, fuer die Verwaltung und Bearbeitung von Daten, erstellt werden. Zu diesem Zweck sind die Schritte der Reihe nach auszufuehren:  
+   
 - Erstellen der Models  
   - ...  
 - Erstellen der Kontroller  
   - ...  
 - Erstellen der Ansichten  
   - ...  
+
+> HINWEIS: Fuer die Erstellung der Ansichten (Views) koennen auch die bereitgestellten Standard-Ansichten (im Ordner /Views/Shared) verwendet werden. Eine Anleitung zur Verwendung dieser Ansichten befinden sich im Solution-Ordner *'Solution items'* mit dem Namen *'AspMvcDefaultViews.md'*. 
+
   
 **Erstellen des RESTful-Services**  
   
+Um die Funktionen im Backend anderen (heterogenen) System zur Verfuegung zu stellen, ist es sinnvoll, dass diese Funktionalitaet ueber RESTful-Services delegiert werden. 
+
 - Erstellen der Models  
   - ...  
 - Erstellen der Kontroller  
