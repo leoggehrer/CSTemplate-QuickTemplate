@@ -55,40 +55,80 @@
                 Console.Write("Choose: ");
                 input = Console.ReadLine()?.ToLower() ?? String.Empty;
 
-                if (input.Equals("1"))
+                if (Int32.TryParse(input, out var select))
                 {
-                    Console.Write("Enter source path: ");
-                    var path = Console.ReadLine();
-
-                    if (string.IsNullOrEmpty(path) == false)
+                    if (select == 1)
                     {
-                        SourcePath = path;
-                    }
-                }
-                else if (input.Equals("2"))
-                {
-                    Console.Write("Enter target path: ");
-                    var path = Console.ReadLine();
+                        var solutionPath = GetCurrentSolutionPath();
+                        var qtProjects = GetQuickTemplateProjects(solutionPath).Union(new[] { solutionPath }).ToArray();
 
-                    if (string.IsNullOrEmpty(path) == false)
+                        for (int i = 0; i < qtProjects.Length; i++)
+                        {
+                            if (i == 0)
+                                Console.WriteLine();
+
+                            Console.WriteLine($"Change path to: [{i + 1}] {qtProjects[i]}");
+                        }
+                        Console.WriteLine();
+                        Console.Write("Select or enter source path: ");
+                        var selectOrPath = Console.ReadLine();
+
+                        if (Int32.TryParse(selectOrPath, out int number))
+                        {
+                            if ((number - 1) >= 0 && (number - 1) < qtProjects.Length)
+                            {
+                                SourcePath = qtProjects[number - 1];
+                            }
+                        }
+                        else if (string.IsNullOrEmpty(selectOrPath) == false)
+                        {
+                            SourcePath = selectOrPath;
+                        }
+                    }
+                    else if (select == 2)
                     {
-                        TargetPath = path;
-                    }
-                }
-                else if (input.Equals("3"))
-                {
-                    Console.Write("Enter target solution name: ");
-                    targetSolutionName = Console.ReadLine() ?? String.Empty;
-                }
-                else if (input.Equals("4"))
-                {
-                    var sc = new Copier();
+                        var solutionPath = GetCurrentSolutionPath();
+                        var qtProjects = GetQuickTemplateProjects(solutionPath).Union(new[] { solutionPath }).ToArray();
+                        var qtPaths = qtProjects.Select(p => GetParentDirectory(p)).Distinct().OrderBy(p => p).ToArray();
 
-                    PrintBusyProgress();
-                    sc.Copy(SourcePath, Path.Combine(TargetPath, targetSolutionName), sourceProjects);
-                    runBusyProgress = false;
+                        for (int i = 0; i < qtPaths.Length; i++)
+                        {
+                            if (i == 0)
+                                Console.WriteLine();
+
+                            Console.WriteLine($"Change path to: [{i + 1}] {qtPaths[i]}");
+                        }
+                        Console.WriteLine();
+                        Console.Write("Select or enter target path: ");
+                        var selectOrPath = Console.ReadLine();
+
+                        if (Int32.TryParse(selectOrPath, out int number))
+                        {
+                            if ((number - 1) >= 0 && (number - 1) < qtPaths.Length)
+                            {
+                                TargetPath = GetParentDirectory(qtPaths[number - 1]);
+                            }
+                        }
+                        else if (string.IsNullOrEmpty(selectOrPath) == false)
+                        {
+                            TargetPath = selectOrPath;
+                        }
+                    }
+                    else if (select == 3)
+                    {
+                        Console.Write("Enter target solution name: ");
+                        targetSolutionName = Console.ReadLine() ?? String.Empty;
+                    }
+                    else if (select == 4)
+                    {
+                        var sc = new Copier();
+
+                        PrintBusyProgress();
+                        sc.Copy(SourcePath, Path.Combine(TargetPath, targetSolutionName), sourceProjects);
+                        runBusyProgress = false;
+                    }
+                    Console.ResetColor();
                 }
-                Console.ResetColor();
             }
         }
 
@@ -109,6 +149,12 @@
                     await Task.Delay(250).ConfigureAwait(false);
                 }
             });
+        }
+        private static string GetParentDirectory(string path)
+        {
+            var result = Directory.GetParent(path);
+
+            return result != null ? result.FullName : path;
         }
         private static string GetCurrentSolutionPath()
         {
@@ -144,6 +190,15 @@
                                                           .SingleOrDefault(f => f.Extension.Equals(".sln", StringComparison.CurrentCultureIgnoreCase));
 
             return fileInfo != null ? Path.GetFileNameWithoutExtension(fileInfo.Name) : string.Empty;
+        }
+        private static string[] GetQuickTemplateProjects(string sourcePath)
+        {
+            var directoryInfo = new DirectoryInfo(sourcePath);
+            var parentDirectory = directoryInfo.Parent != null ? directoryInfo.Parent.FullName : SourcePath;
+            var qtDirectories = Directory.GetDirectories(parentDirectory, "QT*", SearchOption.AllDirectories)
+                                         .Where(d => d.Replace(UserPath, String.Empty).Contains('.') == false)
+                                         .ToList();
+            return qtDirectories.ToArray();
         }
     }
 }
