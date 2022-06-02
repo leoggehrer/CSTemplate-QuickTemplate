@@ -106,7 +106,7 @@
                         {
                             if ((number - 1) >= 0 && (number - 1) < qtPaths.Length)
                             {
-                                TargetPath = GetParentDirectory(qtPaths[number - 1]);
+                                TargetPath = qtPaths[number - 1];
                             }
                         }
                         else if (string.IsNullOrEmpty(selectOrPath) == false)
