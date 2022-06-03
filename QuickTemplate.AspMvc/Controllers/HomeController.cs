@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace QuickTemplate.AspMvc.Controllers
 {
-    public class HomeController : Controller
+    public partial class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
 

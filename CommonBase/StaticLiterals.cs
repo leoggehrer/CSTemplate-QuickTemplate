@@ -1,6 +1,6 @@
 ﻿namespace CommonBase
 {
-    public static class StaticLiterals
+    public static partial class StaticLiterals
     {
         public static string SolutionFileExtension => ".sln";
         public static string ProjectFileExtension => ".csproj";

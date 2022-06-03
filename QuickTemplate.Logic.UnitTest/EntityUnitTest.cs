@@ -11,7 +11,7 @@ namespace QuickTemplate.Logic.UnitTest
     /// </summary>
     /// <typeparam name="T">The generic parameter of the entity.</typeparam>
     [TestClass]
-    public abstract class EntityUnitTest<T> where T : Entities.IdentityEntity, new()
+    public abstract partial class EntityUnitTest<T> where T : Entities.IdentityEntity, new()
     {
 #pragma warning disable CA2211 // Non-constant fields should not be visible
         public static int Counter = 0;

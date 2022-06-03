@@ -13,7 +13,7 @@ namespace QuickTemplate.AspMvc.Controllers
     /// </summary>
     /// <typeparam name="TAccessModel">The type of access model</typeparam>
     /// <typeparam name="TViewModel">The type of view model</typeparam>
-    public abstract class GenericController<TAccessModel, TViewModel> : MvcController
+    public abstract partial class GenericController<TAccessModel, TViewModel> : MvcController
         where TAccessModel : Logic.IIdentifyable, new()
         where TViewModel : class, new()
     {

@@ -5,7 +5,7 @@ using QuickTemplate.Logic.DataContext;
 
 namespace QuickTemplate.Logic.Modules.Database
 {
-    public static class DbManager
+    public static partial class DbManager
     {
         public static async Task DeleteDatabaseAsync()
         {

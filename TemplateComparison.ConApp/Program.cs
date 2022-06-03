@@ -20,6 +20,7 @@ namespace TemplateComparison.ConApp
         static partial void ClassConstructing();
         static partial void ClassConstructed();
 
+        #region Properties
         private static string? HomePath { get; set; }
         private static string UserPath { get; set; }
         private static string SourcePath { get; set; }
@@ -27,12 +28,16 @@ namespace TemplateComparison.ConApp
         private static string[] SearchPatterns => StaticLiterals.SourceFileExtensions.Split('|');
         private static readonly string[] SourceLabels = new string[] { StaticLiterals.BaseCodeLabel };
         private static readonly string[] TargetLabels = new string[] { StaticLiterals.CodeCopyLabel };
+        #endregion Properties
 
         private static void Main(/*string[] args*/)
         {
             RunApp();
         }
 
+        #region Console methods
+        private static readonly bool canBusyPrint = true;
+        private static bool runBusyProgress = false;
         private static void RunApp()
         {
             bool running = false;
@@ -93,9 +98,6 @@ namespace TemplateComparison.ConApp
                 runBusyProgress = false;
             } while (running);
         }
-
-        private static readonly bool canBusyPrint = true;
-        private static bool runBusyProgress = false;
         private static void PrintBusyProgress()
         {
             Console.WriteLine();
@@ -142,7 +144,9 @@ namespace TemplateComparison.ConApp
             }
             Console.WriteLine();
         }
+        #endregion Console methods
 
+        #region App methods
         private static void BalancingSolutions(string sourcePath, string[] sourceLabels, IEnumerable<string> targetPaths, string[] targetLabels)
         {
             var sourcePathExists = Directory.Exists(sourcePath);
@@ -184,23 +188,6 @@ namespace TemplateComparison.ConApp
                     }
                 }
             }
-        }
-        private static IEnumerable<string> GetSourceCodeFiles(string path, string searchPattern, string[] labels)
-        {
-            var result = new List<string>();
-            var files = Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories).OrderBy(i => i);
-
-            foreach (var file in files)
-            {
-                var lines = File.ReadAllLines(file, Encoding.Default);
-
-                if (lines.Any() && labels.Any(l => lines.First().Contains(l)))
-                {
-                    result.Add(file);
-                }
-                System.Diagnostics.Debug.WriteLine($"{file}");
-            }
-            return result;
         }
         private static bool SynchronizeSourceCodeFile(string sourcePath, string sourceFilePath, string targetPath, string[] sourceLabels, string[] targetLabels)
         {
@@ -262,6 +249,42 @@ namespace TemplateComparison.ConApp
             }
             return result;
         }
+        #endregion App methods
+
+        #region Helpers
+        private static string GetCurrentSolutionPath()
+        {
+            int endPos = AppContext.BaseDirectory
+                                   .IndexOf($"{nameof(TemplateComparison)}", StringComparison.CurrentCultureIgnoreCase);
+
+            return AppContext.BaseDirectory[..endPos];
+        }
+        private static string[] GetQuickTemplateProjects(string sourcePath)
+        {
+            var directoryInfo = new DirectoryInfo(sourcePath);
+            var parentDirectory = directoryInfo.Parent != null ? directoryInfo.Parent.FullName : SourcePath;
+            var qtDirectories = Directory.GetDirectories(parentDirectory, "QT*", SearchOption.AllDirectories)
+                                         .Where(d => d.Replace(UserPath, String.Empty).Contains('.') == false)
+                                         .ToList();
+            return qtDirectories.ToArray();
+        }
+        private static IEnumerable<string> GetSourceCodeFiles(string path, string searchPattern, string[] labels)
+        {
+            var result = new List<string>();
+            var files = Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories).OrderBy(i => i);
+
+            foreach (var file in files)
+            {
+                var lines = File.ReadAllLines(file, Encoding.Default);
+
+                if (lines.Any() && labels.Any(l => lines.First().Contains(l)))
+                {
+                    result.Add(file);
+                }
+                System.Diagnostics.Debug.WriteLine($"{file}");
+            }
+            return result;
+        }
         private static string GetSolutionNameFromPath(string path)
         {
             var result = string.Empty;
@@ -307,23 +330,11 @@ namespace TemplateComparison.ConApp
             }
             return result;
         }
-        private static string GetCurrentSolutionPath()
-        {
-            int endPos = AppContext.BaseDirectory
-                                   .IndexOf($"{nameof(TemplateComparison)}", StringComparison.CurrentCultureIgnoreCase);
+        #endregion Helpers
 
-            return AppContext.BaseDirectory[..endPos];
-        }
-        private static string[] GetQuickTemplateProjects(string sourcePath)
-        {
-            var directoryInfo = new DirectoryInfo(sourcePath);
-            var parentDirectory = directoryInfo.Parent != null ? directoryInfo.Parent.FullName : SourcePath;
-            var qtDirectories = Directory.GetDirectories(parentDirectory, "QT*", SearchOption.AllDirectories)
-                                         .Where(d => d.Replace(UserPath, String.Empty).Contains('.') == false)
-                                         .ToList();
-            return qtDirectories.ToArray();
-        }
+        #region Partial methods
         static partial void BeforeGetTargetPaths(string sourcePath, List<string> targetPaths, ref bool handled);
         static partial void AfterGetTargetPaths(string sourcePath, List<string> targetPaths);
+        #endregion Partial methods
     }
 }

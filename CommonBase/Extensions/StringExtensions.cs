@@ -115,7 +115,7 @@ namespace CommonBase.Extensions
         public static string NullText { get; set; } = "<NULL>";
         private static Regex Trimmer { get; } = new Regex(@"\s\s+");
 
-        public class DivideInfo : TagInfo
+        public partial class DivideInfo : TagInfo
         {
             public DivideInfo(int startIdx, int endIdx)
             {

@@ -8,7 +8,7 @@ using FilterType = QuickTemplate.AspMvc.Models.Account.RoleFilter;
 
 namespace QuickTemplate.AspMvc.Controllers.Account
 {
-    public class RolesController : GenericController<Logic.Entities.Account.Role, Models.Account.Role>
+    public partial class RolesController : GenericController<Logic.Entities.Account.Role, Models.Account.Role>
     {
         private static string FilterName => typeof(FilterType).Name;
         public RolesController(IDataAccess<Logic.Entities.Account.Role> dataAccess) : base(dataAccess)

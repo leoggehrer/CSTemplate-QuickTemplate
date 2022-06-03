@@ -4,7 +4,7 @@
 
 namespace QuickTemplate.Logic.Controllers.Revision
 {
-    internal class HistoriesController : GenericController<Entities.Revision.History>
+    internal partial class HistoriesController : GenericController<Entities.Revision.History>
     {
         public HistoriesController()
         {

@@ -4,7 +4,7 @@
 
 namespace QuickTemplate.Logic.Modules.Security
 {
-    public static class PasswordRules
+    public static partial class PasswordRules
     {
         public static int MinimumLength => 6;
         public static int MaximumLength => 30;

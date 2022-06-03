@@ -6,7 +6,7 @@ namespace QuickTemplate.AspMvc.Models.Account
     /// <summary>
     /// A model class for the login data.
     /// </summary>
-    public class LoginSession
+    public partial class LoginSession
     {
         /// <summary>
         /// The reference to the identity.
