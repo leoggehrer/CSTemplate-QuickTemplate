@@ -216,12 +216,12 @@ namespace ...Controllers
         <div class="form-group">
             <label asp-for="FirstName" class="control-label"></label>
             <input asp-for="FirstName" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="LastName" class="control-label"></label>
-            <input asp-for="LastName" class="form-control" readonly="readonly" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
     </div>
 </div>
@@ -242,12 +242,12 @@ namespace ...Controllers
         <div class="form-group">
             <label asp-for="FirstName" class="control-label"></label>
             <input asp-for="FirstName" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="LastName" class="control-label"></label>
-            <input asp-for="LastName" class="form-control" readonly="readonly" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
     </div>
 </div>

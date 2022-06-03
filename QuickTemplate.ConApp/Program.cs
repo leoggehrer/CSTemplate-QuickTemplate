@@ -18,6 +18,13 @@ namespace QuickTemplate.ConApp
             Console.WriteLine(nameof(QuickTemplate));
             Console.WriteLine(DateTime.Now);
             BeforeRun();
+#if DEBUG && DEVELOP_ON
+            Task.Run(async () =>
+            {
+                await Logic.Modules.Database.DbManager.DeleteDatabaseAsync();
+                await Logic.Modules.Database.DbManager.CreateDatabaseAsync();
+            }).Wait();
+#endif
 #if ACCOUNT_ON
             CreateAccount();
 #endif

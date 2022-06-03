@@ -112,6 +112,8 @@ namespace TemplatePreprocessor.ConApp
                         {
                             Defines[select - 2] = Defines[select - 2].Replace("_OFF", "_ON");
                         }
+                        SetPreprocessorDirectivesInProjectFiles(SourcePath, Defines);
+                        EditPreprocessorDirectivesInRazorFiles(SourcePath, Defines);
                     }
                     else if ((select - 2) == Defines.Length)
                     {
