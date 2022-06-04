@@ -1,7 +1,7 @@
 ﻿//@BaseCode
 //MdStart
 
-namespace QuickTemplate.Logic
+namespace QuickTemplate.Logic.Contracts
 {
     /// <summary>
     /// Generic interface for data access.

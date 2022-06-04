@@ -8,8 +8,8 @@ namespace CommonBase.ThreadSafe
 {
     public partial class ThreadSafeList<T> : IList<T>
     {
-        protected static object _lock = new object();
-        protected List<T> internalList = new List<T>();
+        protected static object _lock = new();
+        protected List<T> internalList = new();
 
         public T this[int index]
         {
@@ -133,7 +133,7 @@ namespace CommonBase.ThreadSafe
 
         public List<T> Clone()
         {
-            List<T> newList = new List<T>();
+            var newList = new List<T>();
 
             lock (_lock)
             {

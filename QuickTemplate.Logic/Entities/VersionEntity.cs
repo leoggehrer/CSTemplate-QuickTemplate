@@ -1,6 +1,8 @@
 ﻿//@BaseCode
 //MdStart
 
+using QuickTemplate.Logic.Contracts;
+
 namespace QuickTemplate.Logic.Entities
 {
     public abstract partial class VersionEntity : IdentityEntity, IVersionable

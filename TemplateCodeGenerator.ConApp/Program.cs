@@ -1,4 +1,7 @@
-﻿namespace TemplateCodeGenerator.ConApp
+﻿using System.Diagnostics;
+using TemplateCodeGenerator.ConApp.Generator;
+
+namespace TemplateCodeGenerator.ConApp
 {
     internal partial class Program
     {
@@ -24,8 +27,6 @@
         private static string SourcePath { get; set; }
         private static string[] TargetPaths { get; set; }
         private static string[] SearchPatterns => StaticLiterals.SourceFileExtensions.Split('|');
-        private static readonly string[] SourceLabels = new string[] { StaticLiterals.BaseCodeLabel };
-        private static readonly string[] TargetLabels = new string[] { StaticLiterals.CodeCopyLabel };
         #endregion Properties
 
         static void Main(/*string[] args*/)
@@ -38,63 +39,92 @@
         private static bool runBusyProgress = false;
         private static void RunApp()
         {
-            bool running = false;
+            var input = string.Empty;
 
-            do
+            while (input.Equals("x") == false)
             {
-                var input = string.Empty;
-                var handled = false;
-                var targetPaths = new List<string>();
+                var menuIndex = 0;
+                var maxWaiting = 10 * 60 * 1000;    // 10 minutes
+                var sourceSolutionName = GetSolutionNameByPath(SourcePath);
 
-                BeforeGetTargetPaths(SourcePath, targetPaths, ref handled);
-                if (handled == false)
-                {
-                    TargetPaths = GetQuickTemplateProjects(SourcePath);
-                }
-                else
-                {
-                    TargetPaths = TargetPaths.ToArray();
-                }
-                PrintHeader(SourcePath, TargetPaths);
+                Console.Clear();
+                Console.WriteLine("Template Code Generator");
+                Console.WriteLine("=======================");
+                Console.WriteLine();
+                Console.WriteLine($"Code generation for '{sourceSolutionName}' from: {SourcePath}");
+                Console.WriteLine();
+                Console.WriteLine($"[{++menuIndex}] Change source path");
 
-                Console.Write($"Generating [1..{TargetPaths.Length}|X...Quit]: ");
-                input = Console.ReadLine()?.ToLower();
-                PrintBusyProgress();
-                running = input?.Equals("x") == false;
-                if (running)
+                Console.WriteLine($"[{++menuIndex}] Compile solution...");
+                Console.WriteLine($"[{++menuIndex}] Start code generation...");
+                Console.WriteLine("[x|X] Exit");
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("Choose: ");
+                input = Console.ReadLine()?.ToLower() ?? String.Empty;
+
+                if (Int32.TryParse(input, out var select))
                 {
-                    if (input != null && input.Equals("a"))
+                    if (select == 1)
                     {
-                        foreach (var item in TargetLabels)
+                        var solutionPath = GetCurrentSolutionPath();
+                        var qtProjects = GetQuickTemplateProjects(solutionPath).Union(new[] { solutionPath }).ToArray();
+
+                        for (int i = 0; i < qtProjects.Length; i++)
                         {
-                            //BalancingSolutions(SourcePath, SourceLabels, TargetPaths, TargetLabels);
+                            if (i == 0)
+                                Console.WriteLine();
+
+                            Console.WriteLine($"Change path to: [{i + 1}] {qtProjects[i]}");
                         }
-                    }
-                    else
-                    {
-                        var numbers = input?.Trim()
-                                            .Split(',').Where(s => Int32.TryParse(s, out int n))
-                                            .Select(s => Int32.Parse(s))
-                                            .ToArray();
+                        Console.WriteLine();
+                        Console.Write("Select or enter source path: ");
+                        var selectOrPath = Console.ReadLine();
 
-                        foreach (var number in numbers ?? Array.Empty<int>())
+                        if (Int32.TryParse(selectOrPath, out int number))
                         {
-                            if (number == TargetPaths.Length + 1)
+                            if ((number - 1) >= 0 && (number - 1) < qtProjects.Length)
                             {
-                                foreach (var item in TargetLabels)
-                                {
-                                    //BalancingSolutions(SourcePath, SourceLabels, TargetPaths, TargetLabels);
-                                }
-                            }
-                            else if (number > 0 && number <= TargetPaths.Length)
-                            {
-                                //BalancingSolutions(SourcePath, SourceLabels, new string[] { TargetPaths[number - 1] }, TargetLabels);
+                                SourcePath = qtProjects[number - 1];
                             }
                         }
+                        else if (string.IsNullOrEmpty(selectOrPath) == false)
+                        {
+                            SourcePath = selectOrPath;
+                        }
+                    }
+                    else if (select == 2)
+                    {
+                        var solutionProperties = SolutionProperties.Create(SourcePath);
+                        var entityProject = EntitityProject.Create(solutionProperties);
+                        var arguments = $"build \"{solutionProperties.SolutionFilePath}\" -c Release";
+                        Console.WriteLine(arguments);
+                        Debug.WriteLine($"dotnet.exe {arguments}");
+                        var csprojStartInfo = new ProcessStartInfo("dotnet.exe")
+                        {
+                            Arguments = arguments,
+                            //WorkingDirectory = projectPath,
+                            UseShellExecute = false
+                        };
+                        Process.Start(csprojStartInfo)?.WaitForExit(maxWaiting);
+                        Console.Write("Press any key ");
+                        Console.ReadKey();
+                    }
+                    else if (select == 3)
+                    {
+                        var solutionProperties = SolutionProperties.Create(SourcePath);
+                        var entityProject = EntitityProject.Create(solutionProperties);
+
+                        foreach (var item in entityProject.EntityTypes)
+                        {
+                            Console.WriteLine(item.Name);
+                        }
+                        Console.Write("Press any key ");
+                        Console.ReadKey();
                     }
                 }
-                runBusyProgress = false;
-            } while (running);
+                Console.ResetColor();
+            }
         }
         private static void PrintBusyProgress()
         {
@@ -152,6 +182,12 @@
 
             return AppContext.BaseDirectory[..endPos];
         }
+        private static string GetSolutionNameByPath(string solutionPath)
+        {
+            return solutionPath.Split(new char[] { '\\', '/' })
+                               .Where(e => string.IsNullOrEmpty(e) == false)
+                               .Last();
+        }
         private static string[] GetQuickTemplateProjects(string sourcePath)
         {
             var directoryInfo = new DirectoryInfo(sourcePath);
@@ -161,7 +197,7 @@
                                          .ToList();
             return qtDirectories.ToArray();
         }
-        #endregion
+        #endregion Helpers
 
         #region Partial methods
         static partial void BeforeGetTargetPaths(string sourcePath, List<string> targetPaths, ref bool handled);

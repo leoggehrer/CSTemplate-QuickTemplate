@@ -1,6 +1,7 @@
 ﻿//@BaseCode
 //MdStart
 using Microsoft.AspNetCore.Mvc;
+using QuickTemplate.Logic.Contracts;
 
 namespace QuickTemplate.WebApi.Controllers
 {
@@ -13,7 +14,7 @@ namespace QuickTemplate.WebApi.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public abstract partial class GenericController<TAccessModel, TEditModel, TOutModel> : ApiControllerBase, IDisposable
-        where TAccessModel : class, Logic.IIdentifyable, new()
+        where TAccessModel : class, IIdentifyable, new()
         where TEditModel : class, new()
         where TOutModel : class, new()
     {
@@ -21,12 +22,12 @@ namespace QuickTemplate.WebApi.Controllers
 #if ACCOUNT_ON
         private bool initSessionToken = false;
 #endif
-        private Logic.IDataAccess<TAccessModel>? _dataAccess;
+        private IDataAccess<TAccessModel>? _dataAccess;
 
         /// <summary>
         /// This property controls access to the logic operations.
         /// </summary>
-        protected Logic.IDataAccess<TAccessModel> DataAccess
+        protected IDataAccess<TAccessModel> DataAccess
         {
             get
             {
@@ -42,7 +43,7 @@ namespace QuickTemplate.WebApi.Controllers
             init => _dataAccess = value;
         }
 
-        internal GenericController(Logic.IDataAccess<TAccessModel> dataAccess)
+        internal GenericController(IDataAccess<TAccessModel> dataAccess)
         {
             DataAccess = dataAccess;
         }

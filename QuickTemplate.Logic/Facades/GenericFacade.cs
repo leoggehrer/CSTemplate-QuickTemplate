@@ -1,6 +1,7 @@
 ﻿//@BaseCode
 //MdStart
 
+using QuickTemplate.Logic.Contracts;
 using QuickTemplate.Logic.Controllers;
 
 namespace QuickTemplate.Logic.Facades

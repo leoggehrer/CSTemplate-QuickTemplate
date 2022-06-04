@@ -1,6 +1,7 @@
 ﻿//@BaseCode
 //MdStart
 
+using QuickTemplate.Logic.Contracts;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 

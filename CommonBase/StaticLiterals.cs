@@ -20,15 +20,21 @@
         };
         public static string[] SolutionToolProjects { get; } = new[]
         {
+            "TemplateCodeGenerator.ConApp",
             "TemplateComparsion.ConApp",
             "TemplateCopier.ConApp",
             "TemplatePreprocessor.ConApp",
         };
 
         public static string GeneratedCodeLabel => "@GeneratedCode";
+        public static string CustomizedAndGeneratedCodeLabel => "@CustomAndGeneratedCode";
         public static string IgnoreLabel => "@Ignore";
         public static string BaseCodeLabel => "@BaseCode";
         public static string CodeCopyLabel => "@CodeCopy";
+        public static string CSharpFileExtension => ".cs";
         public static string SourceFileExtensions => "*.css|*.cs|*.ts|*.cshtml|*.razor|*.razor.cs|*.template";
+
+        public static string NullableEnableLabel => "#nullable enable";
+        public static string NullableDisableLabel => "#nullable disable";
     }
 }

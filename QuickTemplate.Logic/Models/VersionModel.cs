@@ -1,6 +1,8 @@
 ﻿//@BaseCode
 //MdStart
 
+using QuickTemplate.Logic.Contracts;
+
 namespace QuickTemplate.Logic.Models
 {
     public abstract partial class VersionModel : IdentityModel, IVersionable

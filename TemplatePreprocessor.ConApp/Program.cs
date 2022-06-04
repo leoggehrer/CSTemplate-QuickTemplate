@@ -51,7 +51,7 @@ namespace TemplatePreprocessor.ConApp
                 var sourceSolutionName = GetSolutionNameByPath(SourcePath);
 
                 Console.Clear();
-                Console.WriteLine("Solution Preprocessor");
+                Console.WriteLine("Template Preprocessor");
                 Console.WriteLine("=====================");
                 Console.WriteLine();
                 Console.WriteLine($"Define-Values: {string.Join(" ", Defines)}");
