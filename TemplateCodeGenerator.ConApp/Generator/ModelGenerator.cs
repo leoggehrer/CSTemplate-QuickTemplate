@@ -18,8 +18,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
         }
 
-        public string AppModelsNameSpace { get; }
-        public string ModelsFolder { get; }
+        public string AppModelsNameSpace { get; } = String.Empty;
+        public string ModelsFolder { get; } = String.Empty;
 
         public string CreateModelsNamespace(Type type)
         {
@@ -208,7 +208,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return result;
         }
 
-        protected string GetBaseClassByType(Type type)
+        protected static string GetBaseClassByType(Type type)
         {
             var result = string.Empty;
 

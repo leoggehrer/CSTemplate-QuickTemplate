@@ -2,7 +2,7 @@
 //MdStart
 #if ACCOUNT_ON
 using Microsoft.AspNetCore.Mvc;
-using QuickTemplate.Logic;
+using QuickTemplate.Logic.Contracts;
 using QuickTemplate.Logic.Entities.Account;
 using FilterType = QuickTemplate.AspMvc.Models.Account.RoleFilter;
 

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants>ACCOUNT_OFF;LOGGING_OFF;REVISION_OFF;DEVELOP_ON</DefineConstants>
+    <DefineConstants>ACCOUNT_OFF;LOGGING_OFF;REVISION_OFF;DEVELOP_OFF</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
