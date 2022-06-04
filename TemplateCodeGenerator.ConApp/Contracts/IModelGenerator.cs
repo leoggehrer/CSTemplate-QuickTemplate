@@ -8,17 +8,13 @@ namespace TemplateCodeGenerator.ConApp.Contracts
     {
         ISolutionProperties Properties { get; }
 
-
-        UnitType UnitType { get; }
-        string AppPostfix { get; }
         string ModelsFolder { get; }
         string AppModelsNameSpace { get; }
 
         IEnumerable<IGeneratedItem> GenerateAll();
-        IEnumerable<IGeneratedItem> CreateBusinessModels();
-        IEnumerable<IGeneratedItem> CreateModulesModels();
-        IEnumerable<IGeneratedItem> CreatePersistenceModels();
-        IEnumerable<IGeneratedItem> CreateShadowModels();
+        IEnumerable<IGeneratedItem> CreateLogicModels();
+        IEnumerable<IGeneratedItem> CreateWebApiModels();
+        IEnumerable<IGeneratedItem> CreateAspMvcModels();
     }
 }
 //MdEnd

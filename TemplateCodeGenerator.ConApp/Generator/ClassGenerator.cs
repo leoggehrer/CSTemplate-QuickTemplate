@@ -264,75 +264,38 @@ namespace TemplateCodeGenerator.ConApp.Generation
         #endregion Create partial properties
 
         #region CopyProperties
-        //public static IEnumerable<string> CreateCopyProperties(Type type, Func<PropertyInfo, bool>? filter = null)
-        //{
-        //    return CreateCopyProperties(type, type.FullName ?? string.Empty, filter ?? (pi => true));
-        //}
-        //private static IEnumerable<string> CreateCopyProperties(Type type, string copyType, Func<PropertyInfo, bool> filter)
-        //{
-        //    var result = new List<string>
-        //    {
-        //        $"public void CopyProperties({copyType} other)",
-        //        "{",
-        //        "bool handled = false;",
-        //        "BeforeCopyProperties(other, ref handled);",
-        //        "if (handled == false)",
-        //        "{"
-        //    };
+        public static IEnumerable<string> CreateCopyProperties(Type type, Func<PropertyInfo, bool>? filter = null)
+        {
+            return CreateCopyProperties(type, type.FullName ?? string.Empty, filter ?? (pi => true));
+        }
+        private static IEnumerable<string> CreateCopyProperties(Type type, string copyType, Func<PropertyInfo, bool> filter)
+        {
+            var result = new List<string>
+            {
+                $"public void CopyProperties({copyType} other)",
+                "{",
+                "bool handled = false;",
+                "BeforeCopyProperties(other, ref handled);",
+                "if (handled == false)",
+                "{"
+            };
 
-        //    foreach (var item in ContractHelper.GetAllProperties(type).Where(filter))
-        //    {
-        //        var contractPropertyHelper = new ContractPropertyHelper(type, item);
+            foreach (var item in type.GetAllPropertyInfos().Where(filter))
+            {
+                if (item.CanRead)
+                {
+                    result.Add($"{item.Name} = other.{item.Name};");
+                }
+            }
+            result.Add("}");
+            result.Add("AfterCopyProperties(other);");
+            result.Add("}");
 
-        //        if (contractPropertyHelper.HasImplementation == false)
-        //        {
-        //            if (item.Name.Equals(StaticLiterals.ConnectorItemName) && item.DeclaringType != null && item.DeclaringType.Name.Equals(StaticLiterals.ICompositeName))
-        //            {
-        //                result.Add($"{StaticLiterals.ConnectorItemName}.CopyProperties(other.{StaticLiterals.ConnectorItemName});");
-        //            }
-        //            else if (item.Name.Equals(StaticLiterals.OneItemName) && item.DeclaringType != null && item.DeclaringType.Name.Equals(StaticLiterals.ICompositeName))
-        //            {
-        //                result.Add($"{StaticLiterals.OneItemName}.CopyProperties(other.{StaticLiterals.OneItemName});");
-        //            }
-        //            else if (item.Name.Equals(StaticLiterals.AnotherItemName) && item.DeclaringType != null && item.DeclaringType.Name.Equals(StaticLiterals.ICompositeName))
-        //            {
-        //                result.Add($"{StaticLiterals.AnotherItemName}.CopyProperties(other.{StaticLiterals.AnotherItemName});");
-        //            }
-        //            else if (item.Name.Equals(StaticLiterals.OneItemName) && item.DeclaringType != null && item.DeclaringType.Name.Equals(StaticLiterals.IOneToAnotherName))
-        //            {
-        //                result.Add($"{StaticLiterals.OneItemName}.CopyProperties(other.{StaticLiterals.OneItemName});");
-        //            }
-        //            else if (item.Name.Equals(StaticLiterals.AnotherItemName) && item.DeclaringType != null && item.DeclaringType.Name.Equals(StaticLiterals.IOneToAnotherName))
-        //            {
-        //                result.Add($"{StaticLiterals.AnotherItemName}.CopyProperties(other.{StaticLiterals.AnotherItemName});");
-        //            }
-        //            else if (item.Name.Equals(StaticLiterals.OneItemName) && item.DeclaringType != null && item.DeclaringType.Name.Equals(StaticLiterals.IOneToManyName))
-        //            {
-        //                result.Add($"{StaticLiterals.OneItemName}.CopyProperties(other.{StaticLiterals.OneItemName});");
-        //            }
-        //            else if (item.Name.Equals(StaticLiterals.ManyItemsName) && item.DeclaringType != null && item.DeclaringType.Name.Equals(StaticLiterals.IOneToManyName))
-        //            {
-        //                result.Add($"Clear{StaticLiterals.ManyItemsName}();");
-        //                result.Add($"foreach (var item in other.{StaticLiterals.ManyItemsName})");
-        //                result.Add("{");
-        //                result.Add($"Add{StaticLiterals.ManyItemName}(item);");
-        //                result.Add("}");
-        //            }
-        //            else if (item.CanRead)
-        //            {
-        //                result.Add($"{item.Name} = other.{item.Name};");
-        //            }
-        //        }
-        //    }
-        //    result.Add("}");
-        //    result.Add("AfterCopyProperties(other);");
-        //    result.Add("}");
+            result.Add($"partial void BeforeCopyProperties({copyType} other, ref bool handled);");
+            result.Add($"partial void AfterCopyProperties({copyType} other);");
 
-        //    result.Add($"partial void BeforeCopyProperties({copyType} other, ref bool handled);");
-        //    result.Add($"partial void AfterCopyProperties({copyType} other);");
-
-        //    return result;
-        //}
+            return result;
+        }
         public static IEnumerable<string> CreateDelegateCopyProperties(Type type)
         {
             return CreateDelegateCopyProperties(type, type.FullName ?? string.Empty);
@@ -374,8 +337,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             var result = new List<string>();
             var counter = 0;
-            var properties = type.GetAllPropertyInfos();
-            var filteredProperties = properties;
+            var typeProperties = type.GetAllPropertyInfos();
+            var filteredProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)));
 
             if (filteredProperties.Any())
             {

@@ -27,6 +27,8 @@ namespace TemplateCodeGenerator.ConApp
         #region Entity names
         public static string IdentityEntityName => "IdentityEntity";
         public static string VersionEntityName => "VersionEntity";
+        public static string[] IdentityEntityProperties => new string[] { "Id" };
+        public static string[] VersionEntityProperties => new string[] { "Id", "RowVersion" };
         #endregion Entity names
 
         #region Folders

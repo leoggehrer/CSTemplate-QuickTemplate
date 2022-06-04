@@ -96,7 +96,7 @@ namespace TemplateCodeGenerator.ConApp
                     else if (select == 2)
                     {
                         var solutionProperties = SolutionProperties.Create(SourcePath);
-                        var entityProject = EntitityProject.Create(solutionProperties);
+                        var entityProject = EntityProject.Create(solutionProperties);
                         var arguments = $"build \"{solutionProperties.SolutionFilePath}\" -c Release";
                         Console.WriteLine(arguments);
                         Debug.WriteLine($"dotnet.exe {arguments}");
@@ -113,7 +113,7 @@ namespace TemplateCodeGenerator.ConApp
                     else if (select == 3)
                     {
                         var solutionProperties = SolutionProperties.Create(SourcePath);
-                        var entityProject = EntitityProject.Create(solutionProperties);
+                        var entityProject = EntityProject.Create(solutionProperties);
 
                         foreach (var item in entityProject.EntityTypes)
                         {

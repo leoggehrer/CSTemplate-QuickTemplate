@@ -4,17 +4,17 @@ using System.Runtime.Loader;
 
 namespace TemplateCodeGenerator.ConApp.Generator
 {
-    internal partial class EntitityProject
+    internal partial class EntityProject
     {
         public SolutionProperties SolutionProperties { get; private set; }
         public string ProjectName => $"{SolutionProperties.SolutionName}{SolutionProperties.LogicPostfix}";
         public string ProjectPath => Path.Combine(SolutionProperties.SolutionPath, ProjectName);
 
-        private EntitityProject(SolutionProperties solutionProperties)
+        private EntityProject(SolutionProperties solutionProperties)
         {
             SolutionProperties = solutionProperties;
         }
-        public static EntitityProject Create(SolutionProperties solutionProperties)
+        public static EntityProject Create(SolutionProperties solutionProperties)
         {
             return new(solutionProperties);
         }

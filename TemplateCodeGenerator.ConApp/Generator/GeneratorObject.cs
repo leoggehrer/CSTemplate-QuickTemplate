@@ -62,8 +62,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             return assembly.GetTypes()
                            .Where(t => t.IsInterface == false 
-                                    && (t.BaseType != null && t.BaseType.Name.Equals("IdentityEntity") 
-                                        || t.BaseType != null && t.BaseType.Name.Equals("VersionEntity")));
+                                    && (t.BaseType != null && t.BaseType.Name.Equals(StaticLiterals.IdentityEntityName) 
+                                        || t.BaseType != null && t.BaseType.Name.Equals(StaticLiterals.VersionEntityName)));
         }
         #endregion Assembly-Helpers
 
@@ -156,30 +156,22 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return result;
         }
         /// <summary>
-        /// Diese Methode ermittelt den Model Namen aus seinem Schnittstellen Typ.
+        /// Diese Methode ermittelt den Model Namen aus seinem Typ.
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>
         /// <returns>Name des Models.</returns>
-        public static string CreateModelNameFromInterface(Type type)
+        public static string CreateModelNameFromType(Type type)
         {
-            CheckInterfaceType(type);
-
-            var result = string.Empty;
-
-            if (type.IsInterface)
-            {
-                result = type.Name[1..];
-            }
-            return result;
+            return type.Name;
         }
         /// <summary>
         /// Diese Methode ermittelt den Edit-Model Namen aus seinem Schnittstellen Typ.
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>
         /// <returns>Name des Models.</returns>
-        public static string CreateEditModelNameFromInterface(Type type)
+        public static string CreateEditModelNameFromType(Type type)
         {
-            return $"Edit{CreateModelNameFromInterface(type)}";
+            return $"Edit{CreateModelNameFromType(type)}";
         }
         /// <summary>
         /// Diese Methode ermittelt den Entity-Typ aus seiner Schnittstellen.

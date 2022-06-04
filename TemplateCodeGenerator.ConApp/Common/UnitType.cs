@@ -7,21 +7,9 @@ namespace TemplateCodeGenerator.ConApp.Common
     {
         General = 1,
 
-        Contracts = 2 * General,
-        Logic = 2 * Contracts,
-        Transfer = 2 * Logic,
-        Adapters = 2 * Transfer,
-        WebApi = 2 * Adapters,
-
-        BaseUnits = Contracts + Logic + Transfer + Adapters + WebApi,
-
-        AspMvcApp = 2 * WebApi,
-        BlazorServerApp = 2 * AspMvcApp,
-        TelerikBlazorServerApp = 2 * BlazorServerApp,
-        AngularApp = 2 * BlazorServerApp,
-
-        NoneApps = 0,
-        AllApps = AspMvcApp + BlazorServerApp + AngularApp,
+        Logic = 2 * General,
+        WebApi = 2 * Logic,
+        AspMvc = 2 * WebApi,
     }
 }
 //MdEnd
