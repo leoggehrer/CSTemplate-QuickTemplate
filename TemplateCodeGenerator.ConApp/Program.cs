@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using TemplateCodeGenerator.ConApp.Generator;
+using TemplateCodeGenerator.ConApp.Generation;
 
 namespace TemplateCodeGenerator.ConApp
 {
@@ -48,6 +48,7 @@ namespace TemplateCodeGenerator.ConApp
                 var sourceSolutionName = GetSolutionNameByPath(SourcePath);
 
                 Console.Clear();
+                Console.ResetColor();
                 Console.WriteLine("Template Code Generator");
                 Console.WriteLine("=======================");
                 Console.WriteLine();
@@ -111,6 +112,7 @@ namespace TemplateCodeGenerator.ConApp
                     }
                     else if (select == 3)
                     {
+                        var generateItems = Generator.Generate(SourcePath);
                         var solutionProperties = SolutionProperties.Create(SourcePath);
                         var entityProject = EntityProject.Create(solutionProperties);
 

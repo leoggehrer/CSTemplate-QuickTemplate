@@ -2,7 +2,6 @@
 using System.Reflection;
 using TemplateCodeGenerator.ConApp.Contracts;
 using TemplateCodeGenerator.ConApp.Extensions;
-using TemplateCodeGenerator.ConApp.Generator;
 
 namespace TemplateCodeGenerator.ConApp.Generation
 {
@@ -26,8 +25,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
         static partial void ClassConstructing();
         static partial void ClassConstructed();
         public ISolutionProperties Properties => SolutionProperties;
-        public SolutionProperties SolutionProperties { get; init; }
-        public GeneratorObject(SolutionProperties solutionProperties)
+        public ISolutionProperties SolutionProperties { get; init; }
+        public GeneratorObject(ISolutionProperties solutionProperties)
         {
             Constructing();
             SolutionProperties = solutionProperties;
@@ -68,24 +67,12 @@ namespace TemplateCodeGenerator.ConApp.Generation
         #endregion Assembly-Helpers
 
         /// <summary>
-        /// Diese Methode ueberprueft, ob der Typ ein Schnittstellen-Typ ist. Wenn nicht,
-        /// dann wirft die Methode eine Ausnahme.
-        /// </summary>
-        /// <param name="type">Der zu ueberpruefende Typ.</param>
-        public static void CheckInterfaceType(Type type)
-        {
-            if (type.IsInterface == false)
-                throw new ArgumentException($"The parameter '{nameof(type)}' must be an interface.");
-        }
-        /// <summary>
         /// Diese Methode ermittelt den Solutionname aus seinem Schnittstellen Typ.
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>
         /// <returns>Schema der Entitaet.</returns>
         public static string GetSolutionNameFromInterface(Type type)
         {
-            CheckInterfaceType(type);
-
             var result = string.Empty;
             var data = type.Namespace?.Split('.');
 
@@ -145,8 +132,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns>Name der Entitaet.</returns>
         public static string CreateEntityNameFromInterface(Type type)
         {
-            CheckInterfaceType(type);
-
             var result = string.Empty;
 
             if (type.IsInterface)
@@ -180,8 +165,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns>Typ der Entitaet.</returns>
         public static string CreateEntityTypeFromInterface(Type type)
         {
-            CheckInterfaceType(type);
-
             var result = string.Empty;
 
             if (type.IsInterface)
@@ -199,8 +182,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns>Name der Entitaet.</returns>
         public static string CreateEntityFullNameFromInterface(Type type)
         {
-            CheckInterfaceType(type);
-
             var result = string.Empty;
 
             if (type.FullName != null)
@@ -222,8 +203,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns></returns>
         public static string CreateSubFilePathFromInterface(Type type, string pathPrefix, string filePostfix, string fileExtension)
         {
-            CheckInterfaceType(type);
-
             var result = string.Empty;
 
             if (type.IsInterface)
@@ -252,8 +231,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns></returns>
         public static string CreatePluralSubFilePathFromInterface(Type type, string pathPrefix, string filePostfix, string fileExtension)
         {
-            CheckInterfaceType(type);
-
             var result = string.Empty;
 
             if (type.IsInterface)
@@ -279,8 +256,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns>Name des Kontrollers.</returns>
         public static string CreateLogicControllerFullNameFromInterface(Type type)
         {
-            CheckInterfaceType(type);
-
             var result = string.Empty;
 
             if (type.FullName != null)
@@ -300,8 +275,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns>Name des Kontrollers.</returns>
         public static string CreateWebApiControllerFullNameFromInterface(Type type)
         {
-            CheckInterfaceType(type);
-
             var result = string.Empty;
 
             if (type.FullName != null)
@@ -321,8 +294,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns>Name des Kontrollers.</returns>
         public static string CreateAspMvcControllerFullNameFromInterface(Type type)
         {
-            CheckInterfaceType(type);
-
             var result = string.Empty;
 
             if (type.FullName != null)

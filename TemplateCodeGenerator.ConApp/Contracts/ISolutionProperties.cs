@@ -6,6 +6,12 @@ namespace TemplateCodeGenerator.ConApp.Contracts
 {
     public interface ISolutionProperties
     {
+        #region Project-postfixes
+        string LogicPostfix { get; }
+        string WebApiPostfix { get; }
+        string AspMvcPostfix { get; }
+        #endregion Project-postfixes
+
         string SolutionPath { get; }
         string SolutionName { get; }
         string SolutionFilePath { get; }

@@ -1,18 +1,18 @@
 //@BaseCode
 //MdStart
 using System.Reflection;
-using TemplateCodeGenerator.ConApp.Generator;
+using TemplateCodeGenerator.ConApp.Contracts;
 
 namespace TemplateCodeGenerator.ConApp.Generation
 {
     internal partial class ClassGenerator : GeneratorObject
     {
-        protected ClassGenerator(SolutionProperties solutionProperties)
+        protected ClassGenerator(ISolutionProperties solutionProperties)
             : base(solutionProperties)
         {
 
         }
-        public static ClassGenerator Create(SolutionProperties solutionProperties)
+        public static ClassGenerator Create(ISolutionProperties solutionProperties)
         {
             return new ClassGenerator(solutionProperties);
         }

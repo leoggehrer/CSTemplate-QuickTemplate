@@ -1,14 +1,13 @@
-//@BaseCode
 //MdStart
 
-namespace TemplateCodeGenerator.ConApp.Generator
+namespace TemplateCodeGenerator.ConApp.Generation
 {
     internal partial class SolutionProperties : Contracts.ISolutionProperties
     {
         #region Project-postfixes
-        public static string LogicPostfix => ".Logic";
-        public static string WebApiPostfix => ".WebApi";
-        public static string AspMvcPostfix => ".AspMvc";
+        public string LogicPostfix => ".Logic";
+        public string WebApiPostfix => ".WebApi";
+        public string AspMvcPostfix => ".AspMvc";
         #endregion Project-postfixes
 
         public string SolutionPath { get; }

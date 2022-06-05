@@ -1,10 +1,10 @@
 //MdStart
 using System.Reflection;
-using TemplateCodeGenerator.ConApp.Generator;
+using TemplateCodeGenerator.ConApp.Contracts;
 
 namespace TemplateCodeGenerator.ConApp.Generation
 {
-    internal partial class ModelGenerator : ClassGenerator, Contracts.IModelGenerator
+    internal partial class ModelGenerator : ClassGenerator, IModelGenerator
     {
         #region Models
         internal static string ModelObject => nameof(ModelObject);
@@ -13,17 +13,19 @@ namespace TemplateCodeGenerator.ConApp.Generation
         internal static string VersionModel => nameof(VersionModel);
         #endregion Models
 
-        protected ModelGenerator(SolutionProperties solutionProperties)
+        public ModelGenerator(ISolutionProperties solutionProperties)
             : base(solutionProperties)
         {
         }
 
-        public string AppModelsNameSpace { get; } = String.Empty;
-        public string ModelsFolder { get; } = String.Empty;
-
-        public string CreateModelsNamespace(Type type)
+        public string ModelsFolder { get; } = StaticLiterals.ModelsFolder;
+        public string CreateModelsNamespace()
         {
-            return $"{AppModelsNameSpace}.{GeneratorObject.CreateSubNamespaceFromType(type)}";
+            return $"{SolutionProperties.SolutionName}.{StaticLiterals.LogicExtension}.{ModelsFolder}";
+        }
+        public string CreateModelTypeNamespace(Type type)
+        {
+            return type.Namespace?.Replace($".{StaticLiterals.EntitiesFolder}.", $".{ModelsFolder}.") ?? String.Empty;
         }
         protected virtual bool CanCreate(Type type)
         {
@@ -44,12 +46,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             AfterCreateModelPropertyAttributes(propertyInfo, codeLines);
         }
+
         partial void BeforeCreateModelPropertyAttributes(PropertyInfo propertyInfo, List<string> codeLines, ref bool handled);
         partial void AfterCreateModelPropertyAttributes(PropertyInfo propertyInfo, List<string> codeLines);
 
-        public virtual IEnumerable<Contracts.IGeneratedItem> GenerateAll()
+        public virtual IEnumerable<IGeneratedItem> GenerateAll()
         {
-            var result = new List<Contracts.IGeneratedItem>();
+            var result = new List<IGeneratedItem>();
 
             result.AddRange(CreateLogicModels());
             //result.AddRange(CreateWebApiModels());
@@ -57,9 +60,9 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return result;
         }
 
-        public virtual IEnumerable<Contracts.IGeneratedItem> CreateLogicModels()
+        public virtual IEnumerable<IGeneratedItem> CreateLogicModels()
         {
-            var result = new List<Contracts.IGeneratedItem>();
+            var result = new List<IGeneratedItem>();
             var entityProject = EntityProject.Create(SolutionProperties);
 
             foreach (var type in entityProject.EntityTypes)
@@ -72,7 +75,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
-        protected virtual Contracts.IGeneratedItem CreateLogicModel(Type type, Common.UnitType unitType)
+        protected virtual IGeneratedItem CreateLogicModel(Type type, Common.UnitType unitType)
         {
             var result = new Models.GeneratedItem(unitType, Common.ItemType.LogicModel)
             {
@@ -83,14 +86,14 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Source.Add($"partial class {CreateModelNameFromType(type)} : {GetBaseClassByType(type)}");
             result.Source.Add("{");
             result.Source.Add("}");
-            result.EnvelopeWithANamespace(CreateModelsNamespace(type));
+            result.EnvelopeWithANamespace(CreateModelTypeNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
 
-        public virtual IEnumerable<Contracts.IGeneratedItem> CreateWebApiModels()
+        public virtual IEnumerable<IGeneratedItem> CreateWebApiModels()
         {
-            var result = new List<Contracts.IGeneratedItem>();
+            var result = new List<IGeneratedItem>();
             var entityProject = EntityProject.Create(SolutionProperties);
 
             foreach (var type in entityProject.EntityTypes)
@@ -103,7 +106,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
-        protected virtual Contracts.IGeneratedItem CreateWebApiModel(Type type, Common.UnitType unitType)
+        protected virtual IGeneratedItem CreateWebApiModel(Type type, Common.UnitType unitType)
         {
             var result = new Models.GeneratedItem(unitType, Common.ItemType.WebApiModel)
             {
@@ -114,14 +117,14 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Source.Add($"partial class {CreateModelNameFromType(type)} : {GetBaseClassByType(type)}");
             result.Source.Add("{");
             result.Source.Add("}");
-            result.EnvelopeWithANamespace(CreateModelsNamespace(type));
+            result.EnvelopeWithANamespace(CreateModelTypeNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
 
-        public virtual IEnumerable<Contracts.IGeneratedItem> CreateAspMvcModels()
+        public virtual IEnumerable<IGeneratedItem> CreateAspMvcModels()
         {
-            var result = new List<Contracts.IGeneratedItem>();
+            var result = new List<IGeneratedItem>();
             var entityProject = EntityProject.Create(SolutionProperties);
 
             foreach (var type in entityProject.EntityTypes)
@@ -150,11 +153,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
         //    return result;
         //}
 
-        protected virtual Contracts.IGeneratedItem CreateModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        protected virtual IGeneratedItem CreateModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
             var modelName = CreateModelNameFromType(type);
             var typeProperties = type.GetAllPropertyInfos();
-            var generateProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name))) ?? Array.Empty<PropertyInfo>();
+            var generateProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false) ?? Array.Empty<PropertyInfo>();
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = CreateModelFullNameFromType(type),
@@ -162,7 +165,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 SubFilePath = CreateSubFilePathFromInterface(type, "Models", "", StaticLiterals.CSharpFileExtension),
             };
             CreateModelAttributes(type, result.Source);
-            result.Add($"public partial class {modelName} : {type.FullName}");
+            result.Add($"public partial class {modelName}");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(modelName));
             result.AddRange(CreatePartialConstrutor("public", modelName));
@@ -175,11 +178,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.AddRange(CreateCopyProperties(type));
             result.AddRange(CreateFactoryMethods(type, false));
             result.Add("}");
-            result.EnvelopeWithANamespace(CreateModelsNamespace(type), "using System;");
+            result.EnvelopeWithANamespace(CreateModelTypeNamespace(type), "using System;");
             result.FormatCSharpCode();
             return result;
         }
-        protected virtual Contracts.IGeneratedItem CreateEditModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        protected virtual IGeneratedItem CreateEditModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
             var modelName = CreateEditModelNameFromType(type);
             var typeProperties = type.GetAllPropertyInfos();
@@ -203,19 +206,29 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 result.AddRange(CreateProperty(propertyInfo));
             }
             result.Add("}");
-            result.EnvelopeWithANamespace(CreateModelsNamespace(type), "using System;");
+            result.EnvelopeWithANamespace(CreateModelTypeNamespace(type), "using System;");
             result.FormatCSharpCode();
             return result;
         }
 
-        protected static string GetBaseClassByType(Type type)
+        protected string GetBaseClassByType(Type type)
         {
             var result = string.Empty;
 
-            while (type.BaseType != null)
+            while (type.BaseType != null 
+                   && StaticLiterals.EntityBaseClasses.Any(e => e.Equals(type.BaseType.Name)) == false)
             {
-                result = type.BaseType.Name;
                 type = type.BaseType;
+            }
+
+            if (type.BaseType != null)
+            {
+                var idx = StaticLiterals.EntityBaseClasses.IndexOf(e => e.Equals(type.BaseType.Name));
+
+                if (idx > -1 && idx < StaticLiterals.ModelBaseClasses.Length)
+                {
+                    result = $"{CreateModelsNamespace()}.{StaticLiterals.ModelBaseClasses[idx]}";
+                }
             }
             return result;
         }

@@ -1,20 +1,20 @@
 //MdStart
-using System.Reflection;
 using System.Runtime.Loader;
+using TemplateCodeGenerator.ConApp.Contracts;
 
-namespace TemplateCodeGenerator.ConApp.Generator
+namespace TemplateCodeGenerator.ConApp.Generation
 {
     internal partial class EntityProject
     {
-        public SolutionProperties SolutionProperties { get; private set; }
+        public ISolutionProperties SolutionProperties { get; private set; }
         public string ProjectName => $"{SolutionProperties.SolutionName}{SolutionProperties.LogicPostfix}";
         public string ProjectPath => Path.Combine(SolutionProperties.SolutionPath, ProjectName);
 
-        private EntityProject(SolutionProperties solutionProperties)
+        private EntityProject(ISolutionProperties solutionProperties)
         {
             SolutionProperties = solutionProperties;
         }
-        public static EntityProject Create(SolutionProperties solutionProperties)
+        public static EntityProject Create(ISolutionProperties solutionProperties)
         {
             return new(solutionProperties);
         }
@@ -40,6 +40,7 @@ namespace TemplateCodeGenerator.ConApp.Generator
         public IEnumerable<Type> EnumTypes => AssemblyTypes.Where(t => t.IsEnum);
         public IEnumerable<Type> InterfaceTypes => AssemblyTypes.Where(t => t.IsInterface);
         public IEnumerable<Type> EntityTypes => AssemblyTypes.Where(t => t.IsClass
+                                                                      && t.IsNested == false
                                                                       && t.Namespace != null 
                                                                       && t.Namespace!.Contains($".{StaticLiterals.EntitiesFolder}")
                                                                       && t.Name.Equals(StaticLiterals.IdentityEntityName) == false

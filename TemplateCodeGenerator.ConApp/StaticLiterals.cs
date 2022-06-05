@@ -1,7 +1,4 @@
-﻿//@BaseCode
-//MdStart
-
-using System.Collections.Generic;
+﻿//MdStart
 using CommonStaticLiterals = CommonBase.StaticLiterals;
 
 namespace TemplateCodeGenerator.ConApp
@@ -24,12 +21,21 @@ namespace TemplateCodeGenerator.ConApp
             {".razor.cs", $"//{GeneratedCodeLabel}" },
         };
 
-        #region Entity names
+        #region Entity properties
         public static string IdentityEntityName => "IdentityEntity";
         public static string VersionEntityName => "VersionEntity";
+        public static string[] EntityBaseClasses => new string[] { VersionEntityName, IdentityEntityName };
         public static string[] IdentityEntityProperties => new string[] { "Id" };
         public static string[] VersionEntityProperties => new string[] { "Id", "RowVersion" };
-        #endregion Entity names
+        #endregion Entity properties
+
+        #region Model properties
+        public static string IdentityModelName => "IdentityModel";
+        public static string VersionModelName => "VersionModel";
+        public static string[] ModelBaseClasses => new string[] { VersionModelName, IdentityModelName };
+        public static string[] IdentityModelProperties => new string[] { "Id" };
+        public static string[] VersionModelProperties => new string[] { "Id", "RowVersion" };
+        #endregion Model properties
 
         #region Folders
         public static string EntitiesFolder => "Entities";
