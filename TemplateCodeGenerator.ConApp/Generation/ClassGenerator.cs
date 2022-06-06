@@ -78,7 +78,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         public static IEnumerable<string> CreateFactoryMethods(Type type, bool newPrefix)
         {
             var result = new List<string>();
-            var entityType = CreateEntityTypeFromInterface(type);
+            var entityType = CreateEntityTypeFromType(type);
 
             result.Add($"public{(newPrefix ? " new " : " ")}static {entityType} Create()");
             result.Add("{");
@@ -115,6 +115,47 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             result.Add($"static partial void BeforeCreate({type.FullName} other);");
             result.Add($"static partial void AfterCreate({entityType} instance, {type.FullName} other);");
+            return result;
+        }
+        public static IEnumerable<string> CreateFactoryMethods(string itemType, bool newPrefix)
+        {
+            var result = new List<string>();
+
+            result.Add($"public{(newPrefix ? " new " : " ")}static {itemType} Create()");
+            result.Add("{");
+            result.Add("BeforeCreate();");
+            result.Add($"var result = new {itemType}();");
+            result.Add("AfterCreate(result);");
+            result.Add("return result;");
+            result.Add("}");
+
+            result.Add($"public{(newPrefix ? " new " : " ")}static {itemType} Create(object other)");
+            result.Add("{");
+            result.Add("BeforeCreate(other);");
+            result.Add("CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));");
+            result.Add($"var result = new {itemType}();");
+            result.Add("CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);");
+            result.Add("AfterCreate(result, other);");
+            result.Add("return result;");
+            result.Add("}");
+
+            result.Add($"public static {itemType} Create({itemType} other)");
+            result.Add("{");
+            result.Add("BeforeCreate(other);");
+            result.Add($"var result = new {itemType}();");
+            result.Add("result.CopyProperties(other);");
+            result.Add("AfterCreate(result, other);");
+            result.Add("return result;");
+            result.Add("}");
+
+            result.Add("static partial void BeforeCreate();");
+            result.Add($"static partial void AfterCreate({itemType} instance);");
+
+            result.Add("static partial void BeforeCreate(object other);");
+            result.Add($"static partial void AfterCreate({itemType} instance, object other);");
+
+            result.Add($"static partial void BeforeCreate({itemType} other);");
+            result.Add($"static partial void AfterCreate({itemType} instance, {itemType} other);");
             return result;
         }
         #endregion Create factory methode

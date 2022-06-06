@@ -5,7 +5,7 @@ namespace TemplateCodeGenerator.ConApp
 {
     public static partial class StaticLiterals
     {
-        public static string LogicExtension => ".Logic";
+        public static string GeneratedCodeFileName => "_GeneratedCode.cs";
         public static string SourceFileExtensions => CommonStaticLiterals.SourceFileExtensions;
         public static string CSharpFileExtension => CommonStaticLiterals.CSharpFileExtension;
         public static string GeneratedCodeLabel => CommonStaticLiterals.GeneratedCodeLabel;
@@ -20,6 +20,12 @@ namespace TemplateCodeGenerator.ConApp
             {".razor", $"@*{GeneratedCodeLabel}*@" },
             {".razor.cs", $"//{GeneratedCodeLabel}" },
         };
+
+        #region Project Extensions
+        public static string LogicExtension => ".Logic";
+        public static string WebApiExtension => ".WebApi";
+        public static string AspMvsExtension => ".AspMvc";
+        #endregion Project Extensions
 
         #region Entity properties
         public static string IdentityEntityName => "IdentityEntity";

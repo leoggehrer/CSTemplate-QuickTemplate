@@ -19,14 +19,22 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
 
         public string ModelsFolder { get; } = StaticLiterals.ModelsFolder;
-        public string CreateModelsNamespace()
-        {
-            return $"{SolutionProperties.SolutionName}.{StaticLiterals.LogicExtension}.{ModelsFolder}";
-        }
+        private string Namespace { get; set; } = string.Empty;
         public string CreateModelTypeNamespace(Type type)
         {
-            return type.Namespace?.Replace($".{StaticLiterals.EntitiesFolder}.", $".{ModelsFolder}.") ?? String.Empty;
+            var modelSubNamespace = $"{ModelsFolder}.{CreateSubNamespaceFromEntityType(type)}";
+
+            return $"{Namespace}.{modelSubNamespace}";
         }
+        public string CreateModelTypeSubNamespace(Type type)
+        {
+            return $"{ModelsFolder}.{CreateSubNamespaceFromEntityType(type)}";
+        }
+        public string CreateModelSubPathFromType(Type type, string postFix, string fileExtension)
+        {
+            return Path.Combine(CreateModelTypeSubNamespace(type).Replace(".", "\\"), $"{type.Name}{postFix}{fileExtension}");
+        }
+
         protected virtual bool CanCreate(Type type)
         {
             bool create = true;
@@ -55,8 +63,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var result = new List<IGeneratedItem>();
 
             result.AddRange(CreateLogicModels());
-            //result.AddRange(CreateWebApiModels());
-            //result.AddRange(CreateAspMvcModels());
+            result.AddRange(CreateWebApiModels());
+            result.AddRange(CreateAspMvcModels());
             return result;
         }
 
@@ -65,25 +73,26 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var result = new List<IGeneratedItem>();
             var entityProject = EntityProject.Create(SolutionProperties);
 
+            Namespace = $"{SolutionProperties.SolutionName}{StaticLiterals.LogicExtension}";
             foreach (var type in entityProject.EntityTypes)
             {
                 if (CanCreate(type))
                 {
-                    result.Add(CreateModelFromType(type, Common.UnitType.Logic, Common.ItemType.AspMvcModel));
-                    result.Add(CreateLogicModel(type, Common.UnitType.Logic));
+                    result.Add(CreateModelFromType(type, Common.UnitType.Logic, Common.ItemType.LogicModel));
+                    result.Add(CreateLogicModel(type, Common.UnitType.Logic, Common.ItemType.LogicModel));
                 }
             }
             return result;
         }
-        protected virtual IGeneratedItem CreateLogicModel(Type type, Common.UnitType unitType)
+        protected virtual IGeneratedItem CreateLogicModel(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var result = new Models.GeneratedItem(unitType, Common.ItemType.LogicModel)
+            var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateSubFilePathFromInterface(type, ModelsFolder, "Inheritance", StaticLiterals.CSharpFileExtension),
+                SubFilePath = CreateModelSubPathFromType(type, "Inheritance", StaticLiterals.CSharpFileExtension),
             };
-            result.Source.Add($"partial class {CreateModelNameFromType(type)} : {GetBaseClassByType(type)}");
+            result.Source.Add($"partial class {CreateModelNameFromType(type)} : {GetBaseClassByType(type, ModelsFolder)}");
             result.Source.Add("{");
             result.Source.Add("}");
             result.EnvelopeWithANamespace(CreateModelTypeNamespace(type));
@@ -96,25 +105,26 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var result = new List<IGeneratedItem>();
             var entityProject = EntityProject.Create(SolutionProperties);
 
+            Namespace = $"{SolutionProperties.SolutionName}{StaticLiterals.WebApiExtension}";
             foreach (var type in entityProject.EntityTypes)
             {
                 if (CanCreate(type))
                 {
                     result.Add(CreateModelFromType(type, Common.UnitType.WebApi, Common.ItemType.WebApiModel));
-                    result.Add(CreateWebApiModel(type, Common.UnitType.WebApi));
+                    result.Add(CreateWebApiModel(type, Common.UnitType.WebApi, Common.ItemType.WebApiModel));
                 }
             }
             return result;
         }
-        protected virtual IGeneratedItem CreateWebApiModel(Type type, Common.UnitType unitType)
+        protected virtual IGeneratedItem CreateWebApiModel(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var result = new Models.GeneratedItem(unitType, Common.ItemType.WebApiModel)
+            var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateSubFilePathFromInterface(type, ModelsFolder, "Inheritance", StaticLiterals.CSharpFileExtension),
+                SubFilePath = CreateModelSubPathFromType(type, "Inheritance", StaticLiterals.CSharpFileExtension),
             };
-            result.Source.Add($"partial class {CreateModelNameFromType(type)} : {GetBaseClassByType(type)}");
+            result.Source.Add($"partial class {CreateModelNameFromType(type)} : {GetBaseClassByType(type, ModelsFolder)}");
             result.Source.Add("{");
             result.Source.Add("}");
             result.EnvelopeWithANamespace(CreateModelTypeNamespace(type));
@@ -127,31 +137,32 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var result = new List<IGeneratedItem>();
             var entityProject = EntityProject.Create(SolutionProperties);
 
+            Namespace = $"{SolutionProperties.SolutionName}{StaticLiterals.AspMvsExtension}";
             foreach (var type in entityProject.EntityTypes)
             {
                 if (CanCreate(type))
                 {
                     result.Add(CreateModelFromType(type, Common.UnitType.AspMvc, Common.ItemType.AspMvcModel));
-                    //result.Add(CreateAspMvcModel(type, Common.UnitType.AspMvc));
+                    result.Add(CreateAspMvcModel(type, Common.UnitType.AspMvc, Common.ItemType.AspMvcModel));
                 }
             }
             return result;
         }
-        //protected virtual Contracts.IGeneratedItem CreateAspMvcModel(Type type, Common.UnitType unitType)
-        //{
-        //    var result = new Models.GeneratedItem(unitType, Common.ItemType.PersistenceModel)
-        //    {
-        //        FullName = CreateModelFullNameFromType(type),
-        //        FileExtension = StaticLiterals.CSharpFileExtension,
-        //        SubFilePath = CreateSubFilePathFromInterface(type, ModelsFolder, "Inheritance", StaticLiterals.CSharpFileExtension),
-        //    };
-        //    result.Source.Add($"partial class {CreateModelNameFromType(type)} : {GetBaseClassByContract(type)}");
-        //    result.Source.Add("{");
-        //    result.Source.Add("}");
-        //    result.EnvelopeWithANamespace(CreateModelsNamespace(type));
-        //    result.FormatCSharpCode();
-        //    return result;
-        //}
+        protected virtual IGeneratedItem CreateAspMvcModel(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        {
+            var result = new Models.GeneratedItem(unitType, itemType)
+            {
+                FullName = CreateModelFullNameFromType(type),
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = CreateModelSubPathFromType(type, "Inheritance", StaticLiterals.CSharpFileExtension),
+            };
+            result.Source.Add($"partial class {CreateModelNameFromType(type)} : {GetBaseClassByType(type, ModelsFolder)}");
+            result.Source.Add("{");
+            result.Source.Add("}");
+            result.EnvelopeWithANamespace(CreateModelTypeNamespace(type));
+            result.FormatCSharpCode();
+            return result;
+        }
 
         protected virtual IGeneratedItem CreateModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
@@ -162,7 +173,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateSubFilePathFromInterface(type, "Models", "", StaticLiterals.CSharpFileExtension),
+                SubFilePath = CreateModelSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
             };
             CreateModelAttributes(type, result.Source);
             result.Add($"public partial class {modelName}");
@@ -191,7 +202,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateSubFilePathFromInterface(type, "Models", "", StaticLiterals.CSharpFileExtension),
+                SubFilePath = CreateSubFilePathFromType(type, "Models", "", StaticLiterals.CSharpFileExtension),
             };
 
             CreateModelAttributes(type, result.Source);
@@ -211,7 +222,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return result;
         }
 
-        protected string GetBaseClassByType(Type type)
+        protected string GetBaseClassByType(Type type, string subNamespace)
         {
             var result = string.Empty;
 
@@ -227,18 +238,19 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
                 if (idx > -1 && idx < StaticLiterals.ModelBaseClasses.Length)
                 {
-                    result = $"{CreateModelsNamespace()}.{StaticLiterals.ModelBaseClasses[idx]}";
+                    var ns = Namespace;
+
+                    if (string.IsNullOrEmpty(subNamespace) == false)
+                        ns = $"{ns}.{subNamespace}";
+
+                    result = $"{ns}.{StaticLiterals.ModelBaseClasses[idx]}";
                 }
             }
             return result;
         }
         protected string CreateModelFullNameFromType(Type type)
         {
-            var modelName = CreateModelNameFromType(type);
-            var subNamespace = $"{(ModelsFolder.HasContent() ? $"{ModelsFolder}." : string.Empty)}";
-            var result = type?.FullName?.Replace(type.Name, modelName);
-
-            return result?.Replace(".Contracts.", subNamespace) ?? string.Empty;
+            return $"{CreateModelTypeNamespace(type)}.{type.Name}";
         }
     }
 }

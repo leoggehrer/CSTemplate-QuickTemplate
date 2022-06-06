@@ -55,8 +55,8 @@ namespace TemplateCodeGenerator.ConApp
                 Console.WriteLine($"Code generation for '{sourceSolutionName}' from: {SourcePath}");
                 Console.WriteLine();
                 Console.WriteLine($"[{++menuIndex}] Change source path");
-
                 Console.WriteLine($"[{++menuIndex}] Compile solution...");
+                Console.WriteLine($"[{++menuIndex}] Delete generation files...");
                 Console.WriteLine($"[{++menuIndex}] Start code generation...");
                 Console.WriteLine("[x|X] Exit");
                 Console.WriteLine();
@@ -112,16 +112,14 @@ namespace TemplateCodeGenerator.ConApp
                     }
                     else if (select == 3)
                     {
-                        var generateItems = Generator.Generate(SourcePath);
+                        Generator.DeleteGenerationFiles(SourcePath);
+                    }
+                    else if (select == 4)
+                    {
                         var solutionProperties = SolutionProperties.Create(SourcePath);
-                        var entityProject = EntityProject.Create(solutionProperties);
+                        var generatedItems = Generator.Generate(SourcePath);
 
-                        foreach (var item in entityProject.EntityTypes)
-                        {
-                            Console.WriteLine(item.Name);
-                        }
-                        Console.Write("Press any key ");
-                        Console.ReadKey();
+                        Writer.WriteAll(SourcePath, solutionProperties, generatedItems);
                     }
                 }
                 Console.ResetColor();

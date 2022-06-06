@@ -7,16 +7,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
 {
     internal abstract partial class GeneratorObject
     {
-        public enum InterfaceType
-        {
-            Unknown,
-            Root,
-            Client,
-            Business,
-            Module,
-            Persistence,
-            Shadow,
-        }
         static GeneratorObject()
         {
             ClassConstructing();
@@ -60,8 +50,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
         public static IEnumerable<Type> GetEntityTypes(Assembly assembly)
         {
             return assembly.GetTypes()
-                           .Where(t => t.IsInterface == false 
-                                    && (t.BaseType != null && t.BaseType.Name.Equals(StaticLiterals.IdentityEntityName) 
+                           .Where(t => t.IsInterface == false
+                                    && (t.BaseType != null && t.BaseType.Name.Equals(StaticLiterals.IdentityEntityName)
                                         || t.BaseType != null && t.BaseType.Name.Equals(StaticLiterals.VersionEntityName)));
         }
         #endregion Assembly-Helpers
@@ -71,7 +61,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>
         /// <returns>Schema der Entitaet.</returns>
-        public static string GetSolutionNameFromInterface(Type type)
+        public static string GetSolutionNameFromType(Type type)
         {
             var result = string.Empty;
             var data = type.Namespace?.Split('.');
@@ -106,6 +96,17 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return result;
         }
         /// <summary>
+        /// Diese Methode ermittelt den Teilnamensraum aus einem Typ.
+        /// </summary>
+        /// <param name="type">Typ</param>
+        /// <returns>Teil-Namensraum</returns>
+        public static string CreateSubNamespaceFromEntityType(Type type)
+        {
+            var result = CreateSubNamespaceFromType(type).Replace($"{StaticLiterals.EntitiesFolder}.", string.Empty);
+
+            return result;
+        }
+        /// <summary>
         /// Diese Methode ermittelt den Teil-Path aus einem Typ.
         /// </summary>
         /// <param name="type">Typ</param>
@@ -116,29 +117,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
 
         /// <summary>
-        /// Diese Methode ermittelt den Transfer-Model-Namensraum aus einem Typ.
-        /// </summary>
-        /// <param name="type">Typ</param>
-        /// <returns>Transfer-Model-Namensraum</returns>
-        public static string CreateTransferModelNameSpace(Type type)
-        {
-            return $"Transfer.{StaticLiterals.ModelsFolder}.{CreateSubNamespaceFromType(type)}";
-        }
-
-        /// <summary>
-        /// Diese Methode ermittelt den Entity Namen aus seinem Schnittstellen Typ.
+        /// Diese Methode ermittelt den Entity Namen aus seinem Typ.
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>
         /// <returns>Name der Entitaet.</returns>
-        public static string CreateEntityNameFromInterface(Type type)
+        public static string CreateEntityNameFromType(Type type)
         {
-            var result = string.Empty;
-
-            if (type.IsInterface)
-            {
-                result = type.Name[1..];
-            }
-            return result;
+            return type.Name;
         }
         /// <summary>
         /// Diese Methode ermittelt den Model Namen aus seinem Typ.
@@ -159,20 +144,16 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return $"Edit{CreateModelNameFromType(type)}";
         }
         /// <summary>
-        /// Diese Methode ermittelt den Entity-Typ aus seiner Schnittstellen.
+        /// Diese Methode ermittelt den Entity-Typ aus seiner Type.
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>
         /// <returns>Typ der Entitaet.</returns>
-        public static string CreateEntityTypeFromInterface(Type type)
+        public static string CreateEntityTypeFromType(Type type)
         {
             var result = string.Empty;
+            var entityName = CreateEntityNameFromType(type);
 
-            if (type.IsInterface)
-            {
-                var entityName = CreateEntityNameFromInterface(type);
-
-                result = $"{CreateSubNamespaceFromType(type)}.{entityName}";
-            }
+            result = $"{CreateSubNamespaceFromType(type)}.{entityName}";
             return result;
         }
         /// <summary>
@@ -180,13 +161,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>
         /// <returns>Name der Entitaet.</returns>
-        public static string CreateEntityFullNameFromInterface(Type type)
+        public static string CreateEntityFullNameFromType(Type type)
         {
             var result = string.Empty;
 
             if (type.FullName != null)
             {
-                var entityName = CreateEntityNameFromInterface(type);
+                var entityName = CreateEntityNameFromType(type);
 
                 result = type.FullName.Replace(type.Name, entityName);
                 result = result.Replace(".Contracts", ".Logic.Entities");
@@ -201,24 +182,20 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <param name="filePostfix">Ein optionaler Datei-Postfix.</param>
         /// <param name="fileExtension">Die Datei-Extension.</param>
         /// <returns></returns>
-        public static string CreateSubFilePathFromInterface(Type type, string pathPrefix, string filePostfix, string fileExtension)
+        public static string CreateSubFilePathFromType(Type type, string pathPrefix, string filePostfix, string fileExtension)
         {
             var result = string.Empty;
+            var entityName = CreateEntityNameFromType(type);
 
-            if (type.IsInterface)
+            if (pathPrefix.IsNullOrEmpty())
             {
-                var entityName = CreateEntityNameFromInterface(type);
-
-                if (pathPrefix.IsNullOrEmpty())
-                {
-                    result = CreateSubPathFromType(type);
-                }
-                else
-                {
-                    result = System.IO.Path.Combine(pathPrefix, CreateSubPathFromType(type));
-                }
-                result = System.IO.Path.Combine(result, $"{entityName}{filePostfix}{fileExtension}");
+                result = CreateSubPathFromType(type);
             }
+            else
+            {
+                result = Path.Combine(pathPrefix, CreateSubPathFromType(type));
+            }
+            result = Path.Combine(result, $"{entityName}{filePostfix}{fileExtension}");
             return result;
         }
         /// <summary>
@@ -235,7 +212,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             if (type.IsInterface)
             {
-                var entityName = CreateEntityNameFromInterface(type);
+                var entityName = CreateEntityNameFromType(type);
 
                 if (pathPrefix.IsNullOrEmpty())
                 {
@@ -243,9 +220,9 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 }
                 else
                 {
-                    result = System.IO.Path.Combine(pathPrefix, CreateSubPathFromType(type));
+                    result = Path.Combine(pathPrefix, CreateSubPathFromType(type));
                 }
-                result = System.IO.Path.Combine(result, $"{entityName.CreatePluralWord()}{filePostfix}{fileExtension}");
+                result = Path.Combine(result, $"{entityName.CreatePluralWord()}{filePostfix}{fileExtension}");
             }
             return result;
         }
