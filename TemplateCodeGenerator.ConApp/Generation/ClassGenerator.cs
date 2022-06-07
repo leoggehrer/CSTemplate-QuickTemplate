@@ -75,48 +75,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         #endregion Create constructors
 
         #region Create factory methode
-        public static IEnumerable<string> CreateFactoryMethods(Type type, bool newPrefix)
-        {
-            var result = new List<string>();
-            var entityType = CreateEntityTypeFromType(type);
-
-            result.Add($"public{(newPrefix ? " new " : " ")}static {entityType} Create()");
-            result.Add("{");
-            result.Add("BeforeCreate();");
-            result.Add($"var result = new {entityType}();");
-            result.Add("AfterCreate(result);");
-            result.Add("return result;");
-            result.Add("}");
-
-            result.Add($"public{(newPrefix ? " new " : " ")}static {entityType} Create(object other)");
-            result.Add("{");
-            result.Add("BeforeCreate(other);");
-            result.Add("CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));");
-            result.Add($"var result = new {entityType}();");
-            result.Add("CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);");
-            result.Add("AfterCreate(result, other);");
-            result.Add("return result;");
-            result.Add("}");
-
-            result.Add($"public static {entityType} Create({type.FullName} other)");
-            result.Add("{");
-            result.Add("BeforeCreate(other);");
-            result.Add($"var result = new {entityType}();");
-            result.Add("result.CopyProperties(other);");
-            result.Add("AfterCreate(result, other);");
-            result.Add("return result;");
-            result.Add("}");
-
-            result.Add("static partial void BeforeCreate();");
-            result.Add($"static partial void AfterCreate({entityType} instance);");
-
-            result.Add("static partial void BeforeCreate(object other);");
-            result.Add($"static partial void AfterCreate({entityType} instance, object other);");
-
-            result.Add($"static partial void BeforeCreate({type.FullName} other);");
-            result.Add($"static partial void AfterCreate({entityType} instance, {type.FullName} other);");
-            return result;
-        }
         public static IEnumerable<string> CreateFactoryMethods(string itemType, bool newPrefix)
         {
             var result = new List<string>();
@@ -160,34 +118,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         #endregion Create factory methode
 
-        //#region Create partial model
-        //public static IEnumerable<string> CreateModelFromInterface(Type type,
-        //                                                           Action<Type, List<string>>? createAttributes = null,
-        //                                                           Action<ContractPropertyHelper, List<string>>? createPropertyAttributes = null)
-        //{
-        //    var result = new List<string>();
-        //    var entityName = CreateEntityNameFromInterface(type);
-        //    var properties = ContractHelper.GetAllProperties(type);
-
-        //    createAttributes?.Invoke(type, result);
-        //    result.Add($"public partial class {entityName} : {type.FullName}");
-        //    result.Add("{");
-        //    result.AddRange(CreatePartialStaticConstrutor(entityName));
-        //    result.AddRange(CreatePartialConstrutor("public", entityName));
-        //    foreach (var item in ContractHelper.FilterPropertiesForGeneration(type, properties))
-        //    {
-        //        var propertyHelper = new ContractPropertyHelper(type, item);
-
-        //        createPropertyAttributes?.Invoke(propertyHelper, result);
-        //        result.AddRange(CreateProperty(propertyHelper));
-        //    }
-        //    result.AddRange(CreateCopyProperties(type));
-        //    result.AddRange(CreateFactoryMethods(type, false));
-        //    result.Add("}");
-        //    return result;
-        //}
-        //#endregion Create partial model
-
         #region Create partial property
         static partial void CreatePropertyAttributes(PropertyInfo propertyInfo, List<string> codeLines);
         static partial void CreateGetPropertyAttributes(PropertyInfo propertyInfo, List<string> codeLines);
@@ -216,7 +146,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         public static IEnumerable<string> CreateAutoProperty(PropertyInfo propertyInfo)
         {
             var result = new List<string>();
-            var defaultValue = string.Empty;
+            var defaultValue = GetDefaultValue(propertyInfo);
             var fieldType = GetPropertyType(propertyInfo);
 
             result.Add(string.Empty);
@@ -237,7 +167,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         public static IEnumerable<string> CreatePartialProperty(PropertyInfo propertyInfo)
         {
             var result = new List<string>();
-            var defaultValue = string.Empty;
+            var defaultValue = GetDefaultValue(propertyInfo);
             var fieldType = GetPropertyType(propertyInfo);
             var fieldName = CreateFieldName(propertyInfo, "_");
             var paramName = CreateFieldName(propertyInfo, "_");
@@ -309,7 +239,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             return CreateCopyProperties(type, type.FullName ?? string.Empty, filter ?? (pi => true));
         }
-        private static IEnumerable<string> CreateCopyProperties(Type type, string copyType, Func<PropertyInfo, bool> filter)
+        public static IEnumerable<string> CreateCopyProperties(Type type, string copyType, Func<PropertyInfo, bool> filter)
         {
             var result = new List<string>
             {

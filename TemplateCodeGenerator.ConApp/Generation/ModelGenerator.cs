@@ -20,6 +20,10 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
         public string ModelsFolder { get; } = StaticLiterals.ModelsFolder;
         private string Namespace { get; set; } = string.Empty;
+        public string CreateModelType(Type type)
+        {
+            return $"{CreateModelTypeNamespace(type)}.{type.Name}";
+        }
         public string CreateModelTypeNamespace(Type type)
         {
             var modelSubNamespace = $"{ModelsFolder}.{CreateSubNamespaceFromEntityType(type)}";
@@ -186,8 +190,20 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 CreateModelPropertyAttributes(propertyInfo, result.Source);
                 result.AddRange(CreateProperty(propertyInfo));
             }
-            result.AddRange(CreateCopyProperties(type));
-            result.AddRange(CreateFactoryMethods(type, false));
+            if (unitType == Common.UnitType.Logic)
+            {
+                result.AddRange(CreateCopyProperties(type));
+                result.AddRange(CreateCopyProperties(type, CreateModelType(type), p => true));
+            }
+            else if (unitType == Common.UnitType.WebApi)
+            {
+                result.AddRange(CreateCopyProperties(type, CreateModelType(type), p => true));
+            }
+            else if (unitType == Common.UnitType.AspMvc)
+            {
+                result.AddRange(CreateCopyProperties(type, CreateModelType(type), p => true));
+            }
+            result.AddRange(CreateFactoryMethods(CreateModelType(type), false));
             result.Add("}");
             result.EnvelopeWithANamespace(CreateModelTypeNamespace(type), "using System;");
             result.FormatCSharpCode();

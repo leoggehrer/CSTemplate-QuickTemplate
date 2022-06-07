@@ -311,6 +311,16 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             return $"{prefix}{char.ToLower(propertyInfo.Name.First())}{propertyInfo.Name[1..]}";
         }
+        public static string GetDefaultValue(PropertyInfo propertyInfo)
+        {
+            string result = string.Empty;
+
+            if (propertyInfo.IsNullable() == false && propertyInfo.PropertyType == typeof(string))
+            {
+                result = "string.Empty";
+            }
+            return result;
+        }
         #endregion Property-Helpers
         #endregion Helpers
     }
