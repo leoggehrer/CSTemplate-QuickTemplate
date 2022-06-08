@@ -48,7 +48,7 @@ namespace TemplateCodeGenerator.ConApp.Models
             }
             Source.AddRange(codeLines);
         }
-        public void FormatCSharpCode(bool removeBlockComments = false, bool removeLineComments = true)
+        public void FormatCSharpCode(bool removeBlockComments = false, bool removeLineComments = false)
         {
             Source.AddRange(Source.Eject().FormatCSharpCode(removeBlockComments, removeLineComments));
         }

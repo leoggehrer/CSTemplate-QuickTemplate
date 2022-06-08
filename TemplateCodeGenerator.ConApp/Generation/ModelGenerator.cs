@@ -179,6 +179,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 FileExtension = StaticLiterals.CSharpFileExtension,
                 SubFilePath = CreateModelSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
             };
+            result.AddRange(CreateComment(type));
             CreateModelAttributes(type, result.Source);
             result.Add($"public partial class {modelName}");
             result.Add("{");

@@ -32,6 +32,17 @@ namespace TemplateCodeGenerator.ConApp
             }));
             #endregion WriteLogicModels
 
+            #region WriteWebApiModels
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.WebApiProjectName);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.WebApi && e.ItemType == ItemType.WebApiModel);
+
+                Console.WriteLine("Write WebApi-Models...");
+                WriteItems(projectPath, writeItems);
+            }));
+            #endregion WriteWebApiModels
+
             Task.WaitAll(tasks.ToArray());
         }
 

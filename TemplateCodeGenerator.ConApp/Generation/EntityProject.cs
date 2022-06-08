@@ -28,12 +28,9 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 {
                     if (SolutionProperties.LogicAssemblyFilePath.HasContent() && File.Exists(SolutionProperties.LogicAssemblyFilePath))
                     {
-                        var assembly = AssemblyLoadContext.Default
-                                                           .LoadFromAssemblyPath(SolutionProperties.LogicAssemblyFilePath);
-                        if (assembly != null)
-                        {
-                            assemblyTypes = assembly.GetTypes();
-                        }
+                        assemblyTypes = AssemblyLoadContext.Default
+                                                           .LoadFromAssemblyPath(SolutionProperties.LogicAssemblyFilePath)
+                                                           .GetTypes();
                     }
                 }
                 return assemblyTypes ?? Array.Empty<Type>();
