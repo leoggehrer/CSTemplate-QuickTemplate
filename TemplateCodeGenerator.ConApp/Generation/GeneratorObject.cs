@@ -285,7 +285,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
 
         #region Comment-Helpers
-        public static IEnumerable<string> CreateComment(Type type)
+        public virtual IEnumerable<string> CreateComment(Type type)
         {
             var result = new List<string>()
             {
@@ -295,7 +295,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             };
             return result;
         }
-        public static IEnumerable<string> CreateComment(PropertyInfo propertyInfo)
+        public virtual IEnumerable<string> CreateComment(PropertyInfo propertyInfo)
         {
             var result = new List<string>()
             {
@@ -313,7 +313,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// </summary>
         /// <param name="propertyInfo">Das Eigenschaftsinfo-Objekt.</param>
         /// <returns>Der Eigenschaftstyp als Zeichenfolge.</returns>
-        public static string GetPropertyType(PropertyInfo propertyInfo)
+        public virtual string GetPropertyType(PropertyInfo propertyInfo)
         {
             var nullable = propertyInfo.IsNullable();
             var result = $"{propertyInfo.PropertyType.GetCodeDefinition()}";

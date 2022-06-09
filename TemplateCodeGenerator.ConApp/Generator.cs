@@ -11,20 +11,31 @@ namespace TemplateCodeGenerator.ConApp
         {
             var result = new ConcurrentBag<IGeneratedItem>();
             ISolutionProperties solutionProperties = Generation.SolutionProperties.Create(solutionPath);
-            var modelGenerator = new Generation.ModelGenerator(solutionProperties);
+            var logicGenerator = new Generation.LogicGenerator(solutionProperties);
+            var webApiGenerator = new Generation.WebApiGenerator(solutionProperties);
             var tasks = new List<Task>();
 
-            #region Models
+            #region Logic
             tasks.Add(Task.Factory.StartNew(() =>
             {
                 var generatedItems = new List<IGeneratedItem>();
 
-                Console.WriteLine("Create Logic-Entities...");
-                generatedItems.AddRange(modelGenerator.GenerateAll());
+                Console.WriteLine("Create Logic-Modles...");
+                generatedItems.AddRange(logicGenerator.GenerateAll());
                 result.AddRangeSafe(generatedItems);
             }));
-            #endregion Models
+            #endregion Logic
 
+            #region WebApi
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var generatedItems = new List<IGeneratedItem>();
+
+                Console.WriteLine("Create WebApi-Modles...");
+                generatedItems.AddRange(webApiGenerator.GenerateAll());
+                result.AddRangeSafe(generatedItems);
+            }));
+            #endregion WebApi
 
             Task.WaitAll(tasks.ToArray());
             return result;

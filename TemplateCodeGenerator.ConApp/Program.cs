@@ -94,7 +94,7 @@ namespace TemplateCodeGenerator.ConApp
                             SourcePath = selectOrPath;
                         }
                     }
-                    else if (select == 2)
+                    if (select == 2)
                     {
                         var solutionProperties = SolutionProperties.Create(SourcePath);
                         var arguments = $"build \"{solutionProperties.SolutionFilePath}\" -c Release";
@@ -110,11 +110,11 @@ namespace TemplateCodeGenerator.ConApp
                         Console.Write("Press any key ");
                         Console.ReadKey();
                     }
-                    else if (select == 3)
+                    if (select == 3)
                     {
                         Generator.DeleteGenerationFiles(SourcePath);
                     }
-                    else if (select == 4)
+                    if (select == 4)
                     {
                         var solutionProperties = SolutionProperties.Create(SourcePath);
                         var generatedItems = Generator.Generate(SourcePath);

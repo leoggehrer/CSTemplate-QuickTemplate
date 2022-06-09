@@ -1,4 +1,5 @@
 //MdStart
+using System.Reflection;
 using System.Runtime.Loader;
 using TemplateCodeGenerator.ConApp.Contracts;
 
@@ -28,9 +29,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 {
                     if (SolutionProperties.LogicAssemblyFilePath.HasContent() && File.Exists(SolutionProperties.LogicAssemblyFilePath))
                     {
-                        assemblyTypes = AssemblyLoadContext.Default
-                                                           .LoadFromAssemblyPath(SolutionProperties.LogicAssemblyFilePath)
-                                                           .GetTypes();
+                        assemblyTypes = Assembly.LoadFile(SolutionProperties.LogicAssemblyFilePath)
+                                                .GetTypes();
                     }
                 }
                 return assemblyTypes ?? Array.Empty<Type>();
