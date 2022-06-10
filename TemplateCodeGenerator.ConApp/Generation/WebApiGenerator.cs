@@ -7,8 +7,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
         public WebApiGenerator(ISolutionProperties solutionProperties) : base(solutionProperties)
         {
         }
-
-        protected override string Namespace => $"{SolutionProperties.SolutionName}{StaticLiterals.WebApiExtension}";
+        protected override string Extension => StaticLiterals.WebApiExtension;
+        protected override string Namespace => $"{SolutionProperties.SolutionName}{Extension}";
 
         public virtual IEnumerable<IGeneratedItem> GenerateAll()
         {

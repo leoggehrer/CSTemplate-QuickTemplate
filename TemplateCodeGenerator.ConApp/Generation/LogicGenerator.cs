@@ -8,7 +8,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
         }
 
-        protected override string Namespace => $"{SolutionProperties.SolutionName}{StaticLiterals.LogicExtension}";
+        protected override string Extension => StaticLiterals.LogicExtension;
+        protected override string Namespace => $"{SolutionProperties.SolutionName}{Extension}";
 
         public virtual IEnumerable<IGeneratedItem> GenerateAll()
         {

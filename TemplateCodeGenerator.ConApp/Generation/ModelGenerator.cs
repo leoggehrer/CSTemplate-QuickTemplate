@@ -12,6 +12,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
 
         public string ModelsFolder { get; } = StaticLiterals.ModelsFolder;
+        protected abstract string Extension { get; }
         protected abstract string Namespace { get; }
         public string CreateModelType(Type type)
         {
@@ -46,6 +47,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 var modelsFolder = $".{StaticLiterals.ModelsFolder}.";
 
                 result = result.Replace(entitiesFolder, modelsFolder);
+                result = result.Replace(StaticLiterals.LogicExtension, Extension);
             }
             return result;
         }
