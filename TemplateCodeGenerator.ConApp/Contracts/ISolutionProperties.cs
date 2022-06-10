@@ -15,6 +15,8 @@ namespace TemplateCodeGenerator.ConApp.Contracts
         string SolutionPath { get; }
         string SolutionName { get; }
         string SolutionFilePath { get; }
+        string? CompilePath { get; set; }
+        string? CompileLogicAssemblyFilePath { get; }
 
         IEnumerable<string> ProjectNames { get; }
 

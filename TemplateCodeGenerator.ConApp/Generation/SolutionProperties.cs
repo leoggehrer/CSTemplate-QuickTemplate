@@ -13,6 +13,21 @@ namespace TemplateCodeGenerator.ConApp.Generation
         public string SolutionPath { get; }
         public string SolutionName { get; }
         public string SolutionFilePath { get; }
+        public string? CompilePath { get; set; }
+
+        public string? CompileLogicAssemblyFilePath 
+        {
+            get
+            {
+                var result = string.Empty;
+
+                if (CompilePath.HasContent())
+                {
+                    result = GetCompileAssemblyFilePath(CompilePath!);
+                }
+                return result;
+            }
+        }
         #region ProjectNames
         public IEnumerable<string> ProjectNames => CommonBase.StaticLiterals.ProjectExtensions.Select(e => $"{SolutionName}{e}");
 
@@ -98,6 +113,28 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 var fileInfos = new DirectoryInfo(path).GetFiles(fileName, SearchOption.AllDirectories)
                                                           .Where(f => f.FullName.EndsWith(fileName))
                                                           .OrderByDescending(f => f.LastWriteTime);
+
+                var fileInfo = fileInfos.Where(f => f.FullName.ToLower().Contains("\\ref\\") == false)
+                                        .FirstOrDefault();
+
+                if (fileInfo != null)
+                {
+                    result = fileInfo.FullName;
+                }
+            }
+            return result ?? string.Empty;
+        }
+        private string GetCompileAssemblyFilePath(string compilePath)
+        {
+            var result = default(string);
+            var projectName = $"{SolutionName}{StaticLiterals.LogicExtension}";
+
+            if (Directory.Exists(compilePath))
+            {
+                var fileName = $"{projectName}.dll";
+                var fileInfos = new DirectoryInfo(compilePath).GetFiles(fileName, SearchOption.AllDirectories)
+                                                              .Where(f => f.FullName.EndsWith(fileName))
+                                                              .OrderByDescending(f => f.LastWriteTime);
 
                 var fileInfo = fileInfos.Where(f => f.FullName.ToLower().Contains("\\ref\\") == false)
                                         .FirstOrDefault();

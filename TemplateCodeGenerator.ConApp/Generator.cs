@@ -9,8 +9,13 @@ namespace TemplateCodeGenerator.ConApp
     {
         public static IEnumerable<IGeneratedItem> Generate(string solutionPath)
         {
-            var result = new ConcurrentBag<IGeneratedItem>();
             ISolutionProperties solutionProperties = Generation.SolutionProperties.Create(solutionPath);
+
+            return Generate(solutionProperties);
+        }
+        public static IEnumerable<IGeneratedItem> Generate(ISolutionProperties solutionProperties)
+        {
+            var result = new ConcurrentBag<IGeneratedItem>();
             var logicGenerator = new Generation.LogicGenerator(solutionProperties);
             var webApiGenerator = new Generation.WebApiGenerator(solutionProperties);
             var tasks = new List<Task>();
