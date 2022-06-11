@@ -11,11 +11,12 @@ namespace TemplateCodeGenerator.ConApp.Common
 
         Entity = 4,
 
-        LogicModel = 8,
-        WebApiModel = 16,
-        AspMvcModel = 32,
-        Model = LogicModel + WebApiModel + AspMvcModel,
+        Model = 8,
+        EditModel = 16,
 
+        AccessContract = 32,
+
+        Controller = 64,
     }
 }
 //MdEnd

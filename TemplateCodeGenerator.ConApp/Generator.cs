@@ -18,6 +18,7 @@ namespace TemplateCodeGenerator.ConApp
             var result = new ConcurrentBag<IGeneratedItem>();
             var logicGenerator = new Generation.LogicGenerator(solutionProperties);
             var webApiGenerator = new Generation.WebApiGenerator(solutionProperties);
+            var aspMvcGenerator = new Generation.AspMvcGenerator(solutionProperties);
             var tasks = new List<Task>();
 
             #region Logic
@@ -41,6 +42,17 @@ namespace TemplateCodeGenerator.ConApp
                 result.AddRangeSafe(generatedItems);
             }));
             #endregion WebApi
+
+            #region AspMvc
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var generatedItems = new List<IGeneratedItem>();
+
+                Console.WriteLine("Create AspMvc-Modles...");
+                generatedItems.AddRange(aspMvcGenerator.GenerateAll());
+                result.AddRangeSafe(generatedItems);
+            }));
+            #endregion AspMvc
 
             Task.WaitAll(tasks.ToArray());
             return result;

@@ -33,9 +33,17 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return Path.Combine(CreateModelTypeSubNamespace(type).Replace(".", "\\"), $"{type.Name}{postFix}{fileExtension}");
         }
 
-        protected bool IsEntityType(Type type)
+        protected static bool IsEntityType(Type type)
         {
             return type.FullName!.Contains($".{StaticLiterals.EntitiesFolder}.");
+        }
+        protected static bool IsModelType(Type type)
+        {
+            return type.FullName!.Contains($".{StaticLiterals.ModelsFolder}.");
+        }
+        protected static bool IsModelType(string strType)
+        {
+            return strType.Contains($".{StaticLiterals.ModelsFolder}.");
         }
         protected string ConvertEntityToModelType(string typeFullname)
         {
@@ -58,11 +66,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             return ConvertEntityToModelType(result);
         }
-        protected override string CopyProperty(PropertyInfo propertyInfo)
+        protected override string CopyProperty(string copyType, PropertyInfo propertyInfo)
         {
             string? result = null;
 
-            if (IsEntityType(propertyInfo.PropertyType))
+            if (IsModelType(copyType) == false && IsEntityType(propertyInfo.PropertyType))
             {
                 if (IsListType(propertyInfo.PropertyType))
                 {
@@ -73,7 +81,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
                     result = $"{propertyInfo.Name} = other.{propertyInfo.Name} != null ? {ConvertEntityToModelType(propertyInfo.PropertyType.FullName!)}.Create(other.{propertyInfo.Name}) : null;";
                 }
             }
-            return result ?? base.CopyProperty(propertyInfo);
+            return result ?? base.CopyProperty(copyType, propertyInfo);
         }
         #endregion overrides
 
@@ -125,17 +133,19 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             if (unitType == Common.UnitType.Logic)
             {
-                result.AddRange(CreateCopyProperties(type, type.FullName!));
-                result.AddRange(CreateCopyProperties(type, CreateModelType(type)));
+                result.AddRange(CreateCopyProperties("internal", type, type.FullName!));
+                result.AddRange(CreateCopyProperties("public", type, CreateModelType(type)));
             }
             else if (unitType == Common.UnitType.WebApi)
             {
-                result.AddRange(CreateCopyProperties(type, CreateModelType(type), p => true));
+                result.AddRange(CreateCopyProperties("public", type, CreateModelType(type)));
             }
             else if (unitType == Common.UnitType.AspMvc)
             {
-                result.AddRange(CreateCopyProperties(type, CreateModelType(type), p => true));
+                result.AddRange(CreateCopyProperties("public", type, CreateModelType(type), p => true));
             }
+            result.AddRange(CreateEquals(type));
+            result.AddRange(CreateGetHashCode(type));
             result.AddRange(CreateFactoryMethods(CreateModelType(type), false));
             result.Add("}");
             result.EnvelopeWithANamespace(CreateModelTypeNamespace(type), "using System;");
@@ -146,14 +156,16 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             var modelName = CreateEditModelNameFromType(type);
             var typeProperties = type.GetAllPropertyInfos();
-            var filteredProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)));
+            var filteredProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false 
+                                                            && IsListType(e.PropertyType) == false);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateSubFilePathFromType(type, "Models", "", StaticLiterals.CSharpFileExtension),
+                SubFilePath = CreateModelSubPathFromType(type, "Edit", StaticLiterals.CSharpFileExtension),
             };
 
+            result.AddRange(CreateComment(type));
             CreateModelAttributes(type, result.Source);
             result.Add($"public partial class {modelName}");
             result.Add("{");

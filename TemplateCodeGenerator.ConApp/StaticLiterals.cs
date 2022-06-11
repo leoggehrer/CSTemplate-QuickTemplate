@@ -44,15 +44,13 @@ namespace TemplateCodeGenerator.ConApp
         #endregion Model properties
 
         #region Folders
+        public static string ContractsFolder => "Contracts";
         public static string EntitiesFolder => "Entities";
         public static string DataContextFolder => "DataContext";
         public static string ControllersFolder => "Controllers";
+        public static string FacadesFolder => "Facades";
         public static string ModelsFolder => "Models";
-        public static string ModulesFolder => "Modules";
         #endregion Folders
-
-        public static string EntitiesLabel => "Entities";
-        public static string ModulesLabel => "Modules";
 
         public static string DelegatePropertyName => "DelegateObject";
     }

@@ -2,12 +2,12 @@
 
 namespace TemplateCodeGenerator.ConApp.Generation
 {
-    internal partial class WebApiGenerator : ModelGenerator
+    internal partial class AspMvcGenerator : ModelGenerator
     {
-        public WebApiGenerator(ISolutionProperties solutionProperties) : base(solutionProperties)
+        public AspMvcGenerator(ISolutionProperties solutionProperties) : base(solutionProperties)
         {
         }
-        protected override string Extension => StaticLiterals.WebApiExtension;
+        protected override string Extension => StaticLiterals.AspMvsExtension;
         protected override string Namespace => $"{SolutionProperties.SolutionName}{Extension}";
 
         public virtual IEnumerable<IGeneratedItem> GenerateAll()
@@ -27,9 +27,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 if (CanCreate(type))
                 {
-                    result.Add(CreateModelFromType(type, Common.UnitType.WebApi, Common.ItemType.Model));
-                    result.Add(CreateLogicModel(type, Common.UnitType.WebApi, Common.ItemType.Model));
-                    result.Add(CreateEditModelFromType(type, Common.UnitType.WebApi, Common.ItemType.EditModel));
+                    result.Add(CreateModelFromType(type, Common.UnitType.AspMvc, Common.ItemType.Model));
+                    result.Add(CreateLogicModel(type, Common.UnitType.AspMvc, Common.ItemType.Model));
                 }
             }
             return result;

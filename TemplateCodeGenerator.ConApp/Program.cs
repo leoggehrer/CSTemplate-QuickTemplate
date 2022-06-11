@@ -99,14 +99,15 @@ namespace TemplateCodeGenerator.ConApp
                     if (select == 2 || select == 4)
                     {
                         var counter = 0;
-                        var deleteError = false;
                         var startCompilePath = Path.Combine(Path.GetTempPath(), solutionProperties.SolutionName);
                         var compilePath = startCompilePath;
+                        bool deleteError;
 
                         if (select == 4)
                         {
                             Generator.DeleteGenerationFiles(SourcePath);
                         }
+
                         do
                         {
                             deleteError = false;
@@ -124,7 +125,7 @@ namespace TemplateCodeGenerator.ConApp
                             }
                         } while (deleteError != false);
 
-                        var arguments = $"build \"{solutionProperties.SolutionFilePath}\" -c Release -o {compilePath}";
+                        var arguments = $"build \"{solutionProperties.LogicCSProjectFilePath}\" -c Release -o {compilePath}";
                         Console.WriteLine(arguments);
                         Debug.WriteLine($"dotnet.exe {arguments}");
 

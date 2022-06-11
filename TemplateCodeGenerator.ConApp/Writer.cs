@@ -16,33 +16,67 @@ namespace TemplateCodeGenerator.ConApp
         static partial void ClassConstructing();
         static partial void ClassConstructed();
         #endregion Class-Constructors
-        public static bool WriteToGroupFile { get; set; } = true;
+        public static bool WriteToGroupFile { get; set; } = false;
         public static void WriteAll(string solutionPath, ISolutionProperties solutionProperties, IEnumerable<IGeneratedItem> generatedItems)
         {
             var tasks = new List<Task>();
 
-            #region WriteLogicModels
-            tasks.Add(Task.Factory.StartNew(() =>
+            #region WriteLogicItems
+            tasks.Add(Task.Factory.StartNew((Action)(() =>
             {
                 var projectPath = Path.Combine(solutionPath, solutionProperties.LogicProjectName);
-                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.Logic && e.ItemType == ItemType.LogicModel);
+                var writeItems = generatedItems.Where<IGeneratedItem>((Func<IGeneratedItem, bool>)(e => e.UnitType == UnitType.Logic && e.ItemType == ItemType.Model));
 
                 Console.WriteLine("Write Logic-Models...");
                 WriteItems(projectPath, writeItems);
-            }));
-            #endregion WriteLogicModels
+            })));
+            tasks.Add(Task.Factory.StartNew((Action)(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.LogicProjectName);
+                var writeItems = generatedItems.Where<IGeneratedItem>((Func<IGeneratedItem, bool>)(e => e.UnitType == UnitType.Logic && e.ItemType == ItemType.AccessContract));
+
+                Console.WriteLine("Write Logic-AccessContracts...");
+                WriteItems(projectPath, writeItems);
+            })));
+            tasks.Add(Task.Factory.StartNew((Action)(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.LogicProjectName);
+                var writeItems = generatedItems.Where<IGeneratedItem>((Func<IGeneratedItem, bool>)(e => e.UnitType == UnitType.Logic && e.ItemType == ItemType.Controller));
+
+                Console.WriteLine("Write Logic-Controllers...");
+                WriteItems(projectPath, writeItems);
+            })));
+            #endregion WriteLogicItems
 
             #region WriteWebApiModels
             tasks.Add(Task.Factory.StartNew(() =>
             {
                 var projectPath = Path.Combine(solutionPath, solutionProperties.WebApiProjectName);
-                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.WebApi && e.ItemType == ItemType.WebApiModel);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.WebApi && e.ItemType == ItemType.Model);
 
                 Console.WriteLine("Write WebApi-Models...");
                 WriteItems(projectPath, writeItems);
             }));
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.WebApiProjectName);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.WebApi && e.ItemType == ItemType.EditModel);
+
+                Console.WriteLine("Write WebApi-EditModels...");
+                WriteItems(projectPath, writeItems);
+            }));
             #endregion WriteWebApiModels
 
+            #region WriteAspMvcModels
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.AspMvcAppProjectName);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.AspMvc && e.ItemType == ItemType.Model);
+
+                Console.WriteLine("Write AspMvc-Models...");
+                WriteItems(projectPath, writeItems);
+            }));
+            #endregion WriteAspMvcModels
             Task.WaitAll(tasks.ToArray());
         }
 
