@@ -154,7 +154,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 if (CanCreate(type))
                 {
-                    result.Add(CreateModelFromType(type, Common.UnitType.Logic, Common.ItemType.Model));
+                    result.Add(CreateDelegateModelFromType(type, Common.UnitType.Logic, Common.ItemType.Model));
                     result.Add(CreateLogicModel(type, Common.UnitType.Logic, Common.ItemType.Model));
                 }
             }

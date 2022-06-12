@@ -150,11 +150,9 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns>Typ der Entitaet.</returns>
         public static string CreateEntityTypeFromType(Type type)
         {
-            var result = string.Empty;
             var entityName = CreateEntityNameFromType(type);
 
-            result = $"{CreateSubNamespaceFromType(type)}.{entityName}";
-            return result;
+            return $"{CreateSubNamespaceFromType(type)}.{entityName}";
         }
         /// <summary>
         /// Diese Methode ermittelt den Entity Namen aus seinem Schnittstellen Typ.
@@ -184,9 +182,9 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns></returns>
         public static string CreateSubFilePathFromType(Type type, string pathPrefix, string filePostfix, string fileExtension)
         {
-            var result = string.Empty;
             var entityName = CreateEntityNameFromType(type);
 
+            string? result;
             if (pathPrefix.IsNullOrEmpty())
             {
                 result = CreateSubPathFromType(type);
@@ -354,6 +352,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
+        public static string CreateParameterName(PropertyInfo propertyInfo) => $"_{char.ToLower(propertyInfo.Name[0])}{propertyInfo.Name[1..]}";
+
         #endregion Property-Helpers
         #endregion Helpers
     }

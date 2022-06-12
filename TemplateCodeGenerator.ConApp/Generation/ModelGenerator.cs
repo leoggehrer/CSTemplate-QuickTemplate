@@ -61,6 +61,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
+
         #region overrides
         public override string GetPropertyType(PropertyInfo propertyInfo)
         {
@@ -179,6 +180,58 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 CreateModelPropertyAttributes(propertyInfo, result.Source);
                 result.AddRange(CreateProperty(propertyInfo));
             }
+            result.Add("}");
+            result.EnvelopeWithANamespace(CreateModelNamespace(type), "using System;");
+            result.FormatCSharpCode();
+            return result;
+        }
+        protected virtual IGeneratedItem CreateDelegateModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        {
+            var modelName = CreateModelName(type);
+            var typeProperties = type.GetAllPropertyInfos();
+            var generateProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false) ?? Array.Empty<PropertyInfo>();
+            var result = new Models.GeneratedItem(unitType, itemType)
+            {
+                FullName = CreateModelFullNameFromType(type),
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = CreateModelSubPath(type, string.Empty, StaticLiterals.CSharpFileExtension),
+            };
+            result.AddRange(CreateComment(type));
+            CreateModelAttributes(type, result.Source);
+            result.Add($"public partial class {modelName}");
+            result.Add("{");
+            result.AddRange(CreatePartialStaticConstrutor(modelName));
+            result.AddRange(CreatePartialConstrutor("public", modelName));
+
+            result.Add(string.Empty);
+            result.Add("new internal Entities.App.Assignment Source");
+            result.Add("{");
+            result.Add($"get => ({type.FullName})(_source ??= new {type.FullName}());");
+            result.Add("set => _source = value;");
+            result.Add("}");
+            result.Add(string.Empty);
+
+            foreach (var propertyInfo in generateProperties)
+            {
+                CreateModelPropertyAttributes(propertyInfo, result.Source);
+                result.AddRange(CreateDelegateProperty(propertyInfo, "Source", propertyInfo));
+            }
+            if (unitType == Common.UnitType.Logic)
+            {
+                result.AddRange(CreateCopyProperties("internal", type, type.FullName!));
+                result.AddRange(CreateCopyProperties("public", type, CreateModelType(type)));
+            }
+            else if (unitType == Common.UnitType.WebApi)
+            {
+                result.AddRange(CreateCopyProperties("public", type, CreateModelType(type)));
+            }
+            else if (unitType == Common.UnitType.AspMvc)
+            {
+                result.AddRange(CreateCopyProperties("public", type, CreateModelType(type), p => true));
+            }
+            result.AddRange(CreateEquals(type));
+            result.AddRange(CreateGetHashCode(type));
+            result.AddRange(CreateFactoryMethods(CreateModelType(type), false));
             result.Add("}");
             result.EnvelopeWithANamespace(CreateModelNamespace(type), "using System;");
             result.FormatCSharpCode();

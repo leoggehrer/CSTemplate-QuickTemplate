@@ -8,10 +8,21 @@ namespace QuickTemplate.Logic.Models
 {
     public abstract partial class IdentityModel : IIdentifyable
     {
+        protected Entities.IdentityEntity? _source;
+
+        internal virtual Entities.IdentityEntity Source
+        {
+            get => _source!;
+            set => _source = value;
+        }
         /// <summary>
         /// ID of the entity (primary key)
         /// </summary>
-        public virtual int Id { get; set; }
+        public virtual int Id 
+        {
+            get => Source.Id; 
+            set => Source.Id = value; 
+        }
         /// <summary>
         /// Determines whether two object instances are equal
         /// </summary>
@@ -43,6 +54,7 @@ namespace QuickTemplate.Logic.Models
             }
             return result;
         }
+        internal virtual void SetSource(Entities.IdentityEntity identityEntity) => _source = identityEntity;
     }
 }
 //MdEnd
