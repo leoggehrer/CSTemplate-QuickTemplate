@@ -62,6 +62,14 @@ namespace TemplateCodeGenerator.ConApp
                 Console.WriteLine("Write Logic-Facades...");
                 WriteItems(projectPath, writeItems);
             })));
+            tasks.Add(Task.Factory.StartNew((Action)(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.LogicProjectName);
+                var writeItems = generatedItems.Where<IGeneratedItem>((Func<IGeneratedItem, bool>)(e => e.UnitType == UnitType.Logic && e.ItemType == ItemType.Factory));
+
+                Console.WriteLine("Write Logic-Factory...");
+                WriteItems(projectPath, writeItems);
+            })));
             #endregion WriteLogicItems
 
             #region WriteWebApiModels

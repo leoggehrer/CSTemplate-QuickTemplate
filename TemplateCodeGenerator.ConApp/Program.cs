@@ -103,11 +103,6 @@ namespace TemplateCodeGenerator.ConApp
                         var compilePath = startCompilePath;
                         bool deleteError;
 
-                        if (select == 4)
-                        {
-                            //Generator.DeleteGenerationFiles(SourcePath);
-                        }
-
                         do
                         {
                             deleteError = false;

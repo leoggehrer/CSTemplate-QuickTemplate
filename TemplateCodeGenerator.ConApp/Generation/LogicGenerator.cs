@@ -16,7 +16,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return type.FullName!.Replace($"{Namespace}.", string.Empty);
         }
 
-        public string CreateContractName(Type type)
+        public static string CreateContractName(Type type)
         {
             return $"I{type.Name.CreatePluralWord()}Access";
         }
@@ -24,7 +24,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             return $"{CreateContractNamespace(type)}.{CreateContractName(type)}";
         }
-        public string CreateContractSubType(Type type)
+        public static string CreateContractSubType(Type type)
         {
             return $"{CreateContractSubNamespace(type)}.{CreateContractName(type)}";
         }
@@ -32,16 +32,16 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             return $"{Namespace}.{CreateContractSubNamespace(type)}";
         }
-        public string CreateContractSubNamespace(Type type)
+        public static string CreateContractSubNamespace(Type type)
         {
             return $"{StaticLiterals.ContractsFolder}.{CreateSubNamespaceFromEntityType(type)}";
         }
-        public string CreateContractSubPathFromType(Type type, string postFix, string fileExtension)
+        public static string CreateContractSubPathFromType(Type type, string postFix, string fileExtension)
         {
             return Path.Combine(CreateContractSubNamespace(type).Replace(".", "\\"), $"{CreateContractName(type)}{postFix}{fileExtension}");
         }
 
-        public string CreateControllerName(Type type)
+        public static string CreateControllerName(Type type)
         {
             return $"{type.Name.CreatePluralWord()}Controller";
         }
@@ -49,7 +49,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             return $"{CreateControllerNamespace(type)}.{CreateControllerName(type)}";
         }
-        public string CreateControllerSubType(Type type)
+        public static string CreateControllerSubType(Type type)
         {
             return $"{CreateControllerSubNamespace(type)}.{CreateControllerName(type)}";
         }
@@ -57,41 +57,51 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             return $"{Namespace}.{CreateControllerSubNamespace(type)}";
         }
-        public string CreateControllerSubNamespace(Type type)
+        public static string CreateControllerSubNamespace(Type type)
         {
             return $"{StaticLiterals.ControllersFolder}.{CreateSubNamespaceFromEntityType(type)}";
         }
-        public string CreateControllersSubPathFromType(Type type, string postFix, string fileExtension)
+        public static string CreateControllersSubPathFromType(Type type, string postFix, string fileExtension)
         {
             return Path.Combine(CreateControllerSubNamespace(type).Replace(".", "\\"), $"{CreateControllerName(type)}{postFix}{fileExtension}");
         }
 
-        public string CreateFacadeName(Type type)
+        public static string CreateFacadeName(Type type)
         {
             return $"{type.Name.CreatePluralWord()}Facade";
+        }
+        public string CreateFacadeType(Type type)
+        {
+            return $"{CreateFacadeNamespace(type)}.{CreateFacadeName(type)}";
+        }
+        public static string CreateFacadeSubType(Type type)
+        {
+            return $"{CreateFacadeSubNamespace(type)}.{CreateFacadeName(type)}";
         }
         public string CreateFacadeNamespace(Type type)
         {
             return $"{Namespace}.{CreateFacadeSubNamespace(type)}";
         }
-        public string CreateFacadeSubNamespace(Type type)
+        public static string CreateFacadeSubNamespace(Type type)
         {
             return $"{StaticLiterals.FacadesFolder}.{CreateSubNamespaceFromEntityType(type)}";
         }
-        public string CreateFacadesSubPathFromType(Type type, string postFix, string fileExtension)
+        public static string CreateFacadesSubPathFromType(Type type, string postFix, string fileExtension)
         {
             return Path.Combine(CreateFacadeSubNamespace(type).Replace(".", "\\"), $"{CreateFacadeName(type)}{postFix}{fileExtension}");
         }
 
         public virtual IEnumerable<IGeneratedItem> GenerateAll()
         {
-            var result = new List<IGeneratedItem>();
-
-            result.Add(CreateDbContext());
+            var result = new List<IGeneratedItem>
+            {
+                CreateDbContext()
+            };
             result.AddRange(CreateModels());
             result.AddRange(CreateContracts());
             result.AddRange(CreateControllers());
-            result.AddRange(CreateControllerFacades());
+            result.AddRange(CreateFacades());
+            result.Add(CreateFactory());
             return result;
         }
 
@@ -193,7 +203,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
-        protected virtual IEnumerable<IGeneratedItem> CreateControllerFacades()
+        protected virtual IEnumerable<IGeneratedItem> CreateFacades()
         {
             var result = new List<IGeneratedItem>();
             var entityProject = EntityProject.Create(SolutionProperties);
@@ -227,7 +237,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         protected virtual IGeneratedItem CreateControllerFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var modelName = CreateModelName(type);
             var entityType = CreateEntitySubType(type);
             var genericType = $"Controllers.GenericController";
             var controllerName = CreateControllerName(type);
@@ -252,12 +261,10 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         protected virtual IGeneratedItem CreateFacadeFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var modelName = CreateModelName(type);
             var modelType = $"{CreateModelType(type)}";
             var entityType = CreateEntitySubType(type);
             var genericType = $"Facades.GenericFacade";
             var facadeName = CreateFacadeName(type);
-            var contractName = CreateContractName(type);
             var contractSubType = CreateContractSubType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
@@ -278,6 +285,39 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return result;
         }
 
+        protected virtual IGeneratedItem CreateFactory()
+        {
+            var entityProject = EntityProject.Create(SolutionProperties);
+            var factoryNamespace = $"{Namespace}";
+            var result = new Models.GeneratedItem(Common.UnitType.Logic, Common.ItemType.DbContext)
+            {
+                FullName = $"{factoryNamespace}.Factory",
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = $"Factory{StaticLiterals.CSharpFileExtension}",
+            };
+            result.AddRange(CreateComment());
+            result.Add($"public static partial class Factory");
+            result.Add("{");
+
+            foreach (var type in entityProject.EntityTypes)
+            {
+                var modelType = $"{CreateModelType(type)}";
+                var contractSubType = CreateContractSubType(type);
+                var facadeName = CreateFacadeName(type);
+                var facadeType = CreateFacadeType(type);
+
+                result.AddRange(CreateComment(type));
+                result.Add($"public static {contractSubType}<{modelType}> Create{facadeName}() => new {facadeType}();");
+
+                result.AddRange(CreateComment(type));
+                result.Add($"public static {contractSubType}<{modelType}> Create{facadeName}(Object otherFacade) => new {facadeType}((otherFacade as Facades.FacadeObject)!);");
+            }
+
+            result.Add("}");
+            result.EnvelopeWithANamespace(factoryNamespace);
+            result.FormatCSharpCode();
+            return result;
+        }
         #region Partial methods
         partial void CreateControllerAttributes(Type type, List<string> codeLines);
         #endregion Partial methods
