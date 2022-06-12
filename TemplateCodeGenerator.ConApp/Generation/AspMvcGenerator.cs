@@ -39,12 +39,12 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateModelSubPathFromType(type, "Inheritance", StaticLiterals.CSharpFileExtension),
+                SubFilePath = CreateModelSubPath(type, "Inheritance", StaticLiterals.CSharpFileExtension),
             };
-            result.Source.Add($"partial class {CreateModelNameFromType(type)} : {GetBaseClassByType(type, ModelsFolder)}");
+            result.Source.Add($"partial class {CreateModelName(type)} : {GetBaseClassByType(type, ModelsFolder)}");
             result.Source.Add("{");
             result.Source.Add("}");
-            result.EnvelopeWithANamespace(CreateModelTypeNamespace(type));
+            result.EnvelopeWithANamespace(CreateModelNamespace(type));
             result.FormatCSharpCode();
             return result;
         }

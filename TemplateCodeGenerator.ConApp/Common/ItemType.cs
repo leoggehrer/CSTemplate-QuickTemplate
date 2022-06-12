@@ -17,6 +17,7 @@ namespace TemplateCodeGenerator.ConApp.Common
         AccessContract = 32,
 
         Controller = 64,
+        Facade = 2 * Controller,
     }
 }
 //MdEnd

@@ -130,7 +130,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>
         /// <returns>Name des Models.</returns>
-        public static string CreateModelNameFromType(Type type)
+        public static string CreateModelName(Type type)
         {
             return type.Name;
         }
@@ -141,7 +141,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns>Name des Models.</returns>
         public static string CreateEditModelNameFromType(Type type)
         {
-            return $"{CreateModelNameFromType(type)}Edit";
+            return $"{CreateModelName(type)}Edit";
         }
         /// <summary>
         /// Diese Methode ermittelt den Entity-Typ aus seiner Type.

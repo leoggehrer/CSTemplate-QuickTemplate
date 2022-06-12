@@ -86,6 +86,10 @@ namespace QuickTemplate.Logic.DataContext
             GetDbSet(ref result, ref handled);
             if (handled == false || result == null)
             {
+                GetGeneratorDbSet(ref result, ref handled);
+            }
+            if (handled == false || result == null)
+            {
                 // if the ACCOUNT switched ON
 #if ACCOUNT_ON
                 if (typeof(E) == typeof(Entities.Account.Identity))
@@ -138,6 +142,13 @@ namespace QuickTemplate.Logic.DataContext
         /// <param name="dbSet">The DbSet depending on the type E</param>
         /// <param name="handled">Indicates whether the method found the DbSet</param>
         partial void GetDbSet<E>(ref DbSet<E>? dbSet, ref bool handled) where E : Entities.IdentityEntity;
+        /// <summary>
+        /// Determines the domain project DbSet depending on the type E
+        /// </summary>
+        /// <typeparam name="E">The entity type E</typeparam>
+        /// <param name="dbSet">The DbSet depending on the type E</param>
+        /// <param name="handled">Indicates whether the method found the DbSet</param>
+        partial void GetGeneratorDbSet<E>(ref DbSet<E>? dbSet, ref bool handled) where E : Entities.IdentityEntity;
     }
 }
 //MdEnd

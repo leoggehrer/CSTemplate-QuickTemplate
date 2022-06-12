@@ -105,7 +105,7 @@ namespace TemplateCodeGenerator.ConApp
 
                         if (select == 4)
                         {
-                            Generator.DeleteGenerationFiles(SourcePath);
+                            //Generator.DeleteGenerationFiles(SourcePath);
                         }
 
                         do
@@ -151,10 +151,7 @@ namespace TemplateCodeGenerator.ConApp
                     {
                         var generatedItems = Generator.Generate(solutionProperties);
 
-                        if (Directory.Exists(solutionProperties.CompilePath))
-                        {
-
-                        }
+                        Generator.DeleteGenerationFiles(SourcePath);
                         Writer.WriteAll(SourcePath, solutionProperties, generatedItems);
                     }
                 }

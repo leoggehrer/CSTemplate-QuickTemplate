@@ -25,6 +25,14 @@ namespace TemplateCodeGenerator.ConApp
             tasks.Add(Task.Factory.StartNew((Action)(() =>
             {
                 var projectPath = Path.Combine(solutionPath, solutionProperties.LogicProjectName);
+                var writeItems = generatedItems.Where<IGeneratedItem>((Func<IGeneratedItem, bool>)(e => e.UnitType == UnitType.Logic && e.ItemType == ItemType.DbContext));
+
+                Console.WriteLine("Write Logic-DataContext...");
+                WriteItems(projectPath, writeItems);
+            })));
+            tasks.Add(Task.Factory.StartNew((Action)(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.LogicProjectName);
                 var writeItems = generatedItems.Where<IGeneratedItem>((Func<IGeneratedItem, bool>)(e => e.UnitType == UnitType.Logic && e.ItemType == ItemType.Model));
 
                 Console.WriteLine("Write Logic-Models...");
@@ -44,6 +52,14 @@ namespace TemplateCodeGenerator.ConApp
                 var writeItems = generatedItems.Where<IGeneratedItem>((Func<IGeneratedItem, bool>)(e => e.UnitType == UnitType.Logic && e.ItemType == ItemType.Controller));
 
                 Console.WriteLine("Write Logic-Controllers...");
+                WriteItems(projectPath, writeItems);
+            })));
+            tasks.Add(Task.Factory.StartNew((Action)(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.LogicProjectName);
+                var writeItems = generatedItems.Where<IGeneratedItem>((Func<IGeneratedItem, bool>)(e => e.UnitType == UnitType.Logic && e.ItemType == ItemType.Facade));
+
+                Console.WriteLine("Write Logic-Facades...");
                 WriteItems(projectPath, writeItems);
             })));
             #endregion WriteLogicItems

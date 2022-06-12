@@ -16,21 +16,23 @@ namespace TemplateCodeGenerator.ConApp.Generation
         protected abstract string Namespace { get; }
         public string CreateModelType(Type type)
         {
-            return $"{CreateModelTypeNamespace(type)}.{type.Name}";
+            return $"{CreateModelNamespace(type)}.{type.Name}";
         }
-        public string CreateModelTypeNamespace(Type type)
+        public string CreateModelSubType(Type type)
         {
-            var modelSubNamespace = $"{ModelsFolder}.{CreateSubNamespaceFromEntityType(type)}";
-
-            return $"{Namespace}.{modelSubNamespace}";
+            return $"{CreateModelSubNamespace(type)}.{type.Name}";
         }
-        public string CreateModelTypeSubNamespace(Type type)
+        public string CreateModelNamespace(Type type)
+        {
+            return $"{Namespace}.{CreateModelSubNamespace(type)}";
+        }
+        public string CreateModelSubNamespace(Type type)
         {
             return $"{ModelsFolder}.{CreateSubNamespaceFromEntityType(type)}";
         }
-        public string CreateModelSubPathFromType(Type type, string postFix, string fileExtension)
+        public string CreateModelSubPath(Type type, string postFix, string fileExtension)
         {
-            return Path.Combine(CreateModelTypeSubNamespace(type).Replace(".", "\\"), $"{type.Name}{postFix}{fileExtension}");
+            return Path.Combine(CreateModelSubNamespace(type).Replace(".", "\\"), $"{type.Name}{postFix}{fileExtension}");
         }
 
         protected static bool IsEntityType(Type type)
@@ -110,14 +112,14 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
         protected virtual IGeneratedItem CreateModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var modelName = CreateModelNameFromType(type);
+            var modelName = CreateModelName(type);
             var typeProperties = type.GetAllPropertyInfos();
             var generateProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false) ?? Array.Empty<PropertyInfo>();
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateModelSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
+                SubFilePath = CreateModelSubPath(type, string.Empty, StaticLiterals.CSharpFileExtension),
             };
             result.AddRange(CreateComment(type));
             CreateModelAttributes(type, result.Source);
@@ -148,7 +150,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.AddRange(CreateGetHashCode(type));
             result.AddRange(CreateFactoryMethods(CreateModelType(type), false));
             result.Add("}");
-            result.EnvelopeWithANamespace(CreateModelTypeNamespace(type), "using System;");
+            result.EnvelopeWithANamespace(CreateModelNamespace(type), "using System;");
             result.FormatCSharpCode();
             return result;
         }
@@ -162,7 +164,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateModelSubPathFromType(type, "Edit", StaticLiterals.CSharpFileExtension),
+                SubFilePath = CreateModelSubPath(type, "Edit", StaticLiterals.CSharpFileExtension),
             };
 
             result.AddRange(CreateComment(type));
@@ -178,7 +180,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 result.AddRange(CreateProperty(propertyInfo));
             }
             result.Add("}");
-            result.EnvelopeWithANamespace(CreateModelTypeNamespace(type), "using System;");
+            result.EnvelopeWithANamespace(CreateModelNamespace(type), "using System;");
             result.FormatCSharpCode();
             return result;
         }
@@ -211,7 +213,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         protected string CreateModelFullNameFromType(Type type)
         {
-            return $"{CreateModelTypeNamespace(type)}.{type.Name}";
+            return $"{CreateModelNamespace(type)}.{type.Name}";
         }
     }
 }
