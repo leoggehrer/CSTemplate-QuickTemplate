@@ -237,6 +237,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         protected virtual IGeneratedItem CreateControllerFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
+            var visibility = type.IsPublic ? "public" : "internal";
             var entityType = CreateEntitySubType(type);
             var genericType = $"Controllers.GenericController";
             var controllerName = CreateControllerName(type);
@@ -249,7 +250,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             };
             result.AddRange(CreateComment(type));
             CreateControllerAttributes(type, result.Source);
-            result.Add($"internal sealed partial class {controllerName} : {genericType}<{entityType}>, {contractSubType}<{entityType}>");
+            result.Add($"{visibility} sealed partial class {controllerName} : {genericType}<{entityType}>, {contractSubType}<{entityType}>");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(controllerName));
             result.AddRange(CreatePartialConstrutor("public", controllerName));
@@ -277,6 +278,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add($"internal partial class {facadeName} : {genericType}<{modelType}, {entityType}>, {contractSubType}<{modelType}>");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(facadeName));
+            result.Add($"new protected {contractSubType}<{type.FullName}> Controller => (base.Controller as {contractSubType}<{type.FullName}>)!;");
             result.AddRange(CreatePartialConstrutor("public", facadeName, null, $"base(new {CreateControllerSubType(type)}())"));
             result.AddRange(CreatePartialConstrutor("public", facadeName, "Facades.FacadeObject other", $"base(new {CreateControllerSubType(type)}(other.ControllerObject))", null, false));
             result.Add("}");

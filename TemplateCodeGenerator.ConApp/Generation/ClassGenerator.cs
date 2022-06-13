@@ -101,7 +101,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("}");
 
             result.AddRange(CreateComment());
-            result.Add($"public static {itemType} Create({itemType} other)");
+            result.Add($"public{(newPrefix ? " new " : " ")}static {itemType} Create({itemType} other)");
             result.Add("{");
             result.Add("BeforeCreate(other);");
             result.Add($"var result = new {itemType}();");
@@ -118,6 +118,64 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             result.Add($"static partial void BeforeCreate({itemType} other);");
             result.Add($"static partial void AfterCreate({itemType} instance, {itemType} other);");
+            return result;
+        }
+        public IEnumerable<string> CreateDelegateFactoryMethods(string itemType, string delegateType, bool newPrefix)
+        {
+#pragma warning disable IDE0028 // Simplify collection initialization
+            var result = new List<string>(CreateComment());
+#pragma warning restore IDE0028 // Simplify collection initialization
+
+            result.Add($"public{(newPrefix ? " new " : " ")}static {itemType} Create()");
+            result.Add("{");
+            result.Add("BeforeCreate();");
+            result.Add($"var result = new {itemType}();");
+            result.Add("AfterCreate(result);");
+            result.Add("return result;");
+            result.Add("}");
+
+            result.AddRange(CreateComment());
+            result.Add($"public{(newPrefix ? " new " : " ")}static {itemType} Create(object other)");
+            result.Add("{");
+            result.Add("BeforeCreate(other);");
+            result.Add("CommonBase.Extensions.ObjectExtensions.CheckArgument(other, nameof(other));");
+            result.Add($"var result = new {itemType}();");
+            result.Add("CommonBase.Extensions.ObjectExtensions.CopyFrom(result, other);");
+            result.Add("AfterCreate(result, other);");
+            result.Add("return result;");
+            result.Add("}");
+
+            result.AddRange(CreateComment());
+            result.Add($"public{(newPrefix ? " new " : " ")}static {itemType} Create({itemType} other)");
+            result.Add("{");
+            result.Add("BeforeCreate(other);");
+            result.Add($"var result = new {itemType}();");
+            result.Add("result.CopyProperties(other);");
+            result.Add("AfterCreate(result, other);");
+            result.Add("return result;");
+            result.Add("}");
+
+            result.AddRange(CreateComment());
+            result.Add($"public{(newPrefix ? " new " : " ")}static {itemType} Create({delegateType} other)");
+            result.Add("{");
+            result.Add("BeforeCreate(other);");
+            result.Add($"var result = new {itemType}();");
+            result.Add("result.Source = other;");
+            result.Add("AfterCreate(result, other);");
+            result.Add("return result;");
+            result.Add("}");
+
+            result.Add("static partial void BeforeCreate();");
+            result.Add($"static partial void AfterCreate({itemType} instance);");
+
+            result.Add("static partial void BeforeCreate(object other);");
+            result.Add($"static partial void AfterCreate({itemType} instance, object other);");
+
+            result.Add($"static partial void BeforeCreate({itemType} other);");
+            result.Add($"static partial void AfterCreate({itemType} instance, {itemType} other);");
+
+            result.Add($"static partial void BeforeCreate({delegateType} other);");
+            result.Add($"static partial void AfterCreate({itemType} instance, {delegateType} other);");
             return result;
         }
         #endregion Create factory methode
@@ -155,13 +213,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             var result = new List<string>();
             var defaultValue = GetDefaultValue(propertyInfo);
-            var fieldType = GetPropertyType(propertyInfo);
+            var propertyType = GetPropertyType(propertyInfo);
 
             result.Add(string.Empty);
             GetPropertyDefaultValue(propertyInfo, ref defaultValue);
             result.AddRange(CreateComment(propertyInfo));
             CreatePropertyAttributes(propertyInfo, result);
-            result.Add($"public {fieldType} {propertyInfo.Name}");
+            result.Add($"public {propertyType} {propertyInfo.Name}");
             result.Add(string.IsNullOrEmpty(defaultValue)
                 ? "{ get; set; }"
                 : "{ get; set; }" + $" = {defaultValue};");
@@ -252,13 +310,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
         #endregion Create partial properties
 
         #region Delegate property helpers
-        public virtual string CreateDelegateAutoGet(PropertyInfo propertyInfo, string delegateObjectName, PropertyInfo delegatePropertyInfo)
+        public virtual IEnumerable<string> CreateDelegateAutoGet(PropertyInfo propertyInfo, string delegateObjectName, PropertyInfo delegatePropertyInfo)
         {
-            return $"get => {delegateObjectName}.{delegatePropertyInfo.Name};";
+            return new [] { $"get => {delegateObjectName}.{delegatePropertyInfo.Name};" };
         }
-        public virtual string CreateDelegateAutoSet(PropertyInfo propertyInfo, string delegateObjectName, PropertyInfo delegatePropertyInfo)
+        public virtual IEnumerable<string> CreateDelegateAutoSet(PropertyInfo propertyInfo, string delegateObjectName, PropertyInfo delegatePropertyInfo)
         {
-            return $"set => {delegateObjectName}.{delegatePropertyInfo.Name} = value;";
+            return new[] { $"set => {delegateObjectName}.{delegatePropertyInfo.Name} = value;" };
         }
         /// <summary>
         /// Diese Methode erstellt den Programmcode einer Delegate-Eigenschaft (Auto-Property oder Partial-Full-Property).
@@ -285,14 +343,20 @@ namespace TemplateCodeGenerator.ConApp.Generation
         public IEnumerable<string> CreateDelegateAutoProperty(PropertyInfo propertyInfo, string delegateObjectName, PropertyInfo delegatePropertyInfo)
         {
             var result = new List<string>();
-            var fieldType = GetPropertyType(propertyInfo); 
+            var propertyType = GetPropertyType(propertyInfo); 
 
             result.Add(string.Empty);
             CreatePropertyAttributes(propertyInfo, result);
-            result.Add($"public {fieldType} {propertyInfo.Name}");
+            result.Add($"public {propertyType} {propertyInfo.Name}");
             result.Add("{");
-            result.Add(CreateDelegateAutoGet(propertyInfo, delegateObjectName, delegatePropertyInfo));
-            result.Add(CreateDelegateAutoSet(propertyInfo, delegateObjectName, delegatePropertyInfo));
+            if (propertyInfo.CanRead)
+            {
+                result.AddRange(CreateDelegateAutoGet(propertyInfo, delegateObjectName, delegatePropertyInfo));
+            }
+            if (propertyInfo.CanWrite)
+            {
+                result.AddRange(CreateDelegateAutoSet(propertyInfo, delegateObjectName, delegatePropertyInfo));
+            }
             result.Add("}");
             return result;
         }
@@ -403,6 +467,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
                     result.Add(CopyProperty(copyType, item));
                 }
             }
+
             result.Add("}");
             result.Add("AfterCopyProperties(other);");
             result.Add("}");
@@ -411,34 +476,37 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add($"partial void AfterCopyProperties({copyType} other);");
             return result;
         }
-        public virtual IEnumerable<string> CreateDelegateCopyProperties(Type type)
+        public virtual IEnumerable<string> CreateDelegateCopyProperties(string visibility, Type type)
         {
-            return CreateDelegateCopyProperties(type, type.FullName ?? string.Empty);
+            return CreateDelegateCopyProperties(visibility, type, type.FullName ?? string.Empty);
         }
-        public virtual IEnumerable<string> CreateDelegateCopyProperties(Type type, string copyType)
+        public virtual IEnumerable<string> CreateDelegateCopyProperties(string visibility, Type type, string copyType, Func<PropertyInfo, bool>? filter = null)
         {
-            var result = new List<string>
+#pragma warning disable IDE0028 // Simplify collection initialization
+            var result = new List<string>(CreateComment(type));
+#pragma warning restore IDE0028 // Simplify collection initialization
+
+            result.Add($"{visibility} void CopyProperties({copyType} other)");
+            result.Add("{");
+            result.Add("bool handled = false;");
+            result.Add("BeforeCopyProperties(other, ref handled);");
+            result.Add("if (handled == false)");
+            result.Add("{");
+
+            foreach (var item in type.GetAllPropertyInfos().Where(filter ?? (p => true)))
             {
-                $"public void CopyProperties({copyType} other)",
-                "{",
-                "if (other == null)",
-                "{",
-                "throw new System.ArgumentNullException(nameof(other));",
-                "}",
-                string.Empty,
-                "bool handled = false;",
-                "BeforeCopyProperties(other, ref handled);",
-                "if (handled == false)",
-                "{",
-                $"{StaticLiterals.DelegatePropertyName}.CopyProperties(other as {type.FullName});",
-                "}",
-                "AfterCopyProperties(other);",
-                "}",
+                if (item.CanRead && item.CanWrite)
+                {
+                    result.Add(CopyProperty(copyType, item));
+                }
+            }
 
-                $"partial void BeforeCopyProperties({copyType} other, ref bool handled);",
-                $"partial void AfterCopyProperties({copyType} other);"
-            };
+            result.Add("}");
+            result.Add("AfterCopyProperties(other);");
+            result.Add("}");
 
+            result.Add($"partial void BeforeCopyProperties({copyType} other, ref bool handled);");
+            result.Add($"partial void AfterCopyProperties({copyType} other);");
             return result;
         }
         #endregion CopyProperties

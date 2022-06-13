@@ -54,7 +54,6 @@ namespace QuickTemplate.Logic.Models
             }
             return result;
         }
-        internal virtual void SetSource(Entities.IdentityEntity identityEntity) => _source = identityEntity;
     }
 }
 //MdEnd

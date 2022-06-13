@@ -32,7 +32,7 @@ namespace QuickTemplate.Logic.Facades
         {
             var result = new TModel();
 
-            result.CopyFrom(entity);
+            result.Source = entity;
             return result;
         }
         /// <summary>
@@ -42,10 +42,9 @@ namespace QuickTemplate.Logic.Facades
         /// <returns>The entity type</returns>
         internal virtual TEntity ToEntity(TModel model)
         {
-            var result = new TEntity();
+            var result = model.Source as TEntity;
 
-            result.CopyFrom(model);
-            return result;
+            return result!;
         }
 
 #if ACCOUNT_ON
