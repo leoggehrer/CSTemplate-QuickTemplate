@@ -223,7 +223,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var contractName = CreateContractName(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
-                FullName = CreateModelFullNameFromType(type),
+                FullName = CreateContractType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
                 SubFilePath = CreateContractSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
             };
@@ -244,7 +244,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var contractSubType = CreateContractSubType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
-                FullName = CreateModelFullNameFromType(type),
+                FullName = $"{CreateControllerType(type)}",
                 FileExtension = StaticLiterals.CSharpFileExtension,
                 SubFilePath = CreateControllersSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
             };
@@ -269,7 +269,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var contractSubType = CreateContractSubType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
-                FullName = CreateModelFullNameFromType(type),
+                FullName = CreateFacadeType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
                 SubFilePath = CreateFacadesSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
             };

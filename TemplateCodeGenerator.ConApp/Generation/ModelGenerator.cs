@@ -201,36 +201,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.FormatCSharpCode();
             return result;
         }
-        protected virtual IGeneratedItem CreateEditModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
-        {
-            var modelName = CreateEditModelNameFromType(type);
-            var typeProperties = type.GetAllPropertyInfos();
-            var filteredProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false 
-                                                            && IsListType(e.PropertyType) == false);
-            var result = new Models.GeneratedItem(unitType, itemType)
-            {
-                FullName = CreateModelFullNameFromType(type),
-                FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateModelSubPath(type, "Edit", StaticLiterals.CSharpFileExtension),
-            };
-
-            result.AddRange(CreateComment(type));
-            CreateModelAttributes(type, result.Source);
-            result.Add($"public partial class {modelName}");
-            result.Add("{");
-            result.AddRange(CreatePartialStaticConstrutor(modelName));
-            result.AddRange(CreatePartialConstrutor("public", modelName));
-
-            foreach (var propertyInfo in filteredProperties.Where(pi => pi.CanWrite))
-            {
-                CreateModelPropertyAttributes(propertyInfo, result.Source);
-                result.AddRange(CreateProperty(propertyInfo));
-            }
-            result.Add("}");
-            result.EnvelopeWithANamespace(CreateModelNamespace(type), "using System;");
-            result.FormatCSharpCode();
-            return result;
-        }
         protected virtual IGeneratedItem CreateDelegateModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
             var modelName = CreateModelName(type);

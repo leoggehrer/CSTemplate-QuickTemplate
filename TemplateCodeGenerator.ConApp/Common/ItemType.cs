@@ -1,5 +1,4 @@
-﻿//@BaseCode
-//MdStart
+﻿//MdStart
 
 namespace TemplateCodeGenerator.ConApp.Common
 {
@@ -12,9 +11,10 @@ namespace TemplateCodeGenerator.ConApp.Common
         Entity = 4,
 
         Model = 8,
-        EditModel = 16,
+        EditModel = 2 * Model,
+        FilterModel = 2 * EditModel,
 
-        AccessContract = 32,
+        AccessContract = 2 * FilterModel,
 
         Controller = 64,
         Facade = 2 * Controller,

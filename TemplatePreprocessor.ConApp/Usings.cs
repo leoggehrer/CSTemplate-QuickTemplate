@@ -1,4 +1,3 @@
-﻿//@BaseCode
-//MdStart
+﻿//MdStart
 global using CommonBase.Extensions;
 //MdEnd

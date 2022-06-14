@@ -135,15 +135,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return type.Name;
         }
         /// <summary>
-        /// Diese Methode ermittelt den Edit-Model Namen aus seinem Schnittstellen Typ.
-        /// </summary>
-        /// <param name="type">Schnittstellen-Typ</param>
-        /// <returns>Name des Models.</returns>
-        public static string CreateEditModelNameFromType(Type type)
-        {
-            return $"{CreateModelName(type)}Edit";
-        }
-        /// <summary>
         /// Diese Methode ermittelt den Entity-Typ aus seiner Type.
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>

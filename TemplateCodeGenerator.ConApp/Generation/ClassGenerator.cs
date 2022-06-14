@@ -1,4 +1,3 @@
-//@BaseCode
 //MdStart
 using System.Reflection;
 using TemplateCodeGenerator.ConApp.Contracts;

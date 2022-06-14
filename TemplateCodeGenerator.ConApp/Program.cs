@@ -40,6 +40,7 @@ namespace TemplateCodeGenerator.ConApp
         private static void RunApp()
         {
             var input = string.Empty;
+            var saveForeColor = Console.ForegroundColor;
 
             while (input.Equals("x") == false)
             {
@@ -48,7 +49,6 @@ namespace TemplateCodeGenerator.ConApp
                 var sourceSolutionName = GetSolutionNameByPath(SourcePath);
 
                 Console.Clear();
-                Console.ResetColor();
                 Console.WriteLine("Template Code Generator");
                 Console.WriteLine("=======================");
                 Console.WriteLine();
@@ -60,7 +60,6 @@ namespace TemplateCodeGenerator.ConApp
                 Console.WriteLine($"[{++menuIndex}] Start code generation...");
                 Console.WriteLine("[x|X] Exit");
                 Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write("Choose: ");
                 input = Console.ReadLine()?.ToLower() ?? String.Empty;
 
@@ -150,7 +149,6 @@ namespace TemplateCodeGenerator.ConApp
                         Writer.WriteAll(SourcePath, solutionProperties, generatedItems);
                     }
                 }
-                Console.ResetColor();
             }
         }
         private static void PrintBusyProgress()

@@ -1,5 +1,4 @@
-﻿//@BaseCode
-//MdStart
+﻿//MdStart
 using System.Text;
 
 namespace TemplatePreprocessor.ConApp

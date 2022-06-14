@@ -1,5 +1,4 @@
-﻿//@BaseCode
-//MdStart
+﻿//MdStart
 using System.Collections.Generic;
 
 namespace TemplateCodeGenerator.ConApp.Contracts

@@ -100,7 +100,16 @@ namespace TemplateCodeGenerator.ConApp
                 Console.WriteLine("Write AspMvc-Models...");
                 WriteItems(projectPath, writeItems);
             }));
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.AspMvcAppProjectName);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.AspMvc && e.ItemType == ItemType.FilterModel);
+
+                Console.WriteLine("Write AspMvc-FilterModels...");
+                WriteItems(projectPath, writeItems);
+            }));
             #endregion WriteAspMvcModels
+
             Task.WaitAll(tasks.ToArray());
         }
 

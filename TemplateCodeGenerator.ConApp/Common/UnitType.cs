@@ -1,5 +1,4 @@
-﻿//@BaseCode
-//MdStart
+﻿//MdStart
 namespace TemplateCodeGenerator.ConApp.Common
 {
     [Flags]

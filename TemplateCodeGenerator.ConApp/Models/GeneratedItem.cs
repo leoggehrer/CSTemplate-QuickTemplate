@@ -54,7 +54,7 @@ namespace TemplateCodeGenerator.ConApp.Models
         }
         public override string ToString()
         {
-            return $"{UnitType,-15}{ItemType,-20}{FullName,-30}{SubFilePath,-50}";
+            return $"{UnitType,-15}{ItemType,-20}{FullName,-30}";
         }
     }
 }
