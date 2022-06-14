@@ -101,10 +101,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 result.Add($"return $\"{sbToString.ToString()}\";");
                 result.Add("}");
             }
-            //public override string ToString()
-            //{
-            //    return $"Name: {(string.IsNullOrEmpty(Name) == false ? Name : "---")} ShortDescription: {(string.IsNullOrEmpty(ShortDescription) == false ? ShortDescription : "---")} LongDescription: {(string.IsNullOrEmpty(LongDescription) == false ? LongDescription : "---")} State: {(State.HasValue ? State.ToString() : "---")}";
-            //}
 
             result.Add("}");
             result.EnvelopeWithANamespace(CreateModelNamespace(type), "using System;");
