@@ -1,4 +1,6 @@
-﻿using TemplateCodeGenerator.ConApp.Contracts;
+﻿using System.Reflection;
+using System.Text;
+using TemplateCodeGenerator.ConApp.Contracts;
 
 namespace TemplateCodeGenerator.ConApp.Generation
 {
@@ -52,10 +54,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
         protected virtual IGeneratedItem CreateFilterModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
+            var sbHasValue = new StringBuilder();
+            var sbToString = new StringBuilder();
             var modelName = CreateFilterModelNameFromType(type);
             var typeProperties = type.GetAllPropertyInfos();
             var filteredProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false
-                                                            && IsListType(e.PropertyType) == false);
+                                                            && IsListType(e.PropertyType) == false
+                                                            && (e.PropertyType.IsPrimitive || e.PropertyType == typeof(string)));
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = CreateModelFullNameFromType(type),
@@ -70,11 +75,37 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.AddRange(CreatePartialStaticConstrutor(modelName));
             result.AddRange(CreatePartialConstrutor("public", modelName));
 
-            foreach (var propertyInfo in filteredProperties.Where(pi => pi.CanWrite))
+            foreach (var propertyInfo in filteredProperties)
             {
+                if (sbHasValue.Length > 0)
+                    sbHasValue.Append(" || ");
+
+                sbToString.Append($"{propertyInfo.Name}: " + "{(" + $"{propertyInfo.Name} != null ? {propertyInfo.Name} : \"---\"" + ")} ");
+
+                sbHasValue.Append($"{propertyInfo.Name} != null");
                 CreateModelPropertyAttributes(propertyInfo, result.Source);
-                result.AddRange(CreateProperty(propertyInfo));
+                result.AddRange(CreateFilterAutoProperty(propertyInfo));
             }
+
+            if (sbHasValue.Length > 0)
+            {
+                result.AddRange(CreateComment(type));
+                result.Add($"public bool HasValue => {sbHasValue.ToString()};");
+            }
+
+            if (sbToString.Length > 0)
+            {
+                result.AddRange(CreateComment(type));
+                result.Add("public override string ToString()");
+                result.Add("{");
+                result.Add($"return $\"{sbToString.ToString()}\";");
+                result.Add("}");
+            }
+            //public override string ToString()
+            //{
+            //    return $"Name: {(string.IsNullOrEmpty(Name) == false ? Name : "---")} ShortDescription: {(string.IsNullOrEmpty(ShortDescription) == false ? ShortDescription : "---")} LongDescription: {(string.IsNullOrEmpty(LongDescription) == false ? LongDescription : "---")} State: {(State.HasValue ? State.ToString() : "---")}";
+            //}
+
             result.Add("}");
             result.EnvelopeWithANamespace(CreateModelNamespace(type), "using System;");
             result.FormatCSharpCode();
@@ -90,7 +121,21 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             return $"{CreateModelName(type)}Filter";
         }
+        public virtual IEnumerable<string> CreateFilterAutoProperty(PropertyInfo propertyInfo)
+        {
+            var result = new List<string>();
+            var propertyType = GetPropertyType(propertyInfo);
 
+            if (propertyType.EndsWith("?") == false)
+            {
+                propertyType = $"{propertyType}?";
+            }
+            result.Add(string.Empty);
+            result.AddRange(CreateComment(propertyInfo));
+            result.Add($"public {propertyType} {propertyInfo.Name}");
+            result.Add("{ get; set; }");
+            return result;
+        }
         partial void CreateModelAttributes(Type type, List<string> source);
     }
 }

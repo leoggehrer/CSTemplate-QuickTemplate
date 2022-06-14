@@ -6,17 +6,17 @@ namespace TemplateCodeGenerator.ConApp.Common
     public enum ItemType : ulong
     {
         DbContext = 1,
-        Factory = 2,
+        Factory = 2 * DbContext,
 
-        Entity = 4,
+        Entity = 2 * Factory,
 
-        Model = 8,
+        Model = 2 * Entity,
         EditModel = 2 * Model,
         FilterModel = 2 * EditModel,
 
         AccessContract = 2 * FilterModel,
 
-        Controller = 64,
+        Controller = 2 * AccessContract,
         Facade = 2 * Controller,
     }
 }
