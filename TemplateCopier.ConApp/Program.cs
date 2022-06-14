@@ -1,4 +1,6 @@
-﻿namespace TemplateCopier.ConApp
+﻿using System.Diagnostics;
+
+namespace TemplateCopier.ConApp
 {
     internal partial class Program
     {
@@ -22,9 +24,26 @@
         private static string UserPath { get; set; }
         private static string SourcePath { get; set; }
         private static string TargetPath { get; set; }
-        private static void Main(/*string[] args*/)
+        private static bool OpenCopiedSolutionFolder { get; set; } = false;
+        private static void Main(string[] args)
         {
+            CheckCLIArguments(args);
+
             RunApp();
+        }
+
+        private static void CheckCLIArguments(string[] args)
+        {
+            if(args.Length > 0)
+            {
+                if (args.Any(a => a.ToLower().Equals("--autoopenfolder")))
+                {
+                    OpenCopiedSolutionFolder = true;
+                }
+
+                //Further cli argument handling
+                //...
+            }
         }
 
         private static void RunApp()
@@ -128,7 +147,13 @@
                         var sc = new Copier();
 
                         PrintBusyProgress();
-                        sc.Copy(SourcePath, Path.Combine(TargetPath, targetSolutionName), sourceProjects);
+
+                        var targetPath = Path.Combine(TargetPath, targetSolutionName);
+                        sc.Copy(SourcePath, targetPath, sourceProjects);
+
+                        if(OpenCopiedSolutionFolder)
+                            OpenSolutionFolder(targetPath);
+
                         runBusyProgress = false;
                     }
                     Console.ResetColor();
@@ -136,6 +161,7 @@
             }
         }
 
+        #region UX-Busy printing
         private static readonly bool canBusyPrint = true;
         private static bool runBusyProgress = false;
         private static void PrintBusyProgress()
@@ -154,6 +180,9 @@
                 }
             });
         }
+        #endregion
+
+        #region Filesystem methods
         private static string GetParentDirectory(string path)
         {
             var result = Directory.GetParent(path);
@@ -204,5 +233,19 @@
                                          .ToList();
             return qtDirectories.ToArray();
         }
+        #endregion
+
+        #region CLI Argument methods
+        private static void OpenSolutionFolder(string solutionPath)
+        {
+            Process.Start(new ProcessStartInfo()
+            {
+                WorkingDirectory = solutionPath,
+                FileName = "explorer",
+                Arguments = solutionPath,
+                CreateNoWindow = true,
+            });
+        }
+        #endregion
     }
 }
