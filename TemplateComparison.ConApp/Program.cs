@@ -40,7 +40,8 @@ namespace TemplateComparison.ConApp
         private static bool runBusyProgress = false;
         private static void RunApp()
         {
-            bool running = false;
+            var running = false;
+            var saveForeColor = Console.ForegroundColor;
 
             do
             {
@@ -48,6 +49,8 @@ namespace TemplateComparison.ConApp
                 var handled = false;
                 var targetPaths = new List<string>();
 
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Green;
                 BeforeGetTargetPaths(SourcePath, targetPaths, ref handled);
                 if (handled == false)
                 {
@@ -60,7 +63,11 @@ namespace TemplateComparison.ConApp
                 PrintHeader(SourcePath, TargetPaths);
 
                 Console.Write($"Balancing [1..{TargetPaths.Length}|X...Quit]: ");
+
                 input = Console.ReadLine()?.ToLower();
+
+                Console.ForegroundColor = saveForeColor;
+                Console.WriteLine();
                 PrintBusyProgress();
                 running = input?.Equals("x") == false;
                 if (running)

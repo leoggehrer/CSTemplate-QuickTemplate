@@ -31,6 +31,7 @@
         {
             var input = string.Empty;
             var targetSolutionName = "TargetSolution";
+            var saveForeColor = Console.ForegroundColor;
 
             while (input.Equals("x") == false)
             {
@@ -39,6 +40,7 @@
                                                    .Concat(StaticLiterals.ProjectExtensions.Select(e => $"{sourceSolutionName}{e}"));
 
                 Console.Clear();
+                Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine("Template Copier");
                 Console.WriteLine("===============");
                 Console.WriteLine();
@@ -51,10 +53,12 @@
                 Console.WriteLine("[4] Start copy process");
                 Console.WriteLine("[x|X] Exit");
                 Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write("Choose: ");
+
                 input = Console.ReadLine()?.ToLower() ?? String.Empty;
 
+                Console.ForegroundColor = saveForeColor;
+                Console.WriteLine();
                 if (Int32.TryParse(input, out var select))
                 {
                     if (select == 1)

@@ -35,14 +35,13 @@ namespace TemplatePreprocessor.ConApp
 
         private static void Main(/*string[] args*/)
         {
-            Console.WriteLine(nameof(TemplatePreprocessor));
-
             RunApp();
         }
 
         private static void RunApp()
         {
             var input = string.Empty;
+            var saveForeColor = Console.ForegroundColor;
 
             while (input.Equals("x") == false)
             {
@@ -50,6 +49,7 @@ namespace TemplatePreprocessor.ConApp
                 var sourceSolutionName = GetSolutionNameByPath(SourcePath);
 
                 Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("Template Preprocessor");
                 Console.WriteLine("=====================");
                 Console.WriteLine();
@@ -67,10 +67,11 @@ namespace TemplatePreprocessor.ConApp
                 Console.WriteLine($"[{++menuIndex}] Start assignment process...");
                 Console.WriteLine("[x|X] Exit");
                 Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write("Choose: ");
-                input = Console.ReadLine()?.ToLower() ?? String.Empty;
 
+                input = Console.ReadLine()?.ToLower() ?? String.Empty;
+                Console.ForegroundColor = saveForeColor;
+                Console.WriteLine();
                 if (Int32.TryParse(input, out var select))
                 {
                     if (select == 1)
