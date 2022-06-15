@@ -89,6 +89,14 @@ namespace TemplateCodeGenerator.ConApp
                 Console.WriteLine("Write WebApi-EditModels...");
                 WriteItems(projectPath, writeItems);
             }));
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.WebApiProjectName);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.WebApi && e.ItemType == ItemType.Controller);
+
+                Console.WriteLine("Write WebApi-Controllers...");
+                WriteItems(projectPath, writeItems);
+            }));
             #endregion WriteWebApiModels
 
             #region WriteAspMvcModels

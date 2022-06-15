@@ -6,11 +6,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
 {
     internal partial class AspMvcGenerator : ModelGenerator
     {
+        private ItemProperties? _itemProperties;
+        protected override ItemProperties ItemProperties => _itemProperties ??= new ItemProperties(SolutionProperties.SolutionName, StaticLiterals.AspMvsExtension);
         public AspMvcGenerator(ISolutionProperties solutionProperties) : base(solutionProperties)
         {
         }
-        protected override string Extension => StaticLiterals.AspMvsExtension;
-        protected override string Namespace => $"{SolutionProperties.SolutionName}{Extension}";
 
         public virtual IEnumerable<IGeneratedItem> GenerateAll()
         {
@@ -30,24 +30,24 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 if (CanCreate(type))
                 {
                     result.Add(CreateModelFromType(type, Common.UnitType.AspMvc, Common.ItemType.Model));
-                    result.Add(CreateLogicModel(type, Common.UnitType.AspMvc, Common.ItemType.Model));
+                    result.Add(CreateModelInheritance(type, Common.UnitType.AspMvc, Common.ItemType.Model));
                     result.Add(CreateFilterModelFromType(type, Common.UnitType.AspMvc, Common.ItemType.FilterModel));
                 }
             }
             return result;
         }
-        protected virtual IGeneratedItem CreateLogicModel(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        protected virtual IGeneratedItem CreateModelInheritance(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateModelSubPath(type, "Inheritance", StaticLiterals.CSharpFileExtension),
+                SubFilePath = ItemProperties.CreateModelSubPath(type, "Inheritance", StaticLiterals.CSharpFileExtension),
             };
-            result.Source.Add($"partial class {CreateModelName(type)} : {GetBaseClassByType(type, ModelsFolder)}");
+            result.Source.Add($"partial class {CreateModelName(type)} : {GetBaseClassByType(type, StaticLiterals.ModelsFolder)}");
             result.Source.Add("{");
             result.Source.Add("}");
-            result.EnvelopeWithANamespace(CreateModelNamespace(type));
+            result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
@@ -65,7 +65,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateModelSubPath(type, "Filter", StaticLiterals.CSharpFileExtension),
+                SubFilePath = ItemProperties.CreateModelSubPath(type, "Filter", StaticLiterals.CSharpFileExtension),
             };
 
             result.AddRange(CreateComment(type));
@@ -90,7 +90,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             if (sbHasValue.Length > 0)
             {
                 result.AddRange(CreateComment(type));
-                result.Add($"public bool HasValue => {sbHasValue.ToString()};");
+                result.Add($"public bool HasValue => {sbHasValue};");
             }
 
             if (sbToString.Length > 0)
@@ -98,12 +98,12 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 result.AddRange(CreateComment(type));
                 result.Add("public override string ToString()");
                 result.Add("{");
-                result.Add($"return $\"{sbToString.ToString()}\";");
+                result.Add($"return $\"{sbToString}\";");
                 result.Add("}");
             }
 
             result.Add("}");
-            result.EnvelopeWithANamespace(CreateModelNamespace(type), "using System;");
+            result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type), "using System;");
             result.FormatCSharpCode();
             return result;
         }

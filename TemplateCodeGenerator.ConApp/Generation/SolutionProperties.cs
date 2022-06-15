@@ -1,5 +1,3 @@
-//MdStart
-
 namespace TemplateCodeGenerator.ConApp.Generation
 {
     internal partial class SolutionProperties : Contracts.ISolutionProperties
@@ -172,4 +170,3 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
     }
 }
-//MdEnd

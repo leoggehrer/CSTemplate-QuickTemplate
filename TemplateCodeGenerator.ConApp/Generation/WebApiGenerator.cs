@@ -4,17 +4,18 @@ namespace TemplateCodeGenerator.ConApp.Generation
 {
     internal partial class WebApiGenerator : ModelGenerator
     {
+        private ItemProperties? _itemProperties;
+        protected override ItemProperties ItemProperties => _itemProperties ??= new ItemProperties(SolutionProperties.SolutionName, StaticLiterals.WebApiExtension);
         public WebApiGenerator(ISolutionProperties solutionProperties) : base(solutionProperties)
         {
         }
-        protected override string Extension => StaticLiterals.WebApiExtension;
-        protected override string Namespace => $"{SolutionProperties.SolutionName}{Extension}";
 
         public virtual IEnumerable<IGeneratedItem> GenerateAll()
         {
             var result = new List<IGeneratedItem>();
 
             result.AddRange(CreateModels());
+            result.AddRange(CreateControllers());
             return result;
         }
 
@@ -28,31 +29,31 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 if (CanCreate(type))
                 {
                     result.Add(CreateModelFromType(type, Common.UnitType.WebApi, Common.ItemType.Model));
-                    result.Add(CreateLogicModel(type, Common.UnitType.WebApi, Common.ItemType.Model));
+                    result.Add(CreateModelInheritance(type, Common.UnitType.WebApi, Common.ItemType.Model));
                     result.Add(CreateEditModelFromType(type, Common.UnitType.WebApi, Common.ItemType.EditModel));
                 }
             }
             return result;
         }
-        protected virtual IGeneratedItem CreateLogicModel(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        protected virtual IGeneratedItem CreateModelInheritance(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateModelSubPath(type, "Inheritance", StaticLiterals.CSharpFileExtension),
+                SubFilePath = ItemProperties.CreateModelSubPath(type, "Inheritance", StaticLiterals.CSharpFileExtension),
             };
-            result.Source.Add($"partial class {CreateModelName(type)} : {GetBaseClassByType(type, ModelsFolder)}");
+            result.Source.Add($"partial class {CreateModelName(type)} : {GetBaseClassByType(type, StaticLiterals.ModelsFolder)}");
             result.Source.Add("{");
             result.Source.Add("}");
-            result.EnvelopeWithANamespace(CreateModelNamespace(type));
+            result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
 
         protected virtual IGeneratedItem CreateEditModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var modelName = CreateEditModelNameFromType(type);
+            var modelName = ItemProperties.CreateEditModelName(type);
             var typeProperties = type.GetAllPropertyInfos();
             var filteredProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false
                                                             && IsListType(e.PropertyType) == false);
@@ -60,7 +61,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateModelSubPath(type, "Edit", StaticLiterals.CSharpFileExtension),
+                SubFilePath = ItemProperties.CreateModelSubPath(type, "Edit", StaticLiterals.CSharpFileExtension),
             };
 
             result.AddRange(CreateComment(type));
@@ -76,20 +77,55 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 result.AddRange(CreateProperty(propertyInfo));
             }
             result.Add("}");
-            result.EnvelopeWithANamespace(CreateModelNamespace(type), "using System;");
+            result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type), "using System;");
             result.FormatCSharpCode();
             return result;
         }
 
-        /// <summary>
-        /// Diese Methode ermittelt den Edit-Model Namen aus seinem Schnittstellen Typ.
-        /// </summary>
-        /// <param name="type">Schnittstellen-Typ</param>
-        /// <returns>Name des Models.</returns>
-        public static string CreateEditModelNameFromType(Type type)
+        protected virtual IEnumerable<IGeneratedItem> CreateControllers()
         {
-            return $"{CreateModelName(type)}Edit";
+            var result = new List<IGeneratedItem>();
+            var entityProject = EntityProject.Create(SolutionProperties);
+
+            foreach (var type in entityProject.EntityTypes)
+            {
+                if (CanCreate(type))
+                {
+                    result.Add(CreateControllerFromType(type, Common.UnitType.WebApi, Common.ItemType.Controller));
+                }
+            }
+            return result;
         }
+        protected virtual IGeneratedItem CreateControllerFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        {
+            var visibility = type.IsPublic ? "public" : "internal";
+            var accessType = ItemProperties.CreateEntitySubType(type);
+            var genericType = $"Controllers.GenericController";
+            var modelType = ItemProperties.CreateModelType(type);
+            var editModelType = ItemProperties.CreateEditModelType(type);
+            var controllerName = ItemProperties.CreateControllerName(type);
+            var contractType = ItemProperties.CreateContractType(type);
+            var result = new Models.GeneratedItem(unitType, itemType)
+            {
+                FullName = $"{ItemProperties.CreateControllerType(type)}",
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = ItemProperties.CreateControllersSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
+            };
+            result.AddRange(CreateComment(type));
+            CreateControllerAttributes(type, result.Source);
+            result.Add($"{visibility} sealed partial class {controllerName} : {genericType}<{accessType}, {editModelType}, {modelType}>");
+            result.Add("{");
+            result.AddRange(CreatePartialStaticConstrutor(controllerName));
+            result.AddRange(CreatePartialConstrutor("public", controllerName, $"{contractType}<{accessType}> other", "base(other)", null, true));
+            result.Add("}");
+            result.EnvelopeWithANamespace(ItemProperties.CreateControllerNamespace(type));
+            result.FormatCSharpCode();
+            return result;
+        }
+
+        #region Partial methods
         partial void CreateModelAttributes(Type type, List<string> source);
+        partial void CreateControllerAttributes(Type type, List<string> codeLines);
+        #endregion Partial methods
     }
 }

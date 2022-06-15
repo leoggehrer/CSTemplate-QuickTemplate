@@ -4,91 +4,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
 {
     internal partial class LogicGenerator : ModelGenerator
     {
+        private ItemProperties? _itemProperties;
+        protected override ItemProperties ItemProperties => _itemProperties ??= new ItemProperties(SolutionProperties.SolutionName, StaticLiterals.LogicExtension);
+
         public LogicGenerator(ISolutionProperties solutionProperties) : base(solutionProperties)
         {
-        }
-
-        protected override string Extension => StaticLiterals.LogicExtension;
-        protected override string Namespace => $"{SolutionProperties.SolutionName}{Extension}";
-
-        public string CreateEntitySubType(Type type)
-        {
-            return type.FullName!.Replace($"{Namespace}.", string.Empty);
-        }
-
-        public static string CreateContractName(Type type)
-        {
-            return $"I{type.Name.CreatePluralWord()}Access";
-        }
-        public string CreateContractType(Type type)
-        {
-            return $"{CreateContractNamespace(type)}.{CreateContractName(type)}";
-        }
-        public static string CreateContractSubType(Type type)
-        {
-            return $"{CreateContractSubNamespace(type)}.{CreateContractName(type)}";
-        }
-        public string CreateContractNamespace(Type type)
-        {
-            return $"{Namespace}.{CreateContractSubNamespace(type)}";
-        }
-        public static string CreateContractSubNamespace(Type type)
-        {
-            return $"{StaticLiterals.ContractsFolder}.{CreateSubNamespaceFromEntityType(type)}";
-        }
-        public static string CreateContractSubPathFromType(Type type, string postFix, string fileExtension)
-        {
-            return Path.Combine(CreateContractSubNamespace(type).Replace(".", "\\"), $"{CreateContractName(type)}{postFix}{fileExtension}");
-        }
-
-        public static string CreateControllerName(Type type)
-        {
-            return $"{type.Name.CreatePluralWord()}Controller";
-        }
-        public string CreateControllerType(Type type)
-        {
-            return $"{CreateControllerNamespace(type)}.{CreateControllerName(type)}";
-        }
-        public static string CreateControllerSubType(Type type)
-        {
-            return $"{CreateControllerSubNamespace(type)}.{CreateControllerName(type)}";
-        }
-        public string CreateControllerNamespace(Type type)
-        {
-            return $"{Namespace}.{CreateControllerSubNamespace(type)}";
-        }
-        public static string CreateControllerSubNamespace(Type type)
-        {
-            return $"{StaticLiterals.ControllersFolder}.{CreateSubNamespaceFromEntityType(type)}";
-        }
-        public static string CreateControllersSubPathFromType(Type type, string postFix, string fileExtension)
-        {
-            return Path.Combine(CreateControllerSubNamespace(type).Replace(".", "\\"), $"{CreateControllerName(type)}{postFix}{fileExtension}");
-        }
-
-        public static string CreateFacadeName(Type type)
-        {
-            return $"{type.Name.CreatePluralWord()}Facade";
-        }
-        public string CreateFacadeType(Type type)
-        {
-            return $"{CreateFacadeNamespace(type)}.{CreateFacadeName(type)}";
-        }
-        public static string CreateFacadeSubType(Type type)
-        {
-            return $"{CreateFacadeSubNamespace(type)}.{CreateFacadeName(type)}";
-        }
-        public string CreateFacadeNamespace(Type type)
-        {
-            return $"{Namespace}.{CreateFacadeSubNamespace(type)}";
-        }
-        public static string CreateFacadeSubNamespace(Type type)
-        {
-            return $"{StaticLiterals.FacadesFolder}.{CreateSubNamespaceFromEntityType(type)}";
-        }
-        public static string CreateFacadesSubPathFromType(Type type, string postFix, string fileExtension)
-        {
-            return Path.Combine(CreateFacadeSubNamespace(type).Replace(".", "\\"), $"{CreateFacadeName(type)}{postFix}{fileExtension}");
         }
 
         public virtual IEnumerable<IGeneratedItem> GenerateAll()
@@ -108,7 +28,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         protected virtual IGeneratedItem CreateDbContext()
         {
             var entityProject = EntityProject.Create(SolutionProperties);
-            var dataContextNamespace = $"{Namespace}.DataContext";
+            var dataContextNamespace = $"{ItemProperties.Namespace}.DataContext";
             var result = new Models.GeneratedItem(Common.UnitType.Logic, Common.ItemType.DbContext)
             {
                 FullName = $"{dataContextNamespace}.ProjectDbContext",
@@ -145,6 +65,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.FormatCSharpCode();
             return result;
         }
+
         protected virtual IEnumerable<IGeneratedItem> CreateModels()
         {
             var result = new List<IGeneratedItem>();
@@ -155,26 +76,27 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 if (CanCreate(type))
                 {
                     result.Add(CreateDelegateModelFromType(type, Common.UnitType.Logic, Common.ItemType.Model));
-                    result.Add(CreateLogicModel(type, Common.UnitType.Logic, Common.ItemType.Model));
+                    result.Add(CreateModelInheritance(type, Common.UnitType.Logic, Common.ItemType.Model));
                 }
             }
             return result;
         }
-        protected virtual IGeneratedItem CreateLogicModel(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        protected virtual IGeneratedItem CreateModelInheritance(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = CreateModelFullNameFromType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateModelSubPath(type, "Inheritance", StaticLiterals.CSharpFileExtension),
+                SubFilePath = ItemProperties.CreateModelSubPath(type, "Inheritance", StaticLiterals.CSharpFileExtension),
             };
-            result.Source.Add($"partial class {CreateModelName(type)} : {GetBaseClassByType(type, ModelsFolder)}");
+            result.Source.Add($"partial class {CreateModelName(type)} : {GetBaseClassByType(type, StaticLiterals.ModelsFolder)}");
             result.Source.Add("{");
             result.Source.Add("}");
-            result.EnvelopeWithANamespace(CreateModelNamespace(type));
+            result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
+
         protected virtual IEnumerable<IGeneratedItem> CreateContracts()
         {
             var result = new List<IGeneratedItem>();
@@ -189,6 +111,24 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
+        protected virtual IGeneratedItem CreateContractFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        {
+            var contractName = ItemProperties.CreateContractName(type);
+            var result = new Models.GeneratedItem(unitType, itemType)
+            {
+                FullName = ItemProperties.CreateContractType(type),
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = ItemProperties.CreateContractSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
+            };
+            result.AddRange(CreateComment(type));
+            result.Add($"public partial interface {contractName}<T> : Contracts.IDataAccess<T>");
+            result.Add("{");
+            result.Add("}");
+            result.EnvelopeWithANamespace(ItemProperties.CreateContractNamespace(type));
+            result.FormatCSharpCode();
+            return result;
+        }
+
         protected virtual IEnumerable<IGeneratedItem> CreateControllers()
         {
             var result = new List<IGeneratedItem>();
@@ -203,6 +143,32 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
+        protected virtual IGeneratedItem CreateControllerFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        {
+            var visibility = type.IsPublic ? "public" : "internal";
+            var entityType = ItemProperties.CreateEntitySubType(type);
+            var genericType = $"Controllers.GenericController";
+            var controllerName = ItemProperties.CreateControllerName(type);
+            var contractSubType = ItemProperties.CreateContractSubType(type);
+            var result = new Models.GeneratedItem(unitType, itemType)
+            {
+                FullName = $"{ItemProperties.CreateControllerType(type)}",
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = ItemProperties.CreateControllersSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
+            };
+            result.AddRange(CreateComment(type));
+            CreateControllerAttributes(type, result.Source);
+            result.Add($"{visibility} sealed partial class {controllerName} : {genericType}<{entityType}>, {contractSubType}<{entityType}>");
+            result.Add("{");
+            result.AddRange(CreatePartialStaticConstrutor(controllerName));
+            result.AddRange(CreatePartialConstrutor("public", controllerName));
+            result.AddRange(CreatePartialConstrutor("public", controllerName, "ControllerObject other", "base(other)", null, false));
+            result.Add("}");
+            result.EnvelopeWithANamespace(ItemProperties.CreateControllerNamespace(type));
+            result.FormatCSharpCode();
+            return result;
+        }
+
         protected virtual IEnumerable<IGeneratedItem> CreateFacades()
         {
             var result = new List<IGeneratedItem>();
@@ -217,61 +183,18 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
-
-        protected virtual IGeneratedItem CreateContractFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
-        {
-            var contractName = CreateContractName(type);
-            var result = new Models.GeneratedItem(unitType, itemType)
-            {
-                FullName = CreateContractType(type),
-                FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateContractSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
-            };
-            result.AddRange(CreateComment(type));
-            result.Add($"public partial interface {contractName}<T> : Contracts.IDataAccess<T>");
-            result.Add("{");
-            result.Add("}");
-            result.EnvelopeWithANamespace(CreateContractNamespace(type));
-            result.FormatCSharpCode();
-            return result;
-        }
-        protected virtual IGeneratedItem CreateControllerFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
-        {
-            var visibility = type.IsPublic ? "public" : "internal";
-            var entityType = CreateEntitySubType(type);
-            var genericType = $"Controllers.GenericController";
-            var controllerName = CreateControllerName(type);
-            var contractSubType = CreateContractSubType(type);
-            var result = new Models.GeneratedItem(unitType, itemType)
-            {
-                FullName = $"{CreateControllerType(type)}",
-                FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateControllersSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
-            };
-            result.AddRange(CreateComment(type));
-            CreateControllerAttributes(type, result.Source);
-            result.Add($"{visibility} sealed partial class {controllerName} : {genericType}<{entityType}>, {contractSubType}<{entityType}>");
-            result.Add("{");
-            result.AddRange(CreatePartialStaticConstrutor(controllerName));
-            result.AddRange(CreatePartialConstrutor("public", controllerName));
-            result.AddRange(CreatePartialConstrutor("public", controllerName, "ControllerObject other", "base(other)", null, false));
-            result.Add("}");
-            result.EnvelopeWithANamespace(CreateControllerNamespace(type));
-            result.FormatCSharpCode();
-            return result;
-        }
         protected virtual IGeneratedItem CreateFacadeFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var modelType = $"{CreateModelType(type)}";
-            var entityType = CreateEntitySubType(type);
+            var modelType = $"{ItemProperties.CreateModelType(type)}";
+            var entityType = ItemProperties.CreateEntitySubType(type);
             var genericType = $"Facades.GenericFacade";
-            var facadeName = CreateFacadeName(type);
-            var contractSubType = CreateContractSubType(type);
+            var facadeName = ItemProperties.CreateFacadeName(type);
+            var contractSubType = ItemProperties.CreateContractSubType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
-                FullName = CreateFacadeType(type),
+                FullName = ItemProperties.CreateFacadeType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = CreateFacadesSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
+                SubFilePath = ItemProperties.CreateFacadesSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
             };
             result.AddRange(CreateComment(type));
             CreateControllerAttributes(type, result.Source);
@@ -279,10 +202,10 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(facadeName));
             result.Add($"new protected {contractSubType}<{type.FullName}> Controller => (base.Controller as {contractSubType}<{type.FullName}>)!;");
-            result.AddRange(CreatePartialConstrutor("public", facadeName, null, $"base(new {CreateControllerSubType(type)}())"));
-            result.AddRange(CreatePartialConstrutor("public", facadeName, "Facades.FacadeObject other", $"base(new {CreateControllerSubType(type)}(other.ControllerObject))", null, false));
+            result.AddRange(CreatePartialConstrutor("public", facadeName, null, $"base(new {ItemProperties.CreateControllerSubType(type)}())"));
+            result.AddRange(CreatePartialConstrutor("public", facadeName, "Facades.FacadeObject other", $"base(new {ItemProperties.CreateControllerSubType(type)}(other.ControllerObject))", null, false));
             result.Add("}");
-            result.EnvelopeWithANamespace(CreateFacadeNamespace(type));
+            result.EnvelopeWithANamespace(ItemProperties.CreateFacadeNamespace(type));
             result.FormatCSharpCode();
             return result;
         }
@@ -290,7 +213,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         protected virtual IGeneratedItem CreateFactory()
         {
             var entityProject = EntityProject.Create(SolutionProperties);
-            var factoryNamespace = $"{Namespace}";
+            var factoryNamespace = $"{ItemProperties.Namespace}";
             var result = new Models.GeneratedItem(Common.UnitType.Logic, Common.ItemType.DbContext)
             {
                 FullName = $"{factoryNamespace}.Factory",
@@ -303,10 +226,10 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             foreach (var type in entityProject.EntityTypes)
             {
-                var modelType = $"{CreateModelType(type)}";
-                var contractSubType = CreateContractSubType(type);
-                var facadeName = CreateFacadeName(type);
-                var facadeType = CreateFacadeType(type);
+                var modelType = $"{ItemProperties.CreateModelType(type)}";
+                var contractSubType = ItemProperties.CreateContractSubType(type);
+                var facadeName = ItemProperties.CreateFacadeName(type);
+                var facadeType = ItemProperties.CreateFacadeType(type);
 
                 result.AddRange(CreateComment(type));
                 result.Add($"public static {contractSubType}<{modelType}> Create{facadeName}() => new {facadeType}();");
@@ -320,6 +243,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.FormatCSharpCode();
             return result;
         }
+
         #region Partial methods
         partial void CreateControllerAttributes(Type type, List<string> codeLines);
         #endregion Partial methods

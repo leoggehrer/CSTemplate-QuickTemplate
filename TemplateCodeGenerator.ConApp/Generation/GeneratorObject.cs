@@ -102,9 +102,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// <returns>Teil-Namensraum</returns>
         public static string CreateSubNamespaceFromEntityType(Type type)
         {
-            var result = CreateSubNamespaceFromType(type).Replace($"{StaticLiterals.EntitiesFolder}.", string.Empty);
-
-            return result;
+            var result = CreateSubNamespaceFromType(type);
+            
+            if (result.Equals(StaticLiterals.EntitiesFolder))
+            {
+                result = string.Empty;
+            }
+            return result.Replace($"{StaticLiterals.EntitiesFolder}.", string.Empty);
         }
         /// <summary>
         /// Diese Methode ermittelt den Teil-Path aus einem Typ.
