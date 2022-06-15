@@ -1,4 +1,6 @@
-﻿namespace TemplateCopier.ConApp
+﻿using System.Diagnostics;
+
+namespace TemplateCopier.ConApp
 {
     internal partial class Program
     {
@@ -126,10 +128,13 @@
                     else if (select == 4)
                     {
                         var sc = new Copier();
+                        var targetSolutionPath = Path.Combine(TargetPath, targetSolutionName);
 
                         PrintBusyProgress();
-                        sc.Copy(SourcePath, Path.Combine(TargetPath, targetSolutionName), sourceProjects);
+                        sc.Copy(SourcePath, targetSolutionPath, sourceProjects);
                         runBusyProgress = false;
+
+                        OpenSolutionFolder(targetSolutionPath);
                     }
                     Console.ResetColor();
                 }
@@ -204,5 +209,19 @@
                                          .ToList();
             return qtDirectories.ToArray();
         }
+
+        #region CLI Argument methods
+        private static void OpenSolutionFolder(string solutionPath)
+        {
+            Process.Start(new ProcessStartInfo()
+            {
+                WorkingDirectory = solutionPath,
+                FileName = "explorer",
+                Arguments = solutionPath,
+                CreateNoWindow = true,
+            });
+        }
+        #endregion
+
     }
 }
