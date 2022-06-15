@@ -73,7 +73,7 @@
         }
         public string CreateContractNamespace(Type type)
         {
-            return $"{Namespace}.{CreateContractSubNamespace(type)}";
+            return $"{SolutionName}{StaticLiterals.LogicExtension}.{CreateContractSubNamespace(type)}";
         }
         public static string CreateContractSubNamespace(Type type)
         {

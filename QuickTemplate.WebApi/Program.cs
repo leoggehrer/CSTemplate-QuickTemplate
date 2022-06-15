@@ -51,7 +51,11 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
+QuickTemplate.WebApi.Program.BeforeBuild(builder);
+
 var app = builder.Build();
+
+QuickTemplate.WebApi.Program.AfterBuild(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

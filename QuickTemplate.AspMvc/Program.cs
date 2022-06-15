@@ -20,7 +20,11 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(20);
 });
 
+QuickTemplate.Logic.Program.BeforeBuild(builder);
+
 var app = builder.Build();
+
+QuickTemplate.Logic.Program.AfterBuild(app);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
