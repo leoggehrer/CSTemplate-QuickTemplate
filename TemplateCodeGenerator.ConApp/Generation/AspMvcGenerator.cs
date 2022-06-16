@@ -57,6 +57,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
         protected virtual IGeneratedItem CreateFilterModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
+            var idx = 0;
             var sbHasValue = new StringBuilder();
             var sbToString = new StringBuilder();
             var modelName = CreateFilterModelName(type);
@@ -71,8 +72,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 SubFilePath = ItemProperties.CreateModelSubPath(type, "Filter", StaticLiterals.CSharpFileExtension),
             };
 
+            idx = 0;
             result.AddRange(CreateComment(type));
-            CreateModelAttributes(type, result.Source);
             result.Add($"public partial class {modelName}");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(modelName));
@@ -80,13 +81,18 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             foreach (var propertyInfo in filteredProperties)
             {
-                if (sbHasValue.Length > 0)
+                if (idx++ > 0)
                     sbHasValue.Append(" || ");
 
-                sbToString.Append($"{propertyInfo.Name}: " + "{(" + $"{propertyInfo.Name} != null ? {propertyInfo.Name} : \"---\"" + ")} ");
-
+                if (propertyInfo.PropertyType == typeof(string))
+                {
+                    sbToString.Append($"{propertyInfo.Name}: " + "{(" + $"{propertyInfo.Name} ?? \"---\"" + ")} ");
+                }
+                else
+                {
+                    sbToString.Append($"{propertyInfo.Name}: " + "{(" + $"{propertyInfo.Name} != null ? {propertyInfo.Name} : \"---\"" + ")} ");
+                }
                 sbHasValue.Append($"{propertyInfo.Name} != null");
-                CreateModelPropertyAttributes(propertyInfo, result.Source);
                 result.AddRange(CreateFilterAutoProperty(propertyInfo));
             }
 
@@ -95,6 +101,36 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 result.AddRange(CreateComment(type));
                 result.Add($"public bool HasValue => {sbHasValue};");
             }
+
+            idx = 0;
+            result.AddRange(CreateComment(type));
+            result.Add("public string CreatePredicate()");
+            result.Add("{");
+            result.Add("var result = new System.Text.StringBuilder();");
+            result.Add(string.Empty);
+            foreach (var propertyInfo in filteredProperties)
+            {
+                result.Add($"if ({propertyInfo.Name} != null)");
+                result.Add("{");
+
+                result.Add("if (result.Length > 0)");
+                result.Add("{");
+                result.Add("result.Append(\" || \");");
+                result.Add("}");
+
+                if (propertyInfo.PropertyType == typeof(string))
+                {
+                    result.Add("result.Append($\"(" + $"{propertyInfo.Name} != null && {propertyInfo.Name}.Contains(\\\"" + "{" + $"{propertyInfo.Name}" + "}" + "\\\"))\");");
+                }
+                else
+                {
+                    result.Add("result.Append($\"(" + $"{propertyInfo.Name} != null && {propertyInfo.Name} == " + "{" + $"{propertyInfo.Name}" + "})\");");
+                }
+
+                result.Add("}");
+            }
+            result.Add("return result.ToString();");
+            result.Add("}");
 
             if (sbToString.Length > 0)
             {
@@ -145,9 +181,57 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add($"{visibility} sealed partial class {controllerName} : {genericType}<{accessType}, {modelType}>");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(controllerName));
+            result.Add(string.Empty);
+            result.Add("private static string FilterName => typeof(FilterType).Name;");
+            result.Add(string.Empty);
             result.AddRange(CreatePartialConstrutor("public", controllerName, $"{contractType}<{accessType}> other", "base(other)", null, true));
+
+            result.AddRange(CreateComment(type));
+            result.Add("public override async Task<IActionResult> Index()");
+            result.Add("{");
+            result.Add("IActionResult? result;");
+            result.Add("var filter = SessionWrapper.Get<FilterType>(FilterName) ?? new FilterType();");
+            result.Add(string.Empty);
+            result.Add("if (filter.HasValue)");
+            result.Add("{");
+            result.Add("var predicate = filter.CreatePredicate();");
+            result.Add("var accessModels = await DataAccess.QueryAsync(predicate);");
+            result.Add(String.Empty);
+            result.Add("result = View(AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index)));");
             result.Add("}");
-            result.EnvelopeWithANamespace(ItemProperties.CreateControllerNamespace(type), filterModelUsing);
+            result.Add("else");
+            result.Add("{");
+            result.Add("var accessModels = await DataAccess.GetAllAsync();");
+            result.Add(String.Empty);
+            result.Add("result = View(AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index)));");
+            result.Add("}");
+            result.Add("ViewBag.Filter = filter;");
+            result.Add("return result;");
+            result.Add("}");
+
+            result.AddRange(CreateComment(type));
+            result.Add("public async Task<IActionResult> Filter(FilterType filter)");
+            result.Add("{");
+            result.Add("IActionResult? result;");
+            result.Add(string.Empty);
+            result.Add("if (filter.HasValue)");
+            result.Add("{");
+            result.Add("var predicate = filter.CreatePredicate();");
+            result.Add("var accessModels = await DataAccess.QueryAsync(predicate);");
+            result.Add(String.Empty);
+            result.Add("result = View(\"Index\", AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index)));");
+            result.Add("}");
+            result.Add("else");
+            result.Add("{");
+            result.Add("result = RedirectToAction(\"Index\");");
+            result.Add("}");
+            result.Add("ViewBag.Filter = filter;");
+            result.Add("SessionWrapper.Set<FilterType>(FilterName, filter);");
+            result.Add("return result;");
+            result.Add("}");
+
+            result.Add("}");
+            result.EnvelopeWithANamespace(ItemProperties.CreateControllerNamespace(type), "using Microsoft.AspNetCore.Mvc;", filterModelUsing);
             result.FormatCSharpCode();
             return result;
         }
@@ -304,7 +388,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var viewProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false
                                                         && IsListType(e.PropertyType) == false
                                                         && (e.PropertyType.IsPrimitive || e.PropertyType == typeof(string)));
-            var modelType = ItemProperties.CreateModelType(type);
+            var modelType = ItemProperties.CreateFilterModelType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = ItemProperties.CreateModelType(type),
@@ -316,15 +400,22 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             result.Add("<div class=\"row\">");
             result.Add("    <div class=\"col-md-4\">");
-            result.Add("        <div asp-validation-summary=\"ModelOnly\" class=\"text-danger\"></div>");
+            result.Add("        <form asp-action=\"Filter\">");
+            result.Add("            <div asp-validation-summary=\"ModelOnly\" class=\"text-danger\"></div>");
 
             foreach (var item in viewProperties)
             {
-                result.Add("        <div class=\"form-group\">");
-                result.Add($"            <label asp-for=\"{item.Name}\" class=\"control-label\"></label>");
-                result.Add($"            <input asp-for=\"{item.Name}\" class=\"form-control\" />");
-                result.Add("        </div>");
+                result.Add("            <div class=\"form-group\">");
+                result.Add($"                <label asp-for=\"{item.Name}\" class=\"control-label\"></label>");
+                result.Add($"                <input asp-for=\"{item.Name}\" class=\"form-control\" />");
+                result.Add("            </div>");
             }
+
+            result.Add("            <p></p>");
+            result.Add("            <div class=\"form-group\">");
+            result.Add("                <input type=\"submit\" value=\"Apply\" class=\"btn btn-primary\" />");
+            result.Add("            </div>");
+            result.Add("        </form>");
 
             result.Add("    </div>");
             result.Add("</div>");

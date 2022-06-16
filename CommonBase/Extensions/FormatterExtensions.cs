@@ -151,8 +151,9 @@ namespace CommonBase.Extensions
             for (var idx = 0; idx >= 0 && idx < text.Length && (start == -1 || end == -1); idx++)
             {
                 var chr = text[idx];
+                var prvChr = idx > 0 ? text[idx - 1] : 0;
 
-                if (chr == '"')
+                if (chr == '"' && prvChr != '\\')
                 {
                     quotationMarks++;
                 }

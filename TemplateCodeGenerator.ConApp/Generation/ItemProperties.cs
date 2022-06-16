@@ -29,6 +29,14 @@
         {
             return $"{CreateModelNamespace(type)}.{CreateEditModelName(type)}";
         }
+        public static string CreateFilterModelName(Type type)
+        {
+            return $"{CreateModelName(type)}Filter";
+        }
+        public string CreateFilterModelType(Type type)
+        {
+            return $"{CreateModelNamespace(type)}.{CreateFilterModelName(type)}";
+        }
 
         public static string CreateModelSubType(Type type)
         {
