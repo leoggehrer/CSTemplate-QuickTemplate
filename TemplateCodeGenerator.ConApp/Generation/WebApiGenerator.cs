@@ -99,7 +99,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         protected virtual IGeneratedItem CreateControllerFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var visibility = type.IsPublic ? "public" : "internal";
+            var visibility = "public";
             var accessType = ItemProperties.CreateEntitySubType(type);
             var genericType = $"Controllers.GenericController";
             var modelType = ItemProperties.CreateModelType(type);

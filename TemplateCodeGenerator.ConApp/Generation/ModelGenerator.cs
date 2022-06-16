@@ -27,11 +27,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 if (IsListType(propertyInfo.PropertyType))
                 {
-                    result = $"{propertyInfo.Name} = other.{propertyInfo.Name}.Select(e => {ItemProperties.ConvertEntityToModelType(propertyInfo.PropertyType.GenericTypeArguments[0].FullName!)}.Create(e)).ToList();";
+                    result = $"{propertyInfo.Name} = other.{propertyInfo.Name}.Select(e => {ItemProperties.ConvertEntityToModelType(propertyInfo.PropertyType.GenericTypeArguments[0].FullName!)}.Create((object)e)).ToList();";
                 }
                 else
                 {
-                    result = $"{propertyInfo.Name} = other.{propertyInfo.Name} != null ? {ItemProperties.ConvertEntityToModelType(propertyInfo.PropertyType.FullName!)}.Create(other.{propertyInfo.Name}) : null;";
+                    result = $"{propertyInfo.Name} = other.{propertyInfo.Name} != null ? {ItemProperties.ConvertEntityToModelType(propertyInfo.PropertyType.FullName!)}.Create((object)other.{propertyInfo.Name}) : null;";
                 }
             }
             return result ?? base.CopyProperty(copyType, propertyInfo);
@@ -130,22 +130,46 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 CreateModelPropertyAttributes(propertyInfo, result.Source);
                 result.AddRange(CreateProperty(propertyInfo));
             }
+
+            result.AddRange(CreateFactoryMethod(false, ItemProperties.CreateModelType(type)));
+
             if (unitType == Common.UnitType.Logic)
             {
+                result.AddRange(CreateFactoryMethod(false, ItemProperties.CreateModelType(type), type.FullName!));
+
                 result.AddRange(CreateCopyProperties("internal", type, type.FullName!));
                 result.AddRange(CreateCopyProperties("public", type, ItemProperties.CreateModelType(type)));
             }
             else if (unitType == Common.UnitType.WebApi)
             {
-                result.AddRange(CreateCopyProperties("public", type, ItemProperties.CreateModelType(type)));
+                if (type.IsPublic)
+                {
+                    result.AddRange(CreateFactoryMethod(false, ItemProperties.CreateModelType(type), type.FullName!));
+
+                    result.AddRange(CreateCopyProperties("public", type, type.FullName!));
+                    result.AddRange(CreateCopyProperties("public", type, ItemProperties.CreateModelType(type)));
+                }
+                else
+                {
+                    result.AddRange(CreateCopyProperties("public", type, ItemProperties.CreateModelType(type)));
+                }
             }
             else if (unitType == Common.UnitType.AspMvc)
             {
-                result.AddRange(CreateCopyProperties("public", type, ItemProperties.CreateModelType(type), p => true));
+                if (type.IsPublic)
+                {
+                    result.AddRange(CreateFactoryMethod(false, ItemProperties.CreateModelType(type), type.FullName!));
+
+                    result.AddRange(CreateCopyProperties("public", type, type.FullName!));
+                    result.AddRange(CreateCopyProperties("public", type, ItemProperties.CreateModelType(type)));
+                }
+                else
+                {
+                    result.AddRange(CreateCopyProperties("public", type, ItemProperties.CreateModelType(type)));
+                }
             }
             result.AddRange(CreateEquals(type));
             result.AddRange(CreateGetHashCode(type));
-            result.AddRange(CreateFactoryMethods(ItemProperties.CreateModelType(type), false));
             result.Add("}");
             result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type), "using System;");
             result.FormatCSharpCode();
@@ -206,7 +230,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
         protected string GetBaseClassByType(Type type, string subNamespace)
         {
-            var result = string.Empty;
+            var result = "object";
 
             while (type.BaseType != null
                    && StaticLiterals.EntityBaseClasses.Any(e => e.Equals(type.BaseType.Name)) == false)

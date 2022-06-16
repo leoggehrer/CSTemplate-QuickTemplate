@@ -57,6 +57,7 @@ namespace TemplateCodeGenerator.ConApp
                 Console.WriteLine();
                 Console.WriteLine($"[{++menuIndex}] Change source path");
                 Console.WriteLine($"[{++menuIndex}] Compile solution...");
+                Console.WriteLine($"[{++menuIndex}] Compile logic project...");
                 Console.WriteLine($"[{++menuIndex}] Delete generation files...");
                 Console.WriteLine($"[{++menuIndex}] Start code generation...");
                 Console.WriteLine("[x|X] Exit");
@@ -99,7 +100,49 @@ namespace TemplateCodeGenerator.ConApp
                             SourcePath = selectOrPath;
                         }
                     }
-                    if (select == 2 || select == 4)
+                    if (select == 2)
+                    {
+                        var counter = 0;
+                        var startCompilePath = Path.Combine(Path.GetTempPath(), solutionProperties.SolutionName);
+                        var compilePath = startCompilePath;
+                        bool deleteError;
+
+                        do
+                        {
+                            deleteError = false;
+                            if (Directory.Exists(compilePath))
+                            {
+                                try
+                                {
+                                    Directory.Delete(compilePath, true);
+                                }
+                                catch
+                                {
+                                    deleteError = true;
+                                    compilePath = $"{startCompilePath}{++counter}";
+                                }
+                            }
+                        } while (deleteError != false);
+
+                        var arguments = $"build \"{solutionProperties.SolutionFilePath}\" -c Release -o {compilePath}";
+                        Console.WriteLine(arguments);
+                        Debug.WriteLine($"dotnet.exe {arguments}");
+
+                        var csprojStartInfo = new ProcessStartInfo("dotnet.exe")
+                        {
+                            Arguments = arguments,
+                            //WorkingDirectory = projectPath,
+                            UseShellExecute = false
+                        };
+                        Process.Start(csprojStartInfo)?.WaitForExit(maxWaiting);
+                        solutionProperties.CompilePath = compilePath;
+                        if (select == 2)
+                        {
+                            Console.Write("Press any key ");
+                            Console.ReadKey();
+                        }
+                    }
+                    if (select == 3 || select == 5)
                     {
                         var counter = 0;
                         var startCompilePath = Path.Combine(Path.GetTempPath(), solutionProperties.SolutionName);
@@ -141,11 +184,11 @@ namespace TemplateCodeGenerator.ConApp
                             Console.ReadKey();
                         }
                     }
-                    if (select == 3)
+                    if (select == 4)
                     {
                         Generator.DeleteGenerationFiles(SourcePath);
                     }
-                    if (select == 4)
+                    if (select == 5)
                     {
                         var generatedItems = Generator.Generate(solutionProperties);
 

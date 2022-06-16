@@ -15,15 +15,12 @@
 
 <h1>@title</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-outline-success">Create New</a>
-</p>
-
 @if (filter != null)
 {
-    <div class="row">
-        <div class="btn-group" role="group" aria-label="Basic outlined example">
-            @*<button type="button" class="btn btn-outline-primary col-md-1" title="Sort"><i class="fa fa-sort"></i></button>*@
+    <div class="row" style="margin: 1em 0em 1em 0em;">
+        <div class="btn-group" role="group" aria-label="Basic outlined filter">
+            <a asp-action="Create" class="btn btn-outline-success"><i class="fa fa-plus"></i></a>
+            @*<button type="button" class="btn btn-outline-primary col-md-1" title="Sort"><i class="fa fa-plus"></i></button>*@
             <button type="button" class="btn btn-outline-secondary col-md-11" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">@filter.ToString()</button>
             <button type="button" class="btn btn-outline-primary col-md-1" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter" title="Filter"><i class="fa fa-filter"></i></button>
         </div>
@@ -33,6 +30,12 @@
             @await Html.PartialAsync("_Filter", filter)
         </div>
     </div>
+}
+else
+{
+    <p>
+        <a asp-action="Create" class="btn btn-outline-success">Create New</a>
+    </p>
 }
 
 <table class="table">

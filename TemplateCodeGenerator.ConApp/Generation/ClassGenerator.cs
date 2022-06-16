@@ -74,12 +74,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
         #endregion Create constructors
 
         #region Create factory methode
-        public IEnumerable<string> CreateFactoryMethods(string itemType, bool newPrefix)
+        public IEnumerable<string> CreateFactoryMethod(bool newPrefix, string itemType)
         {
 #pragma warning disable IDE0028 // Simplify collection initialization
-            var result = new List<string>(CreateComment());
+            var result = new List<string>();
 #pragma warning restore IDE0028 // Simplify collection initialization
 
+            result.AddRange(CreateComment());
             result.Add($"public{(newPrefix ? " new " : " ")}static {itemType} Create()");
             result.Add("{");
             result.Add("BeforeCreate();");
@@ -99,8 +100,21 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("return result;");
             result.Add("}");
 
+            result.Add("static partial void BeforeCreate();");
+            result.Add($"static partial void AfterCreate({itemType} instance);");
+
+            result.Add("static partial void BeforeCreate(object other);");
+            result.Add($"static partial void AfterCreate({itemType} instance, object other);");
+            return result;
+        }
+        public IEnumerable<string> CreateFactoryMethod(bool newPrefix, string itemType, string copyType)
+        {
+#pragma warning disable IDE0028 // Simplify collection initialization
+            var result = new List<string>();
+#pragma warning restore IDE0028 // Simplify collection initialization
+
             result.AddRange(CreateComment());
-            result.Add($"public{(newPrefix ? " new " : " ")}static {itemType} Create({itemType} other)");
+            result.Add($"public{(newPrefix ? " new " : " ")}static {itemType} Create({copyType} other)");
             result.Add("{");
             result.Add("BeforeCreate(other);");
             result.Add($"var result = new {itemType}();");
@@ -109,16 +123,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("return result;");
             result.Add("}");
 
-            result.Add("static partial void BeforeCreate();");
-            result.Add($"static partial void AfterCreate({itemType} instance);");
-
-            result.Add("static partial void BeforeCreate(object other);");
-            result.Add($"static partial void AfterCreate({itemType} instance, object other);");
-
-            result.Add($"static partial void BeforeCreate({itemType} other);");
-            result.Add($"static partial void AfterCreate({itemType} instance, {itemType} other);");
+            result.Add($"static partial void BeforeCreate({copyType} other);");
+            result.Add($"static partial void AfterCreate({itemType} instance, {copyType} other);");
             return result;
         }
+
         public IEnumerable<string> CreateDelegateFactoryMethods(string itemType, string delegateType, bool newPrefix)
         {
 #pragma warning disable IDE0028 // Simplify collection initialization

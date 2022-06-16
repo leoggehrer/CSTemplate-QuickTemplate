@@ -372,7 +372,14 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 result.Add("        <div class=\"form-group\">");
                 result.Add($"            <label asp-for=\"{item.Name}\" class=\"control-label\"></label>");
-                result.Add($"            <input asp-for=\"{item.Name}\" class=\"form-control\" />");
+                if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(bool?))
+                {
+                    result.Add($"            <input asp-for=\"{item.Name}\" class=\"form-check\" />");
+                }
+                else
+                {
+                    result.Add($"            <input asp-for=\"{item.Name}\" class=\"form-control\" />");
+                }
                 result.Add($"            <span asp-validation-for=\"{item.Name}\" class=\"text-danger\"></span>");
                 result.Add("        </div>");
             }
@@ -407,7 +414,14 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 result.Add("            <div class=\"form-group\">");
                 result.Add($"                <label asp-for=\"{item.Name}\" class=\"control-label\"></label>");
-                result.Add($"                <input asp-for=\"{item.Name}\" class=\"form-control\" />");
+                if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(bool?))
+                {
+                    result.Add($"            <input asp-for=\"{item.Name}\" class=\"form-check\" />");
+                }
+                else
+                {
+                    result.Add($"            <input asp-for=\"{item.Name}\" class=\"form-control\" />");
+                }
                 result.Add("            </div>");
             }
 
