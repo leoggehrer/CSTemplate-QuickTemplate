@@ -97,6 +97,14 @@ namespace TemplateCodeGenerator.ConApp
                 Console.WriteLine("Write WebApi-Controllers...");
                 WriteItems(projectPath, writeItems);
             }));
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.WebApiProjectName);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.WebApi && e.ItemType == ItemType.AddServices);
+
+                Console.WriteLine("Write WebApi-AddServices...");
+                WriteItems(projectPath, writeItems);
+            }));
             #endregion WriteWebApiModels
 
             #region WriteAspMvcModels
@@ -116,89 +124,34 @@ namespace TemplateCodeGenerator.ConApp
                 Console.WriteLine("Write AspMvc-FilterModels...");
                 WriteItems(projectPath, writeItems);
             }));
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.AspMvcAppProjectName);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.AspMvc && e.ItemType == ItemType.Controller);
+
+                Console.WriteLine("Write AspMvc-Controllers...");
+                WriteItems(projectPath, writeItems);
+            }));
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.AspMvcAppProjectName);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.AspMvc && e.ItemType == ItemType.AddServices);
+
+                Console.WriteLine("Write AspMvc-AddServices...");
+                WriteItems(projectPath, writeItems);
+            }));
+            tasks.Add(Task.Factory.StartNew(() =>
+            {
+                var projectPath = Path.Combine(solutionPath, solutionProperties.AspMvcAppProjectName);
+                var writeItems = generatedItems.Where(e => e.UnitType == UnitType.AspMvc && e.ItemType == ItemType.View);
+
+                Console.WriteLine("Write AspMvc-Views...");
+                WriteItems(projectPath, writeItems);
+            }));
             #endregion WriteAspMvcModels
 
             Task.WaitAll(tasks.ToArray());
         }
-
-        #region Create translations
-        private record Translation(string AppName, string KeyLanguage, string Key, string ValueLanguage, string Value);
-        private static Translation ToTranslation(string line, string separator)
-        {
-            var data = line.Split(separator);
-            return new Translation(data[0], data[1], data[2], data[3], data[4]);
-        }
-        private static string ToCsv(Translation translation, string separator)
-        {
-            return $"{translation.AppName}{separator}{translation.KeyLanguage}{separator}{translation.Key}{separator}{translation.ValueLanguage}{separator}{translation.Value}";
-        }
-        public static void WriteTranslations(string solutionPath, IGeneratedItem generatedItem)
-        {
-            var separator = ";";
-            var fileName = $"{generatedItem.FullName}{generatedItem.FileExtension}";
-            var filePath = Path.Combine(solutionPath, fileName);
-            var resultItems = new List<Translation>();
-
-            if (File.Exists(filePath))
-            {
-                resultItems.AddRange(File.ReadAllLines(filePath).Select(l => ToTranslation(l, separator)));
-            }
-            foreach (var line in generatedItem.SourceCode)
-            {
-                var entry = ToTranslation(line, separator);
-                var existEntry = resultItems.FirstOrDefault(e => e.AppName.Equals(entry.AppName)
-                                                              && e.KeyLanguage.Equals(entry.KeyLanguage)
-                                                              && e.Key.Equals(entry.Key));
-
-                if (existEntry == null)
-                {
-                    resultItems.Add(entry);
-                }
-            }
-            File.WriteAllLines(filePath, resultItems.Select(t => ToCsv(t, separator)), Encoding.Default);
-        }
-        #endregion Create translations
-
-        #region Create properties
-        private record Property(string AppName, string EntityName, string PropertyName, string Attribute, string Value);
-        private static string ToCsv(Property property, string separator)
-        {
-            return $"{property.AppName}{separator}{property.EntityName}{separator}{property.PropertyName}{separator}{property.Attribute}{separator}{property.Value}";
-        }
-
-        private static Property ToProperty(string line, string separator)
-        {
-            var data = line.Split(separator);
-            return new Property(data[0], data[1], data[2], data[3], data[4]);
-        }
-        public static void WriteProperties(string solutionPath, IGeneratedItem generatedItem)
-        {
-            var separator = ";";
-            var fileName = $"{generatedItem.FullName}{generatedItem.FileExtension}";
-            var filePath = Path.Combine(solutionPath, fileName);
-            var resultItems = new List<Property>();
-
-            if (File.Exists(filePath))
-            {
-                resultItems.AddRange(File.ReadAllLines(filePath).Select(l => ToProperty(l, separator)));
-            }
-
-            foreach (var line in generatedItem.SourceCode)
-            {
-                var entry = ToProperty(line, separator);
-                var existEntry = resultItems.FirstOrDefault(e => e.AppName.Equals(entry.AppName)
-                                                              && e.EntityName.Equals(entry.EntityName)
-                                                              && e.PropertyName.Equals(entry.PropertyName)
-                                                              && e.Attribute.Equals(entry.Attribute));
-
-                if (existEntry == null)
-                {
-                    resultItems.Add(entry);
-                }
-            }
-            File.WriteAllLines(filePath, resultItems.Select(p => ToCsv(p, separator)), Encoding.Default);
-        }
-        #endregion Create properties
 
         #region Write methods
         public static void WriteItems(string projectPath, IEnumerable<IGeneratedItem> generatedItems)
@@ -272,7 +225,14 @@ namespace TemplateCodeGenerator.ConApp
                 var filePath = Path.Combine(projectPath, item.SubFilePath);
 
                 //sourceLines.Insert(0, $"{StaticLiterals.NullableDisableLabel}");
-                sourceLines.Insert(0, $"//{StaticLiterals.GeneratedCodeLabel}");
+                if (item.FileExtension == StaticLiterals.CSharpHtmlFileExtension)
+                {
+                    sourceLines.Insert(0, $"@*{StaticLiterals.GeneratedCodeLabel}*@");
+                }
+                else
+                {
+                    sourceLines.Insert(0, $"//{StaticLiterals.GeneratedCodeLabel}");
+                }
                 WriteCodeFile(filePath, sourceLines);
             }
         }

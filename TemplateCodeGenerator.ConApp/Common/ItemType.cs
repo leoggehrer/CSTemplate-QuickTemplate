@@ -18,6 +18,10 @@ namespace TemplateCodeGenerator.ConApp.Common
 
         Controller = 2 * AccessContract,
         Facade = 2 * Controller,
+
+        AddServices = 2 * Facade,
+
+        View = 2 * AddServices,
     }
 }
 //MdEnd

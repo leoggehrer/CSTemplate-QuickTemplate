@@ -1,6 +1,6 @@
 ﻿//@BaseCode
 //MdStart
-namespace QuickTemplate.Logic
+namespace QuickTemplate.AspMvc
 {
     /// <summary>
     /// Extension Program

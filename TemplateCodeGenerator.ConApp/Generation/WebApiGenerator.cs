@@ -16,6 +16,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             result.AddRange(CreateModels());
             result.AddRange(CreateControllers());
+            result.Add(CreateAddServices());
             return result;
         }
 
@@ -119,6 +120,35 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.AddRange(CreatePartialConstrutor("public", controllerName, $"{contractType}<{accessType}> other", "base(other)", null, true));
             result.Add("}");
             result.EnvelopeWithANamespace(ItemProperties.CreateControllerNamespace(type));
+            result.FormatCSharpCode();
+            return result;
+        }
+
+        protected virtual IGeneratedItem CreateAddServices()
+        {
+            var entityProject = EntityProject.Create(SolutionProperties);
+            var result = new Models.GeneratedItem(Common.UnitType.WebApi, Common.ItemType.AddServices)
+            {
+                FullName = $"{ItemProperties.Namespace}.Program",
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = $"ProgramGeneration{StaticLiterals.CSharpFileExtension}",
+            };
+            result.AddRange(CreateComment());
+            result.Add("partial class Program");
+            result.Add("{");
+            result.Add("static partial void AddServices(WebApplicationBuilder builder)");
+            result.Add("{");
+            foreach (var type in entityProject.EntityTypes)
+            {
+                var accessType = ItemProperties.CreateEntitySubType(type);
+                var contractType = ItemProperties.CreateContractType(type);
+                var controllerType = ItemProperties.CreateLogicControllerType(type);
+
+                result.Add($"builder.Services.AddTransient<{contractType}<{accessType}>, {controllerType}>();");
+            }
+            result.Add("}");
+            result.Add("}");
+            result.EnvelopeWithANamespace(ItemProperties.Namespace);
             result.FormatCSharpCode();
             return result;
         }

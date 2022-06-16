@@ -88,6 +88,10 @@
         #endregion Contracts properties
 
         #region Controller properties
+        public string CreateLogicControllerType(Type type)
+        {
+            return $"{SolutionName}{StaticLiterals.LogicExtension}.{CreateControllerSubType(type)}";
+        }
         public static string CreateControllerName(Type type)
         {
             return $"{type.Name.CreatePluralWord()}Controller";
@@ -144,6 +148,13 @@
             return Path.Combine(CreateFacadeSubNamespace(type).Replace(".", "\\"), $"{CreateFacadeName(type)}{postFix}{fileExtension}");
         }
         #endregion Facade properties
+
+        #region View properties
+        public static string CreateViewSubPathFromType(Type type, string fileName, string fileExtension)
+        {
+            return Path.Combine(StaticLiterals.ViewsFolder, $"{type.Name.CreatePluralWord()}", $"{fileName}{fileExtension}");
+        }
+        #endregion View properties
 
         public static bool IsEntityType(Type type)
         {

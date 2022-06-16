@@ -43,11 +43,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             var lines = new List<string>(CreateComment())
             {
-                $"{visibility} {className}({argumentList})"
+                $"{visibility} {className}({argumentList})",
             };
 
             if (string.IsNullOrEmpty(baseConstructor) == false)
-                lines.Add($":{baseConstructor}");
+                lines.Add($" : {baseConstructor}");
 
             lines.Add("{");
             lines.Add("Constructing();");

@@ -8,6 +8,7 @@ namespace TemplateCodeGenerator.ConApp
         public static string GeneratedCodeFileName => "_GeneratedCode.cs";
         public static string SourceFileExtensions => CommonStaticLiterals.SourceFileExtensions;
         public static string CSharpFileExtension => CommonStaticLiterals.CSharpFileExtension;
+        public static string CSharpHtmlFileExtension => $"{CommonStaticLiterals.CSharpFileExtension}html";
         public static string GeneratedCodeLabel => CommonStaticLiterals.GeneratedCodeLabel;
         public static string CustomizedAndGeneratedCodeLabel => CommonStaticLiterals.CustomizedAndGeneratedCodeLabel;
 
@@ -44,15 +45,14 @@ namespace TemplateCodeGenerator.ConApp
         #endregion Model properties
 
         #region Folders
-        public static string ContractsFolder => "Contracts";
         public static string EntitiesFolder => "Entities";
+        public static string ModelsFolder => "Models";
+        public static string ContractsFolder => "Contracts";
         public static string DataContextFolder => "DataContext";
         public static string ControllersFolder => "Controllers";
         public static string FacadesFolder => "Facades";
-        public static string ModelsFolder => "Models";
+        public static string ViewsFolder => "Views";
         #endregion Folders
-
-        public static string DelegatePropertyName => "DelegateObject";
     }
 }
 //MdEnd

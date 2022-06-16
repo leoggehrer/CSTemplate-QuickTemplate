@@ -33,7 +33,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 FullName = $"{dataContextNamespace}.ProjectDbContext",
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = $"DataContext\\ProjectDbContextGenerationst{StaticLiterals.CSharpFileExtension}",
+                SubFilePath = $"DataContext\\ProjectDbContextGeneration{StaticLiterals.CSharpFileExtension}",
             };
             result.AddRange(CreateComment());
             result.Add($"partial class ProjectDbContext");
