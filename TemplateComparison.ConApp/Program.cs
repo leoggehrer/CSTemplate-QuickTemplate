@@ -61,13 +61,10 @@ namespace TemplateComparison.ConApp
                     TargetPaths = TargetPaths.ToArray();
                 }
                 PrintHeader(SourcePath, TargetPaths);
-
                 Console.Write($"Balancing [1..{TargetPaths.Length}|X...Quit]: ");
 
                 input = Console.ReadLine()?.ToLower();
-
                 Console.ForegroundColor = saveForeColor;
-                Console.WriteLine();
                 PrintBusyProgress();
                 running = input?.Equals("x") == false;
                 if (running)

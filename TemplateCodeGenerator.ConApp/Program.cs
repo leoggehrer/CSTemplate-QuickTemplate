@@ -65,9 +65,7 @@ namespace TemplateCodeGenerator.ConApp
                 Console.Write("Choose: ");
 
                 input = Console.ReadLine()?.ToLower() ?? String.Empty;
-
                 Console.ForegroundColor = saveForeColor;
-                Console.WriteLine();
                 if (Int32.TryParse(input, out var select))
                 {
                     var solutionProperties = SolutionProperties.Create(SourcePath);

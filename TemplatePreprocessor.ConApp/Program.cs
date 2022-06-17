@@ -49,7 +49,7 @@ namespace TemplatePreprocessor.ConApp
                 var sourceSolutionName = GetSolutionNameByPath(SourcePath);
 
                 Console.Clear();
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("Template Preprocessor");
                 Console.WriteLine("=====================");
                 Console.WriteLine();
@@ -71,7 +71,6 @@ namespace TemplatePreprocessor.ConApp
 
                 input = Console.ReadLine()?.ToLower() ?? String.Empty;
                 Console.ForegroundColor = saveForeColor;
-                Console.WriteLine();
                 if (Int32.TryParse(input, out var select))
                 {
                     if (select == 1)

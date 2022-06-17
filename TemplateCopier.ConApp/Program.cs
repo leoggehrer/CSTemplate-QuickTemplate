@@ -42,7 +42,7 @@ namespace TemplateCopier.ConApp
                                                    .Concat(StaticLiterals.ProjectExtensions.Select(e => $"{sourceSolutionName}{e}"));
 
                 Console.Clear();
-                Console.ForegroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("Template Copier");
                 Console.WriteLine("===============");
                 Console.WriteLine();
@@ -59,7 +59,6 @@ namespace TemplateCopier.ConApp
 
                 input = Console.ReadLine()?.ToLower() ?? String.Empty;
                 Console.ForegroundColor = saveForeColor;
-                Console.WriteLine();
                 if (Int32.TryParse(input, out var select))
                 {
                     if (select == 1)
