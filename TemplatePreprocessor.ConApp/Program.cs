@@ -49,7 +49,7 @@ namespace TemplatePreprocessor.ConApp
                 var sourceSolutionName = GetSolutionNameByPath(SourcePath);
 
                 Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine("Template Preprocessor");
                 Console.WriteLine("=====================");
                 Console.WriteLine();
