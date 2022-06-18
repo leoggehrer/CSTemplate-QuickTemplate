@@ -61,10 +61,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var sbHasValue = new StringBuilder();
             var sbToString = new StringBuilder();
             var modelName = CreateFilterModelName(type);
-            var typeProperties = type.GetAllPropertyInfos();
-            var filteredProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false
-                                                            && IsListType(e.PropertyType) == false
-                                                            && (e.PropertyType.IsPrimitive || e.PropertyType == typeof(string)));
+            var viewProperties = GetViewProperties(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = CreateFilterModelType(type),
@@ -79,7 +76,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.AddRange(CreatePartialStaticConstrutor(modelName));
             result.AddRange(CreatePartialConstrutor("public", modelName));
 
-            foreach (var propertyInfo in filteredProperties)
+            foreach (var propertyInfo in viewProperties)
             {
                 if (idx++ > 0)
                     sbHasValue.Append(" || ");
@@ -108,7 +105,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("{");
             result.Add("var result = new System.Text.StringBuilder();");
             result.Add(string.Empty);
-            foreach (var propertyInfo in filteredProperties)
+            foreach (var propertyInfo in viewProperties)
             {
                 result.Add($"if ({propertyInfo.Name} != null)");
                 result.Add("{");
@@ -283,12 +280,28 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
-        protected virtual IGeneratedItem CreatePartialTableHeaderView(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        protected static bool IsPrimitiveNullable(PropertyInfo propertyInfo)
+        {
+            var result = propertyInfo.PropertyType.IsNullableType();
+
+            if (result)
+            {
+                result = propertyInfo.PropertyType.GetGenericArguments()[0].IsPrimitive;
+            }
+            return result;
+        }
+        protected static IEnumerable<PropertyInfo> GetViewProperties(Type type)
         {
             var typeProperties = type.GetAllPropertyInfos();
             var viewProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false
                                                         && IsListType(e.PropertyType) == false
-                                                        && (e.PropertyType.IsPrimitive || e.PropertyType == typeof(string)));
+                                                        && (e.PropertyType.IsPrimitive || IsPrimitiveNullable(e) || e.PropertyType == typeof(string)));
+
+            return viewProperties;
+        }
+        protected virtual IGeneratedItem CreatePartialTableHeaderView(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        {
+            var viewProperties = GetViewProperties(type);
             var modelType = ItemProperties.CreateModelType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
@@ -299,27 +312,23 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add($"@model IEnumerable<{modelType}>");
             result.Add(string.Empty);
             result.Add("<thead>");
-            result.Add("    <tr>");
+            result.Add(" <tr>");
 
             foreach (var item in viewProperties)
             {
-                result.Add("        <th>");
-                result.Add($"            @Html.DisplayNameFor(model => model.{item.Name})");
-                result.Add("        </th>");
+                result.Add("  <th>");
+                result.Add($"   @Html.DisplayNameFor(model => model.{item.Name})");
+                result.Add("  </th>");
             }
 
-            result.Add("        <th></th>");
-            result.Add("    </tr>");
+            result.Add("  <th></th>");
+            result.Add(" </tr>");
             result.Add("</thead>");
-            result.FormatCSharpCode();
             return result;
         }
         protected virtual IGeneratedItem CreatePartialTableRowView(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var typeProperties = type.GetAllPropertyInfos();
-            var viewProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false
-                                                        && IsListType(e.PropertyType) == false
-                                                        && (e.PropertyType.IsPrimitive || e.PropertyType == typeof(string)));
+            var viewProperties = GetViewProperties(type);
             var modelType = ItemProperties.CreateModelType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
@@ -333,26 +342,22 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             foreach (var item in viewProperties)
             {
-                result.Add("    <td>");
-                result.Add($"        @Html.DisplayFor(model => model.{item.Name})");
-                result.Add("    </td>");
+                result.Add(" <td>");
+                result.Add($"  @Html.DisplayFor(model => model.{item.Name})");
+                result.Add(" </td>");
             }
 
-            result.Add("    <td>");
-            result.Add("        @Html.ActionLink(\"Edit\", \"Edit\", new { id=Model.Id }) |");
-            result.Add("        @Html.ActionLink(\"Details\", \"Details\", new { id=Model.Id }) |");
-            result.Add("    @Html.ActionLink(\"Delete\", \"Delete\", new { id=Model.Id })");
-            result.Add("    </td>");
+            result.Add(" <td>");
+            result.Add("  @Html.ActionLink(\"Edit\", \"Edit\", new { id=Model.Id }) |");
+            result.Add("  @Html.ActionLink(\"Details\", \"Details\", new { id=Model.Id }) |");
+            result.Add("  @Html.ActionLink(\"Delete\", \"Delete\", new { id=Model.Id })");
+            result.Add(" </td>");
             result.Add("</tr>");
-            result.FormatCSharpCode();
             return result;
         }
         protected virtual IGeneratedItem CreatePartialEditModelView(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var typeProperties = type.GetAllPropertyInfos();
-            var viewProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false
-                                                        && IsListType(e.PropertyType) == false
-                                                        && (e.PropertyType.IsPrimitive || e.PropertyType == typeof(string)));
+            var viewProperties = GetViewProperties(type);
             var modelType = ItemProperties.CreateModelType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
@@ -364,37 +369,33 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add(string.Empty);
 
             result.Add("<div class=\"row\">");
-            result.Add("    <div class=\"col-md-4\">");
-            result.Add("        <div asp-validation-summary=\"ModelOnly\" class=\"text-danger\"></div>");
-            result.Add("        <input asp-for=\"Id\" type=\"hidden\" />");
+            result.Add(" <div class=\"col-md-4\">");
+            result.Add("  <div asp-validation-summary=\"ModelOnly\" class=\"text-danger\"></div>");
+            result.Add("  <input asp-for=\"Id\" type=\"hidden\" />");
 
             foreach (var item in viewProperties)
             {
-                result.Add("        <div class=\"form-group\">");
-                result.Add($"            <label asp-for=\"{item.Name}\" class=\"control-label\"></label>");
+                result.Add("  <div class=\"form-group\">");
+                result.Add($"   <label asp-for=\"{item.Name}\" class=\"control-label\"></label>");
                 if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(bool?))
                 {
-                    result.Add($"            <input asp-for=\"{item.Name}\" class=\"form-check\" />");
+                    result.Add($"   <input asp-for=\"{item.Name}\" class=\"form-check\" />");
                 }
                 else
                 {
-                    result.Add($"            <input asp-for=\"{item.Name}\" class=\"form-control\" />");
+                    result.Add($"   <input asp-for=\"{item.Name}\" class=\"form-control\" />");
                 }
-                result.Add($"            <span asp-validation-for=\"{item.Name}\" class=\"text-danger\"></span>");
-                result.Add("        </div>");
+                result.Add($"   <span asp-validation-for=\"{item.Name}\" class=\"text-danger\"></span>");
+                result.Add("  </div>");
             }
 
-            result.Add("    </div>");
+            result.Add(" </div>");
             result.Add("</div>");
-            result.FormatCSharpCode();
             return result;
         }
         protected virtual IGeneratedItem CreatePartialFilterView(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var typeProperties = type.GetAllPropertyInfos();
-            var viewProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false
-                                                        && IsListType(e.PropertyType) == false
-                                                        && (e.PropertyType.IsPrimitive || e.PropertyType == typeof(string)));
+            var viewProperties = GetViewProperties(type);
             var modelType = ItemProperties.CreateFilterModelType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
@@ -406,43 +407,38 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add(string.Empty);
 
             result.Add("<div class=\"row\">");
-            result.Add("    <div class=\"col-md-4\">");
-            result.Add("        <form asp-action=\"Filter\">");
-            result.Add("            <div asp-validation-summary=\"ModelOnly\" class=\"text-danger\"></div>");
+            result.Add(" <div class=\"col-md-4\">");
+            result.Add("  <form asp-action=\"Filter\">");
+            result.Add("   <div asp-validation-summary=\"ModelOnly\" class=\"text-danger\"></div>");
 
             foreach (var item in viewProperties)
             {
-                result.Add("            <div class=\"form-group\">");
-                result.Add($"                <label asp-for=\"{item.Name}\" class=\"control-label\"></label>");
+                result.Add("   <div class=\"form-group\">");
+                result.Add($"    <label asp-for=\"{item.Name}\" class=\"control-label\"></label>");
                 if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(bool?))
                 {
-                    result.Add($"            <input asp-for=\"{item.Name}\" class=\"form-check\" />");
+                    result.Add($"    <input asp-for=\"{item.Name}\" class=\"form-check\" />");
                 }
                 else
                 {
-                    result.Add($"            <input asp-for=\"{item.Name}\" class=\"form-control\" />");
+                    result.Add($"    <input asp-for=\"{item.Name}\" class=\"form-control\" />");
                 }
-                result.Add("            </div>");
+                result.Add("   </div>");
             }
 
-            result.Add("            <p></p>");
-            result.Add("            <div class=\"form-group\">");
-            result.Add("                <input type=\"submit\" value=\"Apply\" class=\"btn btn-primary\" />");
-            result.Add("            </div>");
-            result.Add("        </form>");
+            result.Add("   <p></p>");
+            result.Add("   <div class=\"form-group\">");
+            result.Add("    <input type=\"submit\" value=\"Apply\" class=\"btn btn-primary\" />");
+            result.Add("   </div>");
+            result.Add("  </form>");
 
-            result.Add("    </div>");
+            result.Add(" </div>");
             result.Add("</div>");
-            result.FormatCSharpCode();
             return result;
         }
-
         protected virtual IGeneratedItem CreatePartialDisplayModelView(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var typeProperties = type.GetAllPropertyInfos();
-            var viewProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false
-                                                        && IsListType(e.PropertyType) == false
-                                                        && (e.PropertyType.IsPrimitive || e.PropertyType == typeof(string)));
+            var viewProperties = GetViewProperties(type);
             var modelType = ItemProperties.CreateModelType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
@@ -457,16 +453,15 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             foreach (var item in viewProperties)
             {
-                result.Add("    <dt class=\"col-sm-2\">");
-                result.Add($"        @Html.DisplayNameFor(model => model.{item.Name})");
-                result.Add("    </dt>");
-                result.Add("    <dd class=\"col-sm-10\">");
-                result.Add($"        @Html.DisplayFor(model => model.{item.Name})");
-                result.Add("    </dd>");
+                result.Add(" <dt class=\"col-sm-2\">");
+                result.Add($"  @Html.DisplayNameFor(model => model.{item.Name})");
+                result.Add(" </dt>");
+                result.Add(" <dd class=\"col-sm-10\">");
+                result.Add($"  @Html.DisplayFor(model => model.{item.Name})");
+                result.Add(" </dd>");
             }
 
             result.Add("</dl>");
-            result.FormatCSharpCode();
             return result;
         }
 

@@ -20,15 +20,7 @@ namespace CommonBase.Extensions
         }
         public static bool IsNullableType(this Type type)
         {
-            var result = type.IsValueType == false;
-
-            if (result == false
-                && type.IsGenericType
-                && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                result = true;
-            }
-            return result;
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
         /// <summary>
         /// Determine whether a type is simple (String, Decimal, DateTime, etc) 
