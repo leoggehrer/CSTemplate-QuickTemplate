@@ -57,7 +57,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
         protected virtual IGeneratedItem CreateFilterModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var idx = 0;
             var sbHasValue = new StringBuilder();
             var sbToString = new StringBuilder();
             var modelName = CreateFilterModelName(type);
@@ -69,8 +68,9 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 SubFilePath = ItemProperties.CreateModelSubPath(type, "Filter", StaticLiterals.CSharpFileExtension),
             };
 
-            idx = 0;
+            int idx = 0;
             result.AddRange(CreateComment(type));
+            CreateModelAttributes(type, result.Source);
             result.Add($"public partial class {modelName}");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(modelName));
@@ -99,7 +99,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 result.Add($"public bool HasValue => {sbHasValue};");
             }
 
-            idx = 0;
             result.AddRange(CreateComment(type));
             result.Add("public string CreatePredicate()");
             result.Add("{");
