@@ -68,10 +68,12 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 SubFilePath = ItemProperties.CreateModelSubPath(type, "Filter", StaticLiterals.CSharpFileExtension),
             };
 
+            var filterBase = "Models.IFilterModel";
+
             int idx = 0;
             result.AddRange(CreateComment(type));
             CreateModelAttributes(type, result.Source);
-            result.Add($"public partial class {modelName}");
+            result.Add($"public partial class {modelName} : {filterBase}");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(modelName));
             result.AddRange(CreatePartialConstrutor("public", modelName));
@@ -223,6 +225,17 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("}");
             result.Add("ViewBag.Filter = filter;");
             result.Add("SessionWrapper.Set<FilterType>(FilterName, filter);");
+            result.Add("return result;");
+            result.Add("}");
+
+            result.Add("public IActionResult ClearFilter()");
+            result.Add("{");
+            result.Add("IActionResult? result;");
+            result.Add("var filter = new FilterType();");
+            result.Add(string.Empty);
+            result.Add("SessionWrapper.Set<FilterType>(FilterName, filter);");
+            result.Add("result = RedirectToAction(\"Index\");");
+            result.Add(string.Empty);
             result.Add("return result;");
             result.Add("}");
 
