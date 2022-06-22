@@ -4,7 +4,7 @@
 @{
     var title = "Index";
     var type = Model.GetType();
-    var filter = ViewBag.Filter as object;
+    var filter = ViewBag.Filter as IFilterModel;
 
     if (type != null)
     {
@@ -23,6 +23,12 @@
             @*<button type="button" class="btn btn-outline-primary col-md-1" title="Sort"><i class="fa fa-plus"></i></button>*@
             <button type="button" class="btn btn-outline-secondary col-md-11" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">@filter.ToString()</button>
             <button type="button" class="btn btn-outline-primary col-md-1" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter" title="Filter"><i class="fa fa-filter"></i></button>
+             @{
+                if(filter.HasValue)
+                {
+                    <a asp-action="ClearFilter" class="btn btn-outline-danger"><i class="fa fa-trash"></i></a>
+                }
+            }
         </div>
     </div>
     <div class="collapse" id="collapseFilter" style="margin: 5px;">
