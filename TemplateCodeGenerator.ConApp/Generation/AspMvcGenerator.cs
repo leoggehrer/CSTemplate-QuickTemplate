@@ -183,6 +183,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.AddRange(CreatePartialConstrutor("public", controllerName, $"{contractType}<{accessType}> other", "base(other)", null, true));
 
             result.AddRange(CreateComment(type));
+            result.Add($"protected override {modelType} ToViewModel({accessType} accessModel, ActionMode actionMode)");
+            result.Add("{");
+            result.Add($"var result = {modelType}.Create(accessModel);");
+            result.Add("return BeforeView(result, actionMode);");
+            result.Add("}");
+
+            result.AddRange(CreateComment(type));
             result.Add("public override async Task<IActionResult> Index()");
             result.Add("{");
             result.Add("IActionResult? result;");

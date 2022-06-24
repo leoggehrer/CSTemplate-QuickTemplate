@@ -118,6 +118,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(controllerName));
             result.AddRange(CreatePartialConstrutor("public", controllerName, $"{contractType}<{accessType}> other", "base(other)", null, true));
+
+            result.AddRange(CreateComment(type));
+            result.Add($"protected override {modelType} ToOutModel({accessType} entity)");
+            result.Add("{");
+            result.Add($"return {modelType}.Create(entity);");
+            result.Add("}");
+
             result.Add("}");
             result.EnvelopeWithANamespace(ItemProperties.CreateControllerNamespace(type));
             result.FormatCSharpCode();
