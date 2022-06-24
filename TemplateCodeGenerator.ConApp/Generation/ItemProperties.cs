@@ -67,17 +67,25 @@
         }
 
         #region Contracts properties
-        public static string CreateContractName(Type type)
+        public static string CreateAccessContractName(Type type)
         {
             return $"I{type.Name.CreatePluralWord()}Access";
         }
+        public static string CreateFacadeContractName(Type type)
+        {
+            return $"I{type.Name.CreatePluralWord()}Facade";
+        }
         public string CreateContractType(Type type)
         {
-            return $"{CreateContractNamespace(type)}.{CreateContractName(type)}";
+            return $"{CreateContractNamespace(type)}.{CreateAccessContractName(type)}";
         }
-        public static string CreateContractSubType(Type type)
+        public static string CreateAccessContractSubType(Type type)
         {
-            return $"{CreateContractSubNamespace(type)}.{CreateContractName(type)}";
+            return $"{CreateContractSubNamespace(type)}.{CreateAccessContractName(type)}";
+        }
+        public static string CreateFacadeContractSubType(Type type)
+        {
+            return $"{CreateContractSubNamespace(type)}.{CreateFacadeContractName(type)}";
         }
         public string CreateContractNamespace(Type type)
         {
@@ -89,9 +97,13 @@
 
             return subNamespace.HasContent() ? $"{StaticLiterals.ContractsFolder}.{subNamespace}" : StaticLiterals.ContractsFolder;
         }
-        public static string CreateContractSubPathFromType(Type type, string postFix, string fileExtension)
+        public static string CreateAccessContractSubPathFromType(Type type, string postFix, string fileExtension)
         {
-            return Path.Combine(CreateContractSubNamespace(type).Replace(".", "\\"), $"{CreateContractName(type)}{postFix}{fileExtension}");
+            return Path.Combine(CreateContractSubNamespace(type).Replace(".", "\\"), $"{CreateAccessContractName(type)}{postFix}{fileExtension}");
+        }
+        public static string CreateFacadeContractSubPathFromType(Type type, string postFix, string fileExtension)
+        {
+            return Path.Combine(CreateContractSubNamespace(type).Replace(".", "\\"), $"{CreateFacadeContractName(type)}{postFix}{fileExtension}");
         }
         #endregion Contracts properties
 

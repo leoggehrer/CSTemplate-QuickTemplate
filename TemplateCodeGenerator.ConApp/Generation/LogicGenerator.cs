@@ -106,19 +106,37 @@ namespace TemplateCodeGenerator.ConApp.Generation
             {
                 if (CanCreate(type))
                 {
-                    result.Add(CreateContractFromType(type, Common.UnitType.Logic, Common.ItemType.Model));
+                    result.Add(CreateAccessContract(type, Common.UnitType.Logic, Common.ItemType.AccessContract));
+                    result.Add(CreateFacadeContract(type, Common.UnitType.Logic, Common.ItemType.FacadeContract));
                 }
             }
             return result;
         }
-        protected virtual IGeneratedItem CreateContractFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        protected virtual IGeneratedItem CreateAccessContract(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var contractName = ItemProperties.CreateContractName(type);
+            var contractName = ItemProperties.CreateAccessContractName(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = ItemProperties.CreateContractType(type),
                 FileExtension = StaticLiterals.CSharpFileExtension,
-                SubFilePath = ItemProperties.CreateContractSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
+                SubFilePath = ItemProperties.CreateAccessContractSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
+            };
+            result.AddRange(CreateComment(type));
+            result.Add($"public partial interface {contractName}<T> : Contracts.IDataAccess<T>");
+            result.Add("{");
+            result.Add("}");
+            result.EnvelopeWithANamespace(ItemProperties.CreateContractNamespace(type));
+            result.FormatCSharpCode();
+            return result;
+        }
+        protected virtual IGeneratedItem CreateFacadeContract(Type type, Common.UnitType unitType, Common.ItemType itemType)
+        {
+            var contractName = ItemProperties.CreateFacadeContractName(type);
+            var result = new Models.GeneratedItem(unitType, itemType)
+            {
+                FullName = ItemProperties.CreateContractType(type),
+                FileExtension = StaticLiterals.CSharpFileExtension,
+                SubFilePath = ItemProperties.CreateFacadeContractSubPathFromType(type, string.Empty, StaticLiterals.CSharpFileExtension),
             };
             result.AddRange(CreateComment(type));
             result.Add($"public partial interface {contractName}<T> : Contracts.IDataAccess<T>");
@@ -149,7 +167,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var entityType = ItemProperties.CreateEntitySubType(type);
             var genericType = $"Controllers.GenericController";
             var controllerName = ItemProperties.CreateControllerName(type);
-            var contractSubType = ItemProperties.CreateContractSubType(type);
+            var contractSubType = ItemProperties.CreateAccessContractSubType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = $"{ItemProperties.CreateControllerType(type)}",
@@ -189,7 +207,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var entityType = ItemProperties.CreateEntitySubType(type);
             var genericType = $"Facades.GenericFacade";
             var facadeName = ItemProperties.CreateFacadeName(type);
-            var contractSubType = ItemProperties.CreateContractSubType(type);
+            var contractSubType = ItemProperties.CreateFacadeContractSubType(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
                 FullName = ItemProperties.CreateFacadeType(type),
@@ -227,7 +245,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             foreach (var type in entityProject.EntityTypes)
             {
                 var modelType = $"{ItemProperties.CreateModelType(type)}";
-                var contractSubType = ItemProperties.CreateContractSubType(type);
+                var contractSubType = ItemProperties.CreateFacadeContractSubType(type);
                 var facadeName = ItemProperties.CreateFacadeName(type);
                 var facadeType = ItemProperties.CreateFacadeType(type);
 

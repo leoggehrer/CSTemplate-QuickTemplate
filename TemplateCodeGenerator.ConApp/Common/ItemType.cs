@@ -15,9 +15,10 @@ namespace TemplateCodeGenerator.ConApp.Common
         FilterModel = 2 * EditModel,
 
         AccessContract = 2 * FilterModel,
-
         Controller = 2 * AccessContract,
-        Facade = 2 * Controller,
+
+        FacadeContract = 2 * Controller,
+        Facade = 2 * FacadeContract,
 
         AddServices = 2 * Facade,
 

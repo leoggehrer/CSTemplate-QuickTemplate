@@ -42,7 +42,7 @@ namespace TemplateCopier.ConApp
                                                    .Concat(StaticLiterals.ProjectExtensions.Select(e => $"{sourceSolutionName}{e}"));
 
                 Console.Clear();
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("Template Copier");
                 Console.WriteLine("===============");
                 Console.WriteLine();

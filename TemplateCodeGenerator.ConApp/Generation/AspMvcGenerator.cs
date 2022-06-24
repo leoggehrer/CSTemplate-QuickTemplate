@@ -185,9 +185,19 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.AddRange(CreateComment(type));
             result.Add($"protected override {modelType} ToViewModel({accessType} accessModel, ActionMode actionMode)");
             result.Add("{");
-            result.Add($"var result = {modelType}.Create(accessModel);");
+            result.Add($"var handled = false;");
+            result.Add($"var result = default({modelType});");
+            result.Add("BeforeToViewModel(accessModel, actionMode, ref result, ref handled);");
+            result.Add("if (handled == false || result == null)");
+            result.Add("{");
+            result.Add($"result = {modelType}.Create(accessModel);");
+            result.Add("}");
+            result.Add("AfterToViewModel(result, actionMode);");
             result.Add("return BeforeView(result, actionMode);");
             result.Add("}");
+
+            result.Add($"partial void BeforeToViewModel({accessType} accessModel, ActionMode actionMode, ref {modelType}? viewModel, ref bool handled);");
+            result.Add($"partial void AfterToViewModel({modelType} viewModel, ActionMode actionMode);");
 
             result.AddRange(CreateComment(type));
             result.Add("public override async Task<IActionResult> Index()");

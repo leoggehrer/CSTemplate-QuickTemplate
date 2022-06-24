@@ -48,19 +48,19 @@ namespace QuickTemplate.WebApi.Controllers
             DataAccess = dataAccess;
         }
         /// <summary>
-        /// Converts an entity to a model and copies all properties of the same name from the entity to the model.
+        /// Converts an accessModel to a model and copies all properties of the same name from the accessModel to the model.
         /// </summary>
-        /// <param name="entity">The entity to be converted</param>
+        /// <param name="accessModel">The accessModel to be converted</param>
         /// <returns>The model with the property values of the same name</returns>
-        protected virtual TOutModel ToOutModel(TAccessModel entity)
+        protected virtual TOutModel ToOutModel(TAccessModel accessModel)
         {
             var result = new TOutModel();
 
-            result.CopyFrom(entity);
+            result.CopyFrom(accessModel);
             return result;
         }
         /// <summary>
-        /// Converts all entities to models and copies all properties of the same name from an entity to the model.
+        /// Converts all entities to models and copies all properties of the same name from an accessModel to the model.
         /// </summary>
         /// <param name="accessModels">The entities to be converted</param>
         /// <returns>The models</returns>
@@ -68,9 +68,9 @@ namespace QuickTemplate.WebApi.Controllers
         {
             var result = new List<TOutModel>();
 
-            foreach (var entity in accessModels)
+            foreach (var accessModel in accessModels)
             {
-                result.Add(ToOutModel(entity));
+                result.Add(ToOutModel(accessModel));
             }
             return result;
         }
@@ -157,11 +157,11 @@ namespace QuickTemplate.WebApi.Controllers
             var accessModel = new TAccessModel();
 
             accessModel.CopyFrom(editModel);
-            var insertEntity = await DataAccess.InsertAsync(accessModel);
+            var insertaccessModel = await DataAccess.InsertAsync(accessModel);
 
             await DataAccess.SaveChangesAsync();
 
-            return CreatedAtAction("Get", new { id = accessModel.Id }, ToOutModel(insertEntity));
+            return CreatedAtAction("Get", new { id = accessModel.Id }, ToOutModel(insertaccessModel));
         }
 
         /// <summary>

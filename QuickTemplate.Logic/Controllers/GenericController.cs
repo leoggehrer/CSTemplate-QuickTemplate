@@ -77,6 +77,12 @@ namespace QuickTemplate.Logic.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets the internal includes.
+        /// </summary>
+        /// <returns></returns>
+        internal virtual IEnumerable<string> Includes => Array.Empty<string>();
+
         #region Count
         /// <summary>
         /// Gets the number of quantity in the collection.
@@ -120,7 +126,7 @@ namespace QuickTemplate.Logic.Controllers
         {
             var query = EntitySet.AsQueryable();
 
-            foreach (var includeItem in includeItems)
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
             {
                 query = query.Include(includeItem);
             }
@@ -137,7 +143,7 @@ namespace QuickTemplate.Logic.Controllers
         {
             var query = EntitySet.AsQueryable();
 
-            foreach (var includeItem in includeItems)
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
             {
                 query = query.Include(includeItem);
             }
@@ -163,7 +169,13 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>All interfaces of the entity collection.</returns>
         internal virtual Task<TEntity[]> ExecuteGetAllAsync()
         {
-            return EntitySet.AsNoTracking().ToArrayAsync();
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in Includes.Distinct())
+            {
+                query = query.Include(includeItem);
+            }
+            return query.AsNoTracking().ToArrayAsync();
         }
         /// <summary>
         /// Returns all interfaces of the entities in the collection.
@@ -186,7 +198,7 @@ namespace QuickTemplate.Logic.Controllers
         {
             var query = EntitySet.AsQueryable();
 
-            foreach (var includeItem in includeItems)
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
             {
                 query = query.Include(includeItem);
             }
@@ -216,11 +228,11 @@ namespace QuickTemplate.Logic.Controllers
         {
             var query = EntitySet.AsQueryable();
 
-            foreach (var includeItem in includeItems)
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
             {
                 query = query.Include(includeItem);
             }
-            return query.Where(predicate).ToArrayAsync();
+            return query.Where(predicate).AsNoTracking().ToArrayAsync();
         }
         /// <summary>
         /// Filters a sequence of values based on a predicate (without authorization).
@@ -232,11 +244,11 @@ namespace QuickTemplate.Logic.Controllers
         {
             var query = EntitySet.AsQueryable();
 
-            foreach (var includeItem in includeItems)
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
             {
                 query = query.Include(includeItem);
             }
-            return query.Where(predicate).ToArrayAsync();
+            return query.Where(predicate).AsNoTracking().ToArrayAsync();
         }
 
         /// <summary>
@@ -256,9 +268,15 @@ namespace QuickTemplate.Logic.Controllers
         /// </summary>
         /// <param name="id">The identification.</param>
         /// <returns>The element of the type T with the corresponding identification.</returns>
-        internal virtual ValueTask<TEntity?> ExecuteGetByIdAsync(int id)
+        internal virtual Task<TEntity?> ExecuteGetByIdAsync(int id)
         {
-            return EntitySet.FindAsync(id);
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in Includes.Distinct())
+            {
+                query = query.Include(includeItem);
+            }
+            return query.SingleOrDefaultAsync(e => e.Id == id);
         }
         /// <summary>
         /// Returns the element of type T with the identification of id.
@@ -283,11 +301,11 @@ namespace QuickTemplate.Logic.Controllers
         {
             var query = EntitySet.AsQueryable();
 
-            foreach (var includeItem in includeItems)
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
             {
                 query = query.Include(includeItem);
             }
-            return query.FirstOrDefaultAsync(e => e.Id == id);
+            return query.SingleOrDefaultAsync(e => e.Id == id);
         }
         #endregion Queries
 

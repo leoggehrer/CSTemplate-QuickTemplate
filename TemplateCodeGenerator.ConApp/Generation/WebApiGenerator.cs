@@ -120,10 +120,21 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.AddRange(CreatePartialConstrutor("public", controllerName, $"{contractType}<{accessType}> other", "base(other)", null, true));
 
             result.AddRange(CreateComment(type));
-            result.Add($"protected override {modelType} ToOutModel({accessType} entity)");
+            result.Add($"protected override {modelType} ToOutModel({accessType} accessModel)");
             result.Add("{");
-            result.Add($"return {modelType}.Create(entity);");
+            result.Add($"var handled = false;");
+            result.Add($"var result = default({modelType});");
+            result.Add("BeforeToOutModel(accessModel, ref result, ref handled);");
+            result.Add("if (handled == false || result == null)");
+            result.Add("{");
+            result.Add($"result = {modelType}.Create(accessModel);");
             result.Add("}");
+            result.Add("AfterToOutModel(result);");
+            result.Add($"return result;");
+            result.Add("}");
+
+            result.Add($"partial void BeforeToOutModel({accessType} accessModel, ref {modelType}? outModel, ref bool handled);");
+            result.Add($"partial void AfterToOutModel({modelType} outModel);");
 
             result.Add("}");
             result.EnvelopeWithANamespace(ItemProperties.CreateControllerNamespace(type));

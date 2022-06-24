@@ -50,7 +50,7 @@ namespace TemplateComparison.ConApp
                 var targetPaths = new List<string>();
 
                 Console.Clear();
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
                 BeforeGetTargetPaths(SourcePath, targetPaths, ref handled);
                 if (handled == false)
                 {
