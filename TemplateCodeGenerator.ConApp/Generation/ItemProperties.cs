@@ -85,7 +85,7 @@
         }
         public static string CreateFacadeContractSubType(Type type)
         {
-            return $"{CreateContractSubNamespace(type)}.{CreateFacadeContractName(type)}";
+            return $"{CreateContractSubNamespace(type)}.{CreateAccessContractName(type)}";
         }
         public string CreateContractNamespace(Type type)
         {

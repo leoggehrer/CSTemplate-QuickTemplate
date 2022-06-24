@@ -200,6 +200,16 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add($"partial void AfterToViewModel({modelType} viewModel, ActionMode actionMode);");
 
             result.AddRange(CreateComment(type));
+            result.Add("public IActionResult Clear()");
+            result.Add("{");
+            result.Add("var filter = new FilterType();");
+            result.Add(string.Empty);
+            result.Add("ViewBag.Filter = filter;");
+            result.Add("SessionWrapper.Set<FilterType>(FilterName, filter);");
+            result.Add("return RedirectToAction(\"Index\");");
+            result.Add("}");
+
+            result.AddRange(CreateComment(type));
             result.Add("public override async Task<IActionResult> Index()");
             result.Add("{");
             result.Add("IActionResult? result;");
@@ -209,14 +219,16 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("{");
             result.Add("var predicate = filter.CreatePredicate();");
             result.Add("var accessModels = await DataAccess.QueryAsync(predicate);");
+            result.Add("var viewModels = AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index));");
             result.Add(String.Empty);
-            result.Add("result = View(AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index)));");
+            result.Add("result = View(BeforeView(viewModels, ActionMode.Index));");
             result.Add("}");
             result.Add("else");
             result.Add("{");
             result.Add("var accessModels = await DataAccess.GetAllAsync();");
+            result.Add("var viewModels = AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index));");
             result.Add(String.Empty);
-            result.Add("result = View(AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index)));");
+            result.Add("result = View(BeforeView(viewModels, ActionMode.Index));");
             result.Add("}");
             result.Add("ViewBag.Filter = filter;");
             result.Add("return result;");
@@ -231,8 +243,9 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("{");
             result.Add("var predicate = filter.CreatePredicate();");
             result.Add("var accessModels = await DataAccess.QueryAsync(predicate);");
+            result.Add("var viewModels = AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index));");
             result.Add(String.Empty);
-            result.Add("result = View(\"Index\", AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index)));");
+            result.Add("result = View(\"Index\", viewModels);");
             result.Add("}");
             result.Add("else");
             result.Add("{");
@@ -444,7 +457,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             result.Add("   <p></p>");
             result.Add("   <div class=\"form-group\">");
-            result.Add("    <input type=\"submit\" value=\"Apply\" class=\"btn btn-primary\" />");
+            result.Add("    <input type=\"submit\" value=\"Apply\" class=\"btn btn-primary\" style=\"min-width: 100px;\" />");
+            result.Add("    @Html.ActionLink(\"Clear\", \"Clear\", null, null, new { @class=\"btn btn-outline-success\", @style=\"min-width: 100px;\" })");
             result.Add("   </div>");
             result.Add("  </form>");
 

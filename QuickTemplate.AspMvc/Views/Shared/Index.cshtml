@@ -8,7 +8,14 @@
 
     if (type != null)
     {
-        title = type.GetGenericArguments()[0].Name;
+        if (type.IsArray)
+        {
+            title = type.GetElementType()!.Name;
+        }
+        else
+        {
+            title = type.GetGenericArguments()[0].Name;
+        }
     }
     ViewData["Title"] = title;
 }

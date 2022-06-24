@@ -44,14 +44,6 @@ namespace QuickTemplate.AspMvc.Controllers
             DataAccess.SessionToken = SessionWrapper.SessionToken;
         }
 #endif
-        protected virtual TAccessModel[] AfterQuery(TAccessModel[] accessModels) => accessModels;
-        protected virtual TViewModel ToViewModel(TAccessModel accessModel, ActionMode actionMode)
-        {
-            var result = new TViewModel();
-
-            result.CopyFrom(accessModel);
-            return BeforeView(result, actionMode);
-        }
         protected virtual TAccessModel ToAccessModel(TViewModel viewModel)
         {
             var result = new TAccessModel();
@@ -59,14 +51,25 @@ namespace QuickTemplate.AspMvc.Controllers
             result.CopyFrom(viewModel);
             return result;
         }
+        protected virtual TViewModel ToViewModel(TAccessModel accessModel, ActionMode actionMode)
+        {
+            var result = new TViewModel();
+
+            result.CopyFrom(accessModel);
+            return BeforeView(result, actionMode);
+        }
+
+        protected virtual IEnumerable<TAccessModel> AfterQuery(IEnumerable<TAccessModel> accessModels) => accessModels;
         protected virtual TViewModel BeforeView(TViewModel viewModel, ActionMode actionMode) => viewModel;
+        protected virtual IEnumerable<TViewModel> BeforeView(IEnumerable<TViewModel> viewModels, ActionMode actionMode) => viewModels;
 
         // GET: Item
         public virtual async Task<IActionResult> Index()
         {
             var accessModels = await DataAccess.GetAllAsync();
+            var viewModels = AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index)).ToArray();
 
-            return View(AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index)));
+            return View(BeforeView(viewModels, ActionMode.Index));
         }
 
         // GET: Item/Details/5

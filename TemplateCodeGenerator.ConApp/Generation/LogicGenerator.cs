@@ -107,7 +107,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 if (CanCreate(type))
                 {
                     result.Add(CreateAccessContract(type, Common.UnitType.Logic, Common.ItemType.AccessContract));
-                    result.Add(CreateFacadeContract(type, Common.UnitType.Logic, Common.ItemType.FacadeContract));
+                    //result.Add(CreateFacadeContract(type, Common.UnitType.Logic, Common.ItemType.FacadeContract));
                 }
             }
             return result;
@@ -245,7 +245,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             foreach (var type in entityProject.EntityTypes)
             {
                 var modelType = $"{ItemProperties.CreateModelType(type)}";
-                var contractSubType = ItemProperties.CreateFacadeContractSubType(type);
+                var contractSubType = ItemProperties.CreateAccessContractSubType(type);
                 var facadeName = ItemProperties.CreateFacadeName(type);
                 var facadeType = ItemProperties.CreateFacadeType(type);
 
