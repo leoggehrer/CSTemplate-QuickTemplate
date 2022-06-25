@@ -60,6 +60,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var sbHasValue = new StringBuilder();
             var sbToString = new StringBuilder();
             var modelName = CreateFilterModelName(type);
+            var filterContract = "Models.View.IFilterModel";
             var viewProperties = GetViewProperties(type);
             var result = new Models.GeneratedItem(unitType, itemType)
             {
@@ -71,7 +72,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             int idx = 0;
             result.AddRange(CreateComment(type));
             CreateModelAttributes(type, result.Source);
-            result.Add($"public partial class {modelName}");
+            result.Add($"public partial class {modelName} : {filterContract}");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(modelName));
             result.AddRange(CreatePartialConstrutor("public", modelName));
@@ -98,6 +99,10 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 result.AddRange(CreateComment(type));
                 result.Add($"public bool HasValue => {sbHasValue};");
             }
+
+            result.Add("private bool show = true;");
+            result.AddRange(CreateComment(type));
+            result.Add("public bool Show => show;");
 
             result.AddRange(CreateComment(type));
             result.Add("public string CreatePredicate()");
@@ -503,6 +508,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             return $"{ItemProperties.Namespace}.{ItemProperties.CreateModelSubNamespace(type)}.{CreateFilterModelName(type)}";
         }
+
         public virtual IEnumerable<string> CreateFilterAutoProperty(PropertyInfo propertyInfo)
         {
             var result = new List<string>();

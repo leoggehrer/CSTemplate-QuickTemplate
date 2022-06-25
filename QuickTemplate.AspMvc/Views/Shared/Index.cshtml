@@ -4,7 +4,7 @@
 @{
     var title = "Index";
     var type = Model.GetType();
-    var filter = ViewBag.Filter as object;
+    var filter = ViewBag.Filter as QuickTemplate.AspMvc.Models.View.IFilterModel;
 
     if (type != null)
     {
@@ -22,7 +22,7 @@
 
 <h1>@title</h1>
 
-@if (filter != null)
+@if (filter != null && filter.Show)
 {
     <div class="row" style="margin: 1em 0em 1em 0em;">
         <div class="btn-group" role="group" aria-label="Basic outlined filter">
