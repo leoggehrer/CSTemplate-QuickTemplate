@@ -14,12 +14,6 @@ namespace QuickTemplate.AspMvc.Controllers.Account
         public RolesController(IDataAccess<Logic.Entities.Account.Role> dataAccess) : base(dataAccess)
         {
         }
-
-        protected override Role[] AfterQuery(Role[] accessModels)
-        {
-            return base.AfterQuery(accessModels);
-        }
-
         public override Task<IActionResult> Index()
         {
             ViewBag.Filter = SessionWrapper.Get<FilterType>(FilterName) ?? new FilterType();
