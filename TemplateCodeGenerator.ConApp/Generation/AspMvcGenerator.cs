@@ -57,8 +57,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
         protected virtual IGeneratedItem CreateFilterModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var sbHasValue = new StringBuilder();
             var sbToString = new StringBuilder();
+            var sbHasEntityValue = new StringBuilder();
             var modelName = CreateFilterModelName(type);
             var filterContract = "Models.View.IFilterModel";
             var viewProperties = GetViewProperties(type);
@@ -80,7 +80,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             foreach (var propertyInfo in viewProperties)
             {
                 if (idx++ > 0)
-                    sbHasValue.Append(" || ");
+                    sbHasEntityValue.Append(" || ");
 
                 if (propertyInfo.PropertyType == typeof(string))
                 {
@@ -90,14 +90,14 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 {
                     sbToString.Append($"{propertyInfo.Name}: " + "{(" + $"{propertyInfo.Name} != null ? {propertyInfo.Name} : \"---\"" + ")} ");
                 }
-                sbHasValue.Append($"{propertyInfo.Name} != null");
+                sbHasEntityValue.Append($"{propertyInfo.Name} != null");
                 result.AddRange(CreateFilterAutoProperty(propertyInfo));
             }
 
-            if (sbHasValue.Length > 0)
+            if (sbHasEntityValue.Length > 0)
             {
                 result.AddRange(CreateComment(type));
-                result.Add($"public bool HasValue => {sbHasValue};");
+                result.Add($"public bool HasEntityValue => {sbHasEntityValue};");
             }
 
             result.Add("private bool show = true;");
@@ -105,7 +105,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("public bool Show => show;");
 
             result.AddRange(CreateComment(type));
-            result.Add("public string CreatePredicate()");
+            result.Add("public string CreateEntityPredicate()");
             result.Add("{");
             result.Add("var result = new System.Text.StringBuilder();");
             result.Add(string.Empty);
@@ -220,9 +220,9 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("IActionResult? result;");
             result.Add("var filter = SessionWrapper.Get<FilterType>(FilterName) ?? new FilterType();");
             result.Add(string.Empty);
-            result.Add("if (filter.HasValue)");
+            result.Add("if (filter.HasEntityValue)");
             result.Add("{");
-            result.Add("var predicate = filter.CreatePredicate();");
+            result.Add("var predicate = filter.CreateEntityPredicate();");
             result.Add("var accessModels = await DataAccess.QueryAsync(predicate);");
             result.Add("var viewModels = AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index));");
             result.Add(String.Empty);
@@ -244,9 +244,9 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add("{");
             result.Add("IActionResult? result;");
             result.Add(string.Empty);
-            result.Add("if (filter.HasValue)");
+            result.Add("if (filter.HasEntityValue)");
             result.Add("{");
-            result.Add("var predicate = filter.CreatePredicate();");
+            result.Add("var predicate = filter.CreateEntityPredicate();");
             result.Add("var accessModels = await DataAccess.QueryAsync(predicate);");
             result.Add("var viewModels = AfterQuery(accessModels).Select(e => ToViewModel(e, ActionMode.Index));");
             result.Add(String.Empty);

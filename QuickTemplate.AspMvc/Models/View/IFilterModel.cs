@@ -5,8 +5,8 @@ namespace QuickTemplate.AspMvc.Models.View
     public partial interface IFilterModel
     {
         bool Show { get; }
-        bool HasValue { get; }
-        string CreatePredicate();
+        bool HasEntityValue { get; }
+        string CreateEntityPredicate();
     }
 }
 //MdEnd
