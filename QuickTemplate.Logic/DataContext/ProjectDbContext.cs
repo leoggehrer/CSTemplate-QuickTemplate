@@ -58,6 +58,12 @@ namespace QuickTemplate.Logic.DataContext
         }
         partial void Constructing();
         partial void Constructed();
+
+        /// <summary>
+        /// This method is called for each instance of the context that is created. The base implementation does nothing.
+        /// </summary>
+        /// <param name="optionsBuilder">A builder used to create or modify options for this context. Databases (and other extensions) 
+        /// typically define extension methods on this object that allow you to configure the context.</param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var handled = false;
@@ -72,6 +78,31 @@ namespace QuickTemplate.Logic.DataContext
         }
         static partial void BeforeOnConfiguring(DbContextOptionsBuilder optionsBuilder, ref bool handled);
         static partial void AfterOnConfiguring(DbContextOptionsBuilder optionsBuilder);
+
+        /// <summary>
+        /// This method is called when the model for a derived context has been initialized, but before the model 
+        /// has been locked down and used to initialize the context. The default implementation of this method does 
+        /// nothing, but it can be overridden in a derived class such that the model can be further configured 
+        /// before it is locked down.
+        /// </summary>
+        /// <param name="modelBuilder">The builder that defines the model for the context being created.</param>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            var handled = false;
+
+            BeforeOnModelCreating(modelBuilder, ref handled);
+            if (handled == false)
+            {
+                foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+                {
+                    relationship.DeleteBehavior = DeleteBehavior.Restrict;
+                }
+            }
+            AfterOnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder);
+        }
+        static partial void BeforeOnModelCreating(ModelBuilder modelBuilder, ref bool handled);
+        static partial void AfterOnModelCreating(ModelBuilder modelBuilder);
 
         /// <summary>
         /// Determines the DbSet depending on the type E
@@ -149,6 +180,7 @@ namespace QuickTemplate.Logic.DataContext
         /// <param name="dbSet">The DbSet depending on the type E</param>
         /// <param name="handled">Indicates whether the method found the DbSet</param>
         partial void GetGeneratorDbSet<E>(ref DbSet<E>? dbSet, ref bool handled) where E : Entities.IdentityEntity;
+
     }
 }
 //MdEnd
