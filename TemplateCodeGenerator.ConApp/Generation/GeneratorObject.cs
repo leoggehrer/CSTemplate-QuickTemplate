@@ -47,8 +47,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
                                                          UnitType = Enum.Parse<UnitType>(d[0]),
                                                          ItemType = Enum.Parse<ItemType>(d[1]),
                                                          EntityName = d[2],
-                                                         Name = d[2],
-                                                         Value = d[3],
+                                                         Name = d[3],
+                                                         Value = d[4],
                                                      })
                                                      .ToArray();
                         }
@@ -66,6 +66,21 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 return generationSettings;
             }
         }
+        public string QueryGenerationSettingValue(UnitType unitType, ItemType itemType, string entityName, string valueName, string defaultValue)
+        {
+            var result = defaultValue;
+            var generationSetting = GenerationSettings.FirstOrDefault(e => e.UnitType == unitType
+                                                                        && e.ItemType == itemType
+                                                                        && e.EntityName.StartsWith(entityName)
+                                                                        && e.Name.Equals(valueName, StringComparison.CurrentCultureIgnoreCase));
+
+            if (generationSetting != null)
+            {
+                result = generationSetting.Value;
+            }
+            return result;
+        }
+
         #region Helpers
         #region Namespace-Helpers
         public static IEnumerable<string> EnvelopeWithANamespace(IEnumerable<string> source, string nameSpace, params string[] usings)
@@ -180,7 +195,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return type.Name;
         }
         /// <summary>
-        /// Diese Methode ermittelt den Entity-Typ aus seiner Type.
+        /// Diese Methode ermittelt den Entity-Typ aus seiner Type (eg. Entities.App.Type).
         /// </summary>
         /// <param name="type">Schnittstellen-Typ</param>
         /// <returns>Typ der Entitaet.</returns>
@@ -189,6 +204,17 @@ namespace TemplateCodeGenerator.ConApp.Generation
             var entityName = CreateEntityNameFromType(type);
 
             return $"{CreateSubNamespaceFromType(type)}.{entityName}";
+        }
+        /// <summary>
+        /// Diese Methode ermittelt den Entity-Typ aus seiner Type (eg. App.Type).
+        /// </summary>
+        /// <param name="type">Schnittstellen-Typ</param>
+        /// <returns>Typ der Entitaet.</returns>
+        public static string CreateEntitiesSubTypeFromType(Type type)
+        {
+            var entityName = CreateEntityNameFromType(type);
+
+            return $"{CreateSubNamespaceFromType(type)}.{entityName}".Replace($"{StaticLiterals.EntitiesFolder}.", string.Empty);
         }
         /// <summary>
         /// Diese Methode ermittelt den Entity Namen aus seinem Schnittstellen Typ.
