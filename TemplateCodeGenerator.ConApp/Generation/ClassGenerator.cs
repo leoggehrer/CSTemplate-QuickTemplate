@@ -194,6 +194,10 @@ namespace TemplateCodeGenerator.ConApp.Generation
         static partial void CreateSetPropertyAttributes(PropertyInfo propertyInfo, List<string> codeLines);
         static partial void GetPropertyDefaultValue(PropertyInfo propertyInfo, ref string defaultValue);
 
+        public static bool IsArrayType(Type type)
+        {
+            return type.IsArray;
+        }
         public static bool IsListType(Type type)
         {
             return type.FullName!.StartsWith("System.Collections.Generic.List");

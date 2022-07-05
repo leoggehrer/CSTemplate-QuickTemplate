@@ -149,7 +149,18 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
         private T QueryLogicSetting<T>(Common.ItemType itemType, Type type, string valueName, string defaultValue)
         {
-            return (T)Convert.ChangeType(QueryGenerationSettingValue(Common.UnitType.Logic, itemType, CreateEntitiesSubTypeFromType(type), valueName, defaultValue), typeof(T));
+            T result;
+
+            try
+            {
+                result = (T)Convert.ChangeType(QueryGenerationSettingValue(Common.UnitType.Logic, itemType, CreateEntitiesSubTypeFromType(type), valueName, defaultValue), typeof(T));
+            }
+            catch (Exception ex)
+            {
+                result = (T)Convert.ChangeType(defaultValue, typeof(T));
+                System.Diagnostics.Debug.WriteLine($"Error in {System.Reflection.MethodBase.GetCurrentMethod()!.Name}: {ex.Message}");
+            }
+            return result;
         }
 
         protected virtual IEnumerable<IGeneratedItem> CreateControllers()
@@ -168,7 +179,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         protected virtual IGeneratedItem CreateControllerFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var visibility = QueryGenerationSettingValue(unitType, itemType, CreateEntitiesSubTypeFromType(type), "visibility", type.IsPublic ? "public" : "internal");
+            var visibility = QueryLogicSetting<string>(itemType, type, "visibility", type.IsPublic ? "public" : "internal");
+            var attributes = QueryLogicSetting<string>(itemType, type, "Attributes", string.Empty);
             var entityType = ItemProperties.CreateEntitySubType(type);
             var genericType = $"Controllers.GenericController";
             var controllerName = ItemProperties.CreateControllerName(type);
@@ -181,6 +193,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             };
             result.AddRange(CreateComment(type));
             CreateControllerAttributes(type, result.Source);
+            result.Add($"{(attributes.HasContent() ? $"[{attributes}]" : string.Empty)}");
             result.Add($"{visibility} sealed partial class {controllerName} : {genericType}<{entityType}>, {contractSubType}<{entityType}>");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(controllerName));

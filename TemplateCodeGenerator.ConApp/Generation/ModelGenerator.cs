@@ -25,7 +25,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             if (ItemProperties.IsModelType(copyType) == false && ItemProperties.IsEntityType(propertyInfo.PropertyType))
             {
-                if (IsListType(propertyInfo.PropertyType))
+                if (IsArrayType(propertyInfo.PropertyType))
+                {
+                    result = $"{propertyInfo.Name} = other.{propertyInfo.Name}.Select(e => {ItemProperties.ConvertEntityToModelType(propertyInfo.PropertyType.GetElementType()!.FullName!)}.Create((object)e)).ToArray();";
+                }
+                else if (IsListType(propertyInfo.PropertyType))
                 {
                     result = $"{propertyInfo.Name} = other.{propertyInfo.Name}.Select(e => {ItemProperties.ConvertEntityToModelType(propertyInfo.PropertyType.GenericTypeArguments[0].FullName!)}.Create((object)e)).ToList();";
                 }
@@ -44,7 +48,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             if (ItemProperties.IsModelType(propertyType))
             {
-                if (IsListType(propertyInfo.PropertyType))
+                if (IsArrayType(propertyInfo.PropertyType))
+                {
+                    result.Add($"get => {delegateProperty}.Select(e => {ItemProperties.ConvertEntityToModelType(propertyInfo.PropertyType.GetElementType()!.FullName!)}.Create(e)).ToArray();");
+                }
+                else if (IsListType(propertyInfo.PropertyType))
                 {
                     result.Add($"get => {delegateProperty}.Select(e => {ItemProperties.ConvertEntityToModelType(propertyInfo.PropertyType.GenericTypeArguments[0].FullName!)}.Create(e)).ToList();");
                 }
@@ -67,7 +75,11 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             if (ItemProperties.IsModelType(propertyType))
             {
-                if (IsListType(propertyInfo.PropertyType))
+                if (IsArrayType(propertyInfo.PropertyType))
+                {
+                    result.Add($"set => {delegateProperty} = value.Select(e => e.{delegateObjectName}).ToArray();");
+                }
+                else if (IsListType(propertyInfo.PropertyType))
                 {
                     result.Add($"set => {delegateProperty} = value.Select(e => e.{delegateObjectName}).ToList();");
                 }
