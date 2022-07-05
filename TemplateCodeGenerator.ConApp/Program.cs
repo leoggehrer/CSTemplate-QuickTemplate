@@ -33,23 +33,6 @@ namespace TemplateCodeGenerator.ConApp
         {
             RunApp();
         }
-
-        private static void TestForecolor()
-        {
-            var savecolor = Console.ForegroundColor;
-            var first = Console.ForegroundColor.FirstEnum();
-            var run = first;
-
-            do
-            {
-                Console.ForegroundColor = savecolor;
-                Console.Write($"Color - {run,-14}: ");
-                Console.ForegroundColor = run;
-                Console.WriteLine("Hallo, das ist ein color Test!");
-                run = run.NextEnum();
-            } while (first != run);
-        }
-
         #region Console methods
         private static readonly bool canBusyPrint = true;
         private static bool runBusyProgress = false;
@@ -289,5 +272,21 @@ namespace TemplateCodeGenerator.ConApp
         static partial void BeforeGetTargetPaths(string sourcePath, List<string> targetPaths, ref bool handled);
         static partial void AfterGetTargetPaths(string sourcePath, List<string> targetPaths);
         #endregion Partial methods
+
+        private static void TestForecolor()
+        {
+            var savecolor = Console.ForegroundColor;
+            var first = Console.ForegroundColor.FirstEnum();
+            var run = first;
+
+            do
+            {
+                Console.ForegroundColor = savecolor;
+                Console.Write($"Color - {run,-14}: ");
+                Console.ForegroundColor = run;
+                Console.WriteLine("Hallo, das ist ein color Test!");
+                run = run.NextEnum();
+            } while (first != run);
+        }
     }
 }

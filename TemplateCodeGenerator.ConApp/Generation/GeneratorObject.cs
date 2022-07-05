@@ -1,7 +1,9 @@
 //MdStart
 using System.Reflection;
+using TemplateCodeGenerator.ConApp.Common;
 using TemplateCodeGenerator.ConApp.Contracts;
 using TemplateCodeGenerator.ConApp.Extensions;
+using TemplateCodeGenerator.ConApp.Models;
 
 namespace TemplateCodeGenerator.ConApp.Generation
 {
@@ -14,7 +16,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         static partial void ClassConstructing();
         static partial void ClassConstructed();
-        public ISolutionProperties Properties => SolutionProperties;
         public ISolutionProperties SolutionProperties { get; init; }
         public GeneratorObject(ISolutionProperties solutionProperties)
         {
@@ -25,6 +26,46 @@ namespace TemplateCodeGenerator.ConApp.Generation
         partial void Constructing();
         partial void Constructed();
 
+        private GenerationSetting[]? generationSettings = null;
+        public GenerationSetting[] GenerationSettings
+        {
+            get
+            {
+                if (generationSettings == null)
+                {
+                    var filePath = Path.Combine(SolutionProperties.SolutionPath, "CodeGeneration.csv");
+
+                    if (File.Exists(filePath))
+                    {
+                        try
+                        {
+                            generationSettings = File.ReadAllLines(filePath, System.Text.Encoding.Default)
+                                                     .Skip(1)
+                                                     .Select(l => l.Split(';'))
+                                                     .Select(d => new GenerationSetting()
+                                                     {
+                                                         UnitType = Enum.Parse<UnitType>(d[0]),
+                                                         ItemType = Enum.Parse<ItemType>(d[1]),
+                                                         EntityName = d[2],
+                                                         Name = d[2],
+                                                         Value = d[3],
+                                                     })
+                                                     .ToArray();
+                        }
+                        catch (Exception ex)
+                        {
+                            generationSettings = Array.Empty<GenerationSetting>();
+                            System.Diagnostics.Debug.WriteLine($"Error in {System.Reflection.MethodBase.GetCurrentMethod()!.Name}: {ex.Message}");
+                        }
+                    }
+                    else
+                    {
+                        generationSettings = Array.Empty<GenerationSetting>();
+                    }
+                }
+                return generationSettings;
+            }
+        }
         #region Helpers
         #region Namespace-Helpers
         public static IEnumerable<string> EnvelopeWithANamespace(IEnumerable<string> source, string nameSpace, params string[] usings)
@@ -103,7 +144,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         public static string CreateSubNamespaceFromEntityType(Type type)
         {
             var result = CreateSubNamespaceFromType(type);
-            
+
             if (result.Equals(StaticLiterals.EntitiesFolder))
             {
                 result = string.Empty;

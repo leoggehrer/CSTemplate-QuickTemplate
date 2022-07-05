@@ -33,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickTemplate.Logic.UnitTes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemplatePreprocessor.ConApp", "TemplatePreprocessor.ConApp\TemplatePreprocessor.ConApp.csproj", "{823A43FC-1128-4EDA-A553-31CA75C29915}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemplateCodeGenerator.ConApp", "TemplateCodeGenerator.ConApp\TemplateCodeGenerator.ConApp.csproj", "{8C44BAB5-8752-4CD7-B4D2-3B8A647A2250}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemplateCodeGenerator.ConApp", "TemplateCodeGenerator.ConApp\TemplateCodeGenerator.ConApp.csproj", "{8C44BAB5-8752-4CD7-B4D2-3B8A647A2250}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
