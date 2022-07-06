@@ -194,25 +194,16 @@ namespace TemplateCodeGenerator.ConApp.Generation
         static partial void CreateSetPropertyAttributes(PropertyInfo propertyInfo, List<string> codeLines);
         static partial void GetPropertyDefaultValue(PropertyInfo propertyInfo, ref string defaultValue);
 
-        public static bool IsArrayType(Type type)
-        {
-            return type.IsArray;
-        }
-        public static bool IsListType(Type type)
-        {
-            return type.FullName!.StartsWith("System.Collections.Generic.List");
-        }
-
         /// <summary>
         /// Diese Methode erstellt den Programmcode einer Eigenschaft (Auto-Property oder Partial-Full-Property).
         /// </summary>
         /// <param name="propertyInfo">Property info object</param>
         /// <returns>Die Eigenschaft als Text</returns>
-        public virtual IEnumerable<string> CreateProperty(PropertyInfo propertyinfo)
+        public virtual IEnumerable<string> CreateProperty(Type type, PropertyInfo propertyinfo)
         {
             IEnumerable<string> result;
 
-            result = CreateAutoProperty(propertyinfo);
+            result = CreateAutoProperty(type, propertyinfo);
             //result = CreatePartialProperty(propertyinfo);
             return result;
         }
@@ -221,28 +212,22 @@ namespace TemplateCodeGenerator.ConApp.Generation
         /// </summary>
         /// <param name="propertyInfo">Property info object</param>
         /// <returns>Die Eigenschaft als Text</returns>
-        public virtual IEnumerable<string> CreateAutoProperty(PropertyInfo propertyInfo)
+        public virtual IEnumerable<string> CreateAutoProperty(Type type, PropertyInfo propertyInfo)
         {
             var result = new List<string>();
             var defaultValue = GetDefaultValue(propertyInfo);
             var propertyType = GetPropertyType(propertyInfo);
 
+            if (defaultValue.HasContent())
+                defaultValue = defaultValue.Replace($"{StaticLiterals.TProperty}", propertyType.Replace("[]", string.Empty));
+
             result.Add(string.Empty);
             GetPropertyDefaultValue(propertyInfo, ref defaultValue);
-            result.AddRange(CreateComment(propertyInfo));
-            CreatePropertyAttributes(propertyInfo, result);
             result.Add($"public {propertyType} {propertyInfo.Name}");
             result.Add(string.IsNullOrEmpty(defaultValue)
                 ? "{ get; set; }"
                 : "{ get; set; }" + $" = {defaultValue};");
 
-            if (string.IsNullOrEmpty(defaultValue))
-            {
-                if (IsListType(propertyInfo.PropertyType))
-                {
-                    result.Add(" = new();");
-                }
-            }
             return result;
         }
         /// <summary>
@@ -427,10 +412,10 @@ namespace TemplateCodeGenerator.ConApp.Generation
         public IEnumerable<string> CreateDelegatePartialSetProperty(PropertyInfo propertyInfo, string delegateObjectName, PropertyInfo delegatePropertyInfo)
         {
             var result = new List<string>();
-            var defaultValue = GetDefaultValue(propertyInfo);
             var propName = propertyInfo.Name;
             var fieldType = GetPropertyType(propertyInfo);
             var fieldName = CreateFieldName(propertyInfo, "_");
+            var defaultValue = GetDefaultValue(propertyInfo);
 
             CreateSetPropertyAttributes(propertyInfo, result);
             result.Add("set");

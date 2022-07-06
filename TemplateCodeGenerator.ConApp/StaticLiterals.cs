@@ -53,6 +53,13 @@ namespace TemplateCodeGenerator.ConApp
         public static string FacadesFolder => "Facades";
         public static string ViewsFolder => "Views";
         #endregion Folders
+
+        #region Settings
+        public static string TProperty => nameof(TProperty);
+        public static string Generate => nameof(Generate);
+        public static string Visibility => nameof(Visibility);
+        public static string Attributes => nameof(Attributes);
+        #endregion Settings
     }
 }
 //MdEnd

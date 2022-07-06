@@ -46,7 +46,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
                                                      {
                                                          UnitType = Enum.Parse<UnitType>(d[0]),
                                                          ItemType = Enum.Parse<ItemType>(d[1]),
-                                                         EntityName = d[2],
+                                                         ItemName = d[2],
                                                          Name = d[3],
                                                          Value = d[4],
                                                      })
@@ -66,12 +66,12 @@ namespace TemplateCodeGenerator.ConApp.Generation
                 return generationSettings;
             }
         }
-        public string QueryGenerationSettingValue(UnitType unitType, ItemType itemType, string entityName, string valueName, string defaultValue)
+        public string QueryGenerationSettingValue(UnitType unitType, ItemType itemType, string itemName, string valueName, string defaultValue)
         {
             var result = defaultValue;
             var generationSetting = GenerationSettings.FirstOrDefault(e => e.UnitType == unitType
                                                                         && e.ItemType == itemType
-                                                                        && e.EntityName.StartsWith(entityName)
+                                                                        && e.ItemName.StartsWith(itemName)
                                                                         && e.Name.Equals(valueName, StringComparison.CurrentCultureIgnoreCase));
 
             if (generationSetting != null)
@@ -111,6 +111,15 @@ namespace TemplateCodeGenerator.ConApp.Generation
                                         || t.BaseType != null && t.BaseType.Name.Equals(StaticLiterals.VersionEntityName)));
         }
         #endregion Assembly-Helpers
+
+        public static bool IsArrayType(Type type)
+        {
+            return type.IsArray;
+        }
+        public static bool IsListType(Type type)
+        {
+            return type.FullName!.StartsWith("System.Collections.Generic.List");
+        }
 
         /// <summary>
         /// Diese Methode ermittelt den Solutionname aus seinem Schnittstellen Typ.
@@ -408,9 +417,20 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             string result = string.Empty;
 
-            if (propertyInfo.IsNullable() == false && propertyInfo.PropertyType == typeof(string))
+            if (propertyInfo.IsNullable() == false)
             {
-                result = "string.Empty";
+                if (propertyInfo.PropertyType == typeof(string))
+                {
+                    result = "string.Empty";
+                }
+                else if (IsListType(propertyInfo.PropertyType))
+                {
+                    result = "new()";
+                }
+                else if (IsArrayType(propertyInfo.PropertyType))
+                {
+                    result = $"Array.Empty<{StaticLiterals.TProperty}>()";
+                }
             }
             return result;
         }

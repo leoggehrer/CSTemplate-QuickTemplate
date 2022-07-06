@@ -1,4 +1,5 @@
 ﻿using TemplateCodeGenerator.ConApp.Contracts;
+using SL = TemplateCodeGenerator.ConApp.StaticLiterals;
 
 namespace TemplateCodeGenerator.ConApp.Generation
 {
@@ -104,7 +105,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             foreach (var type in entityProject.EntityTypes)
             {
-                if (CanCreate(type) && QueryLogicSetting<bool>(Common.ItemType.AccessContract, type, "generate", "True"))
+                if (CanCreate(type) && QueryLogicSetting<bool>(Common.ItemType.AccessContract, type, StaticLiterals.Generate, "True"))
                 {
                     result.Add(CreateAccessContract(type, Common.UnitType.Logic, Common.ItemType.AccessContract));
                     //result.Add(CreateFacadeContract(type, Common.UnitType.Logic, Common.ItemType.FacadeContract));
@@ -170,7 +171,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             foreach (var type in entityProject.EntityTypes)
             {
-                if (CanCreate(type) && QueryLogicSetting<bool>(Common.ItemType.Controller, type, "generate", "True"))
+                if (CanCreate(type) && QueryLogicSetting<bool>(Common.ItemType.Controller, type, StaticLiterals.Generate, "True"))
                 {
                     result.Add(CreateControllerFromType(type, Common.UnitType.Logic, Common.ItemType.Controller));
                 }
@@ -179,8 +180,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         protected virtual IGeneratedItem CreateControllerFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
-            var visibility = QueryLogicSetting<string>(itemType, type, "visibility", type.IsPublic ? "public" : "internal");
-            var attributes = QueryLogicSetting<string>(itemType, type, "Attributes", string.Empty);
+            var visibility = QueryLogicSetting<string>(itemType, type, StaticLiterals.Visibility, type.IsPublic ? "public" : "internal");
+            var attributes = QueryLogicSetting<string>(itemType, type, StaticLiterals.Attributes, string.Empty);
             var entityType = ItemProperties.CreateEntitySubType(type);
             var genericType = $"Controllers.GenericController";
             var controllerName = ItemProperties.CreateControllerName(type);
@@ -212,7 +213,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             foreach (var type in entityProject.EntityTypes)
             {
-                if (CanCreate(type) && QueryLogicSetting<bool>(Common.ItemType.Facade, type, "generate", "True"))
+                if (CanCreate(type) && QueryLogicSetting<bool>(Common.ItemType.Facade, type, StaticLiterals.Generate, "True"))
                 {
                     result.Add(CreateFacadeFromType(type, Common.UnitType.Logic, Common.ItemType.Facade));
                 }
@@ -263,7 +264,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             foreach (var type in entityProject.EntityTypes)
             {
 
-                if (CanCreate(type) && QueryLogicSetting<bool>(Common.ItemType.Factory, type, "generate", "True"))
+                if (CanCreate(type) && QueryLogicSetting<bool>(Common.ItemType.Factory, type, StaticLiterals.Generate, "True"))
                 {
                     var modelType = $"{ItemProperties.CreateModelType(type)}";
                     var contractSubType = ItemProperties.CreateAccessContractSubType(type);

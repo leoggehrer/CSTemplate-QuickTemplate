@@ -74,8 +74,9 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             foreach (var propertyInfo in filteredProperties.Where(pi => pi.CanWrite))
             {
+                result.AddRange(CreateComment(propertyInfo));
                 CreateModelPropertyAttributes(propertyInfo, result.Source);
-                result.AddRange(CreateProperty(propertyInfo));
+                result.AddRange(CreateProperty(type, propertyInfo));
             }
             result.Add("}");
             result.EnvelopeWithANamespace(ItemProperties.CreateModelNamespace(type), "using System;");

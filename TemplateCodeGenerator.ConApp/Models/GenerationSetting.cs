@@ -6,7 +6,7 @@ namespace TemplateCodeGenerator.ConApp.Models
     {
         public UnitType UnitType { get; set; }
         public ItemType ItemType { get; set; }
-        public string EntityName { get; set; } = string.Empty;
+        public string ItemName { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Value { get; set; } = string.Empty;
     }

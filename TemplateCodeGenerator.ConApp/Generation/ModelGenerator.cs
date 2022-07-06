@@ -96,6 +96,37 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         #endregion overrides
 
+        private T QueryModelSetting<T>(Common.UnitType unitType, Common.ItemType itemType, Type type, string valueName, string defaultValue)
+        {
+            T result;
+
+            try
+            {
+                result = (T)Convert.ChangeType(QueryGenerationSettingValue(unitType, itemType, CreateEntitiesSubTypeFromType(type), valueName, defaultValue), typeof(T));
+            }
+            catch (Exception ex)
+            {
+                result = (T)Convert.ChangeType(defaultValue, typeof(T));
+                System.Diagnostics.Debug.WriteLine($"Error in {MethodBase.GetCurrentMethod()!.Name}: {ex.Message}");
+            }
+            return result;
+        }
+        private T QueryModelSetting<T>(Common.UnitType unitType, Common.ItemType itemType, Type type, string itemSubName, string valueName, string defaultValue)
+        {
+            T result;
+
+            try
+            {
+                result = (T)Convert.ChangeType(QueryGenerationSettingValue(unitType, itemType, $"{CreateEntitiesSubTypeFromType(type)}.{itemSubName}", valueName, defaultValue), typeof(T));
+            }
+            catch (Exception ex)
+            {
+                result = (T)Convert.ChangeType(defaultValue, typeof(T));
+                System.Diagnostics.Debug.WriteLine($"Error in {MethodBase.GetCurrentMethod()!.Name}: {ex.Message}");
+            }
+            return result;
+        }
+
         protected virtual bool CanCreate(Type type)
         {
             bool create = true;
@@ -122,6 +153,8 @@ namespace TemplateCodeGenerator.ConApp.Generation
         protected virtual IGeneratedItem CreateModelFromType(Type type, Common.UnitType unitType, Common.ItemType itemType)
         {
             var modelName = CreateModelName(type);
+            var visibility = QueryModelSetting<string>(unitType, itemType, type, StaticLiterals.Visibility, "public");
+            var attributes = QueryModelSetting<string>(unitType, itemType, type, StaticLiterals.Attributes, string.Empty);
             var typeProperties = type.GetAllPropertyInfos();
             var generateProperties = typeProperties.Where(e => StaticLiterals.VersionEntityProperties.Any(p => p.Equals(e.Name)) == false) ?? Array.Empty<PropertyInfo>();
             var result = new Models.GeneratedItem(unitType, itemType)
@@ -132,15 +165,20 @@ namespace TemplateCodeGenerator.ConApp.Generation
             };
             result.AddRange(CreateComment(type));
             CreateModelAttributes(type, result.Source);
-            result.Add($"public partial class {modelName}");
+            result.Add($"{(attributes.HasContent() ? $"[{attributes}]" : string.Empty)}");
+            result.Add($"{visibility} partial class {modelName}");
             result.Add("{");
             result.AddRange(CreatePartialStaticConstrutor(modelName));
             result.AddRange(CreatePartialConstrutor("public", modelName));
 
             foreach (var propertyInfo in generateProperties)
             {
+                var propertyAttributes = QueryModelSetting<string>(unitType, Common.ItemType.Property, type, propertyInfo.Name, StaticLiterals.Attributes, string.Empty);
+
+                result.AddRange(CreateComment(propertyInfo));
                 CreateModelPropertyAttributes(propertyInfo, result.Source);
-                result.AddRange(CreateProperty(propertyInfo));
+                result.Add($"{(propertyAttributes.HasContent() ? $"[{propertyAttributes}]" : string.Empty)}");
+                result.AddRange(CreateProperty(type, propertyInfo));
             }
 
             result.AddRange(CreateFactoryMethod(false, ItemProperties.CreateModelType(type)));
