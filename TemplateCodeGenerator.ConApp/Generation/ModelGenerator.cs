@@ -96,7 +96,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
         }
         #endregion overrides
 
-        private T QueryModelSetting<T>(Common.UnitType unitType, Common.ItemType itemType, Type type, string valueName, string defaultValue)
+        protected T QueryModelSetting<T>(Common.UnitType unitType, Common.ItemType itemType, Type type, string valueName, string defaultValue)
         {
             T result;
 
@@ -111,13 +111,28 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
-        private T QueryModelSetting<T>(Common.UnitType unitType, Common.ItemType itemType, Type type, string itemSubName, string valueName, string defaultValue)
+        protected T QueryModelSetting<T>(Common.UnitType unitType, Common.ItemType itemType, Type type, string itemSubName, string valueName, string defaultValue)
         {
             T result;
 
             try
             {
                 result = (T)Convert.ChangeType(QueryGenerationSettingValue(unitType, itemType, $"{CreateEntitiesSubTypeFromType(type)}.{itemSubName}", valueName, defaultValue), typeof(T));
+            }
+            catch (Exception ex)
+            {
+                result = (T)Convert.ChangeType(defaultValue, typeof(T));
+                System.Diagnostics.Debug.WriteLine($"Error in {MethodBase.GetCurrentMethod()!.Name}: {ex.Message}");
+            }
+            return result;
+        }
+        protected T QueryModelSetting<T>(Common.UnitType unitType, Common.ItemType itemType, string itemName, string valueName, string defaultValue)
+        {
+            T result;
+
+            try
+            {
+                result = (T)Convert.ChangeType(QueryGenerationSettingValue(unitType, itemType, $"{itemName}", valueName, defaultValue), typeof(T));
             }
             catch (Exception ex)
             {

@@ -22,7 +22,9 @@ namespace TemplateCodeGenerator.ConApp.Common
         Factory = 2 * Facade,
 
         AddServices = 2 * Factory,
+
         View = 2 * AddServices,
+        ViewItem = 2 * View,
     }
 }
 //MdEnd

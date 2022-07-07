@@ -12,6 +12,25 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
         }
 
+        protected static bool IsPrimitiveNullable(PropertyInfo propertyInfo)
+        {
+            var result = propertyInfo.PropertyType.IsNullableType();
+
+            if (result)
+            {
+                result = propertyInfo.PropertyType.GetGenericArguments()[0].IsPrimitive;
+            }
+            return result;
+        }
+        protected static string CreateFilterModelName(Type type)
+        {
+            return $"{CreateModelName(type)}Filter";
+        }
+        protected string CreateFilterModelType(Type type)
+        {
+            return $"{ItemProperties.Namespace}.{ItemProperties.CreateModelSubNamespace(type)}.{CreateFilterModelName(type)}";
+        }
+
         public virtual IEnumerable<IGeneratedItem> GenerateAll()
         {
             var result = new List<IGeneratedItem>();
@@ -22,8 +41,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.AddRange(CreateViews());
             return result;
         }
-
-        public virtual IEnumerable<IGeneratedItem> CreateModels()
+        protected virtual IEnumerable<IGeneratedItem> CreateModels()
         {
             var result = new List<IGeneratedItem>();
             var entityProject = EntityProject.Create(SolutionProperties);
@@ -79,19 +97,24 @@ namespace TemplateCodeGenerator.ConApp.Generation
 
             foreach (var propertyInfo in viewProperties)
             {
-                if (idx++ > 0)
-                    sbHasEntityValue.Append(" || ");
+                var canCreate = QueryModelSetting<bool>(unitType, Common.ItemType.Property, $"{CreateEntitiesSubTypeFromType(type)}Filter.{propertyInfo.Name}", StaticLiterals.Generate, "True");
 
-                if (propertyInfo.PropertyType == typeof(string))
+                if (canCreate)
                 {
-                    sbToString.Append($"{propertyInfo.Name}: " + "{(" + $"{propertyInfo.Name} ?? \"---\"" + ")} ");
+                    if (idx++ > 0)
+                        sbHasEntityValue.Append(" || ");
+
+                    if (propertyInfo.PropertyType == typeof(string))
+                    {
+                        sbToString.Append($"{propertyInfo.Name}: " + "{(" + $"{propertyInfo.Name} ?? \"---\"" + ")} ");
+                    }
+                    else
+                    {
+                        sbToString.Append($"{propertyInfo.Name}: " + "{(" + $"{propertyInfo.Name} != null ? {propertyInfo.Name} : \"---\"" + ")} ");
+                    }
+                    sbHasEntityValue.Append($"{propertyInfo.Name} != null");
+                    result.AddRange(CreateFilterAutoProperty(propertyInfo));
                 }
-                else
-                {
-                    sbToString.Append($"{propertyInfo.Name}: " + "{(" + $"{propertyInfo.Name} != null ? {propertyInfo.Name} : \"---\"" + ")} ");
-                }
-                sbHasEntityValue.Append($"{propertyInfo.Name} != null");
-                result.AddRange(CreateFilterAutoProperty(propertyInfo));
             }
 
             if (sbHasEntityValue.Length > 0)
@@ -111,24 +134,28 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add(string.Empty);
             foreach (var propertyInfo in viewProperties)
             {
-                result.Add($"if ({propertyInfo.Name} != null)");
-                result.Add("{");
+                var canCreate = QueryModelSetting<bool>(unitType, Common.ItemType.Property, $"{CreateEntitiesSubTypeFromType(type)}Filter.{propertyInfo.Name}", StaticLiterals.Generate, "True");
 
-                result.Add("if (result.Length > 0)");
-                result.Add("{");
-                result.Add("result.Append(\" || \");");
-                result.Add("}");
-
-                if (propertyInfo.PropertyType == typeof(string))
+                if (canCreate)
                 {
-                    result.Add("result.Append($\"(" + $"{propertyInfo.Name} != null && {propertyInfo.Name}.Contains(\\\"" + "{" + $"{propertyInfo.Name}" + "}" + "\\\"))\");");
-                }
-                else
-                {
-                    result.Add("result.Append($\"(" + $"{propertyInfo.Name} != null && {propertyInfo.Name} == " + "{" + $"{propertyInfo.Name}" + "})\");");
-                }
+                    result.Add($"if ({propertyInfo.Name} != null)");
+                    result.Add("{");
 
-                result.Add("}");
+                    result.Add("if (result.Length > 0)");
+                    result.Add("{");
+                    result.Add("result.Append(\" || \");");
+                    result.Add("}");
+
+                    if (propertyInfo.PropertyType == typeof(string))
+                    {
+                        result.Add("result.Append($\"(" + $"{propertyInfo.Name} != null && {propertyInfo.Name}.Contains(\\\"" + "{" + $"{propertyInfo.Name}" + "}" + "\\\"))\");");
+                    }
+                    else
+                    {
+                        result.Add("result.Append($\"(" + $"{propertyInfo.Name} != null && {propertyInfo.Name} == " + "{" + $"{propertyInfo.Name}" + "})\");");
+                    }
+                    result.Add("}");
+                }
             }
             result.Add("return result.ToString();");
             result.Add("}");
@@ -314,16 +341,6 @@ namespace TemplateCodeGenerator.ConApp.Generation
             }
             return result;
         }
-        protected static bool IsPrimitiveNullable(PropertyInfo propertyInfo)
-        {
-            var result = propertyInfo.PropertyType.IsNullableType();
-
-            if (result)
-            {
-                result = propertyInfo.PropertyType.GetGenericArguments()[0].IsPrimitive;
-            }
-            return result;
-        }
         protected static IEnumerable<PropertyInfo> GetViewProperties(Type type)
         {
             var typeProperties = type.GetAllPropertyInfos();
@@ -440,24 +457,33 @@ namespace TemplateCodeGenerator.ConApp.Generation
             result.Add($"@model {modelType}");
             result.Add(string.Empty);
 
+            result.Add("@{");
+            result.Add("  var boolSelect = new SelectList(new[] { new { Id = \"\", Value = \"---\" }, new { Id = \"True\", Value = \"True\" }, new { Id = \"False\", Value = \"False\" } }, \"Id\", \"Value\");");
+            result.Add("}");
+            result.Add(string.Empty);
             result.Add("<div class=\"row\">");
             result.Add(" <div class=\"col-md-4\">");
             result.Add("  <form asp-action=\"Filter\">");
             result.Add("   <div asp-validation-summary=\"ModelOnly\" class=\"text-danger\"></div>");
 
-            foreach (var item in viewProperties)
+            foreach (var propertyInfo in viewProperties)
             {
-                result.Add("   <div class=\"form-group\">");
-                result.Add($"    <label asp-for=\"{item.Name}\" class=\"control-label\"></label>");
-                if (item.PropertyType == typeof(bool) || item.PropertyType == typeof(bool?))
+                var canCreate = QueryModelSetting<bool>(unitType, Common.ItemType.Property, $"{CreateEntitiesSubTypeFromType(type)}Filter.{propertyInfo.Name}", StaticLiterals.Generate, "True");
+
+                if (canCreate)
                 {
-                    result.Add($"    <input asp-for=\"{item.Name}\" class=\"form-check\" />");
+                    result.Add("   <div class=\"form-group\">");
+                    result.Add($"    <label asp-for=\"{propertyInfo.Name}\" class=\"control-label\"></label>");
+                    if (propertyInfo.PropertyType == typeof(bool) || propertyInfo.PropertyType == typeof(bool?))
+                    {
+                        result.Add($"    @Html.DropDownListFor(model => model.{propertyInfo.Name}, boolSelect" + ", new { @class = \"form-select\" })");
+                    }
+                    else
+                    {
+                        result.Add($"    <input asp-for=\"{propertyInfo.Name}\" class=\"form-control\" />");
+                    }
+                    result.Add("   </div>");
                 }
-                else
-                {
-                    result.Add($"    <input asp-for=\"{item.Name}\" class=\"form-control\" />");
-                }
-                result.Add("   </div>");
             }
 
             result.Add("   <p></p>");
@@ -500,16 +526,7 @@ namespace TemplateCodeGenerator.ConApp.Generation
             return result;
         }
 
-        public static string CreateFilterModelName(Type type)
-        {
-            return $"{CreateModelName(type)}Filter";
-        }
-        protected string CreateFilterModelType(Type type)
-        {
-            return $"{ItemProperties.Namespace}.{ItemProperties.CreateModelSubNamespace(type)}.{CreateFilterModelName(type)}";
-        }
-
-        public virtual IEnumerable<string> CreateFilterAutoProperty(PropertyInfo propertyInfo)
+        protected virtual IEnumerable<string> CreateFilterAutoProperty(PropertyInfo propertyInfo)
         {
             var result = new List<string>();
             var propertyType = GetPropertyType(propertyInfo);

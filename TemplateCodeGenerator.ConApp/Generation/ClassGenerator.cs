@@ -239,9 +239,13 @@ namespace TemplateCodeGenerator.ConApp.Generation
         {
             var result = new List<string>();
             var defaultValue = GetDefaultValue(propertyInfo);
+            var propertyType = GetPropertyType(propertyInfo);
             var fieldType = GetPropertyType(propertyInfo);
             var fieldName = CreateFieldName(propertyInfo, "_");
             var paramName = CreateFieldName(propertyInfo, "_");
+
+            if (defaultValue.HasContent())
+                defaultValue = defaultValue.Replace($"{StaticLiterals.TProperty}", propertyType.Replace("[]", string.Empty));
 
             result.Add(string.Empty);
             result.AddRange(CreateComment(propertyInfo));
