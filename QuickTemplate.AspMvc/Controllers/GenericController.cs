@@ -22,10 +22,10 @@ namespace QuickTemplate.AspMvc.Controllers
         {
             Index,
             Details,
+            ViewCreate,
             Create,
-            Insert,
+            ViewEdit,
             Edit,
-            Update,
             ViewDelete,
             Delete,
         }
@@ -44,6 +44,10 @@ namespace QuickTemplate.AspMvc.Controllers
             DataAccess.SessionToken = SessionWrapper.SessionToken;
         }
 #endif
+        protected virtual RedirectToActionResult RedirectAfterAction(ActionMode actionMode, TAccessModel accessModel)
+        {
+            return RedirectToAction(nameof(Index));
+        }
         protected virtual TAccessModel ToAccessModel(TViewModel viewModel)
         {
             var result = new TAccessModel();
@@ -94,7 +98,7 @@ namespace QuickTemplate.AspMvc.Controllers
         {
             var accessModel = new TAccessModel();
 
-            return View(ToViewModel(accessModel, ActionMode.Create));
+            return View(ToViewModel(accessModel, ActionMode.ViewCreate));
         }
 
         // POST: Item/Create
@@ -110,9 +114,9 @@ namespace QuickTemplate.AspMvc.Controllers
             {
                 try
                 {
-                    await DataAccess.InsertAsync(accessModel);
+                    accessModel = await DataAccess.InsertAsync(accessModel);
                     await DataAccess.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectAfterAction(ActionMode.Create, accessModel);
                 }
                 catch (Exception ex)
                 {
@@ -147,7 +151,7 @@ namespace QuickTemplate.AspMvc.Controllers
             {
                 return NotFound();
             }
-            return View(ToViewModel(accessModel, ActionMode.Edit));
+            return View(ToViewModel(accessModel, ActionMode.ViewEdit));
         }
 
         // POST: Item/Edit/5
@@ -189,7 +193,7 @@ namespace QuickTemplate.AspMvc.Controllers
                                       .SelectMany(x => x.Errors)
                                       .Select(x => x.ErrorMessage));
             }
-            return string.IsNullOrEmpty(ViewBag.Error) ? RedirectToAction(nameof(Index)) : View(ToViewModel(accessModel, ActionMode.Update));
+            return string.IsNullOrEmpty(ViewBag.Error) ? RedirectAfterAction(ActionMode.Edit, accessModel) : View(ToViewModel(accessModel, ActionMode.Edit));
         }
 
         // GET: Item/Delete/5
@@ -233,7 +237,7 @@ namespace QuickTemplate.AspMvc.Controllers
                     }
                 }
             }
-            return ViewBag.Error != null ? View(ToViewModel(accessModel, ActionMode.Delete)) : RedirectToAction(nameof(Index));
+            return ViewBag.Error != null ? View(ToViewModel(accessModel, ActionMode.Delete)) : RedirectAfterAction(ActionMode.Delete, accessModel);
         }
 
         protected override void Dispose(bool disposing)

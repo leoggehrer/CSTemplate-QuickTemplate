@@ -71,7 +71,7 @@ Die nachfolgenden Abbildung zeigt den schematischen Erstellungs-Prozess fuer ein
   
 ![Create domain project overview](CreateProjectOverview.png)  
   
-Als Ausgangsbasis wird die Vorlage ***QuickTemplate*** verwendet. Diese Vorlage wird mit Hilfe dem Hilfsprogramm ***'TemplateCopier.ConApp'*** in ein Verzeichnis eigener Wahl kopiert. In diesem Verzeichnis werden alle Projektteile (mit Ausnahme der Hilfsprogramme *TemplateCopier.ConApp*, *TemplateComparison.ConApp* und *TemplatePreprocessor.ConApp*) von der Vorlage kopiert und die Namen der Projekte und Komponenten werden entsprechend angepasst. Alle Projekte mit dem Prefix ***QuickTemplate*** werden mit dem domainspezifischen Namen des Verzeichnisses ersetzt. Beim Kopieren der Dateien von der Vorlage werden alle Dateien mit dem Label ***@BaseCode*** durch den Label ***@CodeCopy*** gekennzeichnet. Diese Label werden fuer den Abgleich-Prozess verwendet.  
+Als Ausgangsbasis wird die Vorlage ***QuickTemplate*** verwendet. Diese Vorlage wird mit Hilfe dem Hilfsprogramm ***'TemplateCopier.ConApp'*** in ein Verzeichnis eigener Wahl kopiert. In diesem Verzeichnis werden alle Projektteile (mit Ausnahme der Hilfsprogramme *TemplateCopier.ConApp*, *TemplateComparison.ConApp*, *TemplatePreprocessor.ConApp* und *TemplateCodeGenerator.ConApp*) von der Vorlage kopiert und die Namen der Projekte und Komponenten werden entsprechend angepasst. Alle Projekte mit dem Prefix ***QuickTemplate*** werden mit dem domainspezifischen Namen des Verzeichnisses ersetzt. Beim Kopieren der Dateien von der Vorlage werden alle Dateien mit dem Label ***@BaseCode*** durch den Label ***@CodeCopy*** gekennzeichnet. Diese Label werden fuer einen spaeteren Abgleich-Prozess verwendet.  
   
 Zum Beispiel soll ein Projekt mit dem Namen 'QTMusicStoreLight' erstellt werden. Im 'TemplateCopier' werden folgende Parameter eingestellt:  
   
@@ -141,6 +141,39 @@ Balancing [1..1|X...Quit]:
   
 Wird nun die Option **[1 oder a]** aktiviert, dann werden alle Dateien in der Solution **QuickTemplate** mit der Kennzeichnung `@BaseCopy` mit den Dateien in der Solution  **QTMusicStoreLight** mit der Kennzeichnung `@CodeCopy` abgeglichen.  
   
+## Setzen von Preprozessor-Defines  
+
+Im Projekt ***QuickTemplate*** sind Preprozessor-Definitions definiert. Mit Hilfe dieser Definitions können Module und Funktionen  eingeschaltet bzw. ausgeschaltet werden. Diese *Definitions* werden natuerlich beim Kopieren in das Domain-Projekt uebernommen. Die folgende Tabelle bietet eine Uebersicht ueber die Module und Funktionen:
+
+| Preprozessor-Definition | Modul/Funktion | Abhaengigkeit | Beschreibung |
+|-------------------------|----------------|---------------|--------------|
+|ACCOUNT_ON               | Authentifizierung| kein | Der Zugriff auf das System ist nur mit einen Konto gestattet. | 
+|LOGGING_ON               | Logging | ACCOUNT_ON | Die Manipultion der Daten wird mitprotokolliert. | 
+|REVISION_ON              | Historie | ACCOUNT_ON | Die Daten werden zusaetzlich in einer Historie verwaltet. | 
+|DEVELOP_ON               | Developer Mode | DEBUG | Zusaetzliche Funktionen wie Datenbank-Loeschen und Datenbank-Erstellen sind freigeschaltet. |  
+
+```text  
+Template Preprocessor
+=====================
+
+Definition-Values: ACCOUNT_OFF LOGGING_OFF REVISION_OFF DEVELOP_OFF
+
+Set definition-values in 'QuickTemplate' from: ...\source\repos\HtlLeo\CSSoftwareEngineering\QuickTemplate
+
+[1] Change source path
+[2] Set definition ACCOUNT_ON
+[3] Set definition LOGGING_ON
+[4] Set definition REVISION_ON
+[5] Set definition DEVELOP_ON
+[6] Start assignment process...
+[x|X] Exit
+
+Choose:
+
+```  
+
+Wird eine Option **[2..6]** aktiviert, dann werden die Definitions fuer das ausgewaehlten Projekt gesetzt. Mit der Option **[1]** kann der entsprechende Pfad auf das Projekt geaendert werden.
+
 # Umsetzungsschritte  
   
 Nachdem nun das Domain-Projekt **QTMusicStoreLight** erstellt wurde, werden nun folgende Schritte der Reihenfolge nach ausgefuehrt:  

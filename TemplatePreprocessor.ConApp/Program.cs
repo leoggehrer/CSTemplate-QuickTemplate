@@ -53,15 +53,15 @@ namespace TemplatePreprocessor.ConApp
                 Console.WriteLine("Template Preprocessor");
                 Console.WriteLine("=====================");
                 Console.WriteLine();
-                Console.WriteLine($"Define-Values: {string.Join(" ", Defines)}");
+                Console.WriteLine($"Definition-Values: {string.Join(" ", Defines)}");
                 Console.WriteLine();
-                Console.WriteLine($"Set define-values '{sourceSolutionName}' from: {SourcePath}");
+                Console.WriteLine($"Set definition-values '{sourceSolutionName}' from: {SourcePath}");
                 Console.WriteLine();
                 Console.WriteLine($"[{++menuIndex}] Change source path");
 
                 for (int i = 0; i < Defines.Length; i++)
                 {
-                    Console.WriteLine($"[{++menuIndex}] Set directive {(Defines[i].EndsWith("_ON") ? Defines[i].Replace("_ON", "_OFF") : Defines[i].Replace("_OFF", "_ON"))}");
+                    Console.WriteLine($"[{++menuIndex}] Set definition {(Defines[i].EndsWith("_ON") ? Defines[i].Replace("_ON", "_OFF") : Defines[i].Replace("_OFF", "_ON"))}");
                 }
 
                 Console.WriteLine($"[{++menuIndex}] Start assignment process...");
