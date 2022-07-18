@@ -62,7 +62,8 @@ namespace QuickTemplate.Logic.Facades
         #endregion SessionToken
 #endif
 
-        #region Count
+        #region MaxPageSize and Count
+        public virtual int MaxPageSize => Controller.MaxPageSize;
         public virtual Task<int> CountAsync()
         {
             return Controller.CountAsync();
@@ -71,21 +72,9 @@ namespace QuickTemplate.Logic.Facades
         {
             return Controller.CountAsync(predicate, includeItems);
         }
-        #endregion Count
+        #endregion MaxPageSize and Count
 
         #region Queries
-        public virtual async Task<TModel[]> GetAllAsync()
-        {
-            var entities = await Controller.GetAllAsync().ConfigureAwait(false);
-
-            return entities.Select(e => ToModel(e)).ToArray();
-        }
-        public virtual async Task<TModel[]> GetAllAsync(params string[] includeItems)
-        {
-            var entities = await Controller.GetAllAsync(includeItems).ConfigureAwait(false);
-
-            return entities.Select(e => ToModel(e)).ToArray();
-        }
         public virtual async Task<TModel?> GetByIdAsync(int id)
         {
             var entity = await Controller.GetByIdAsync(id).ConfigureAwait(false);
@@ -98,9 +87,42 @@ namespace QuickTemplate.Logic.Facades
 
             return entity != null ? ToModel(entity) : null;
         }
+
+        public virtual async Task<TModel[]> GetAllAsync(params string[] includeItems)
+        {
+            var entities = await Controller.GetAllAsync(includeItems).ConfigureAwait(false);
+
+            return entities.Select(e => ToModel(e)).ToArray();
+        }
+        public virtual async Task<TModel[]> GetAllAsync(string orderBy, params string[] includeItems)
+        {
+            var entities = await Controller.GetAllAsync(orderBy, includeItems).ConfigureAwait(false);
+
+            return entities.Select(e => ToModel(e)).ToArray();
+        }
+
+        public virtual async Task<TModel[]> GetPageListAsync(int pageIndex, int pageSize, params string[] includeItems)
+        {
+            var entities = await Controller.GetPageListAsync(pageIndex, pageSize, includeItems).ConfigureAwait(false);
+
+            return entities.Select(e => ToModel(e)).ToArray();
+        }
+        public virtual async Task<TModel[]> GetPageListAsync(string orderBy, int pageIndex, int pageSize, params string[] includeItems)
+        {
+            var entities = await Controller.GetPageListAsync(orderBy, pageIndex, pageSize, includeItems).ConfigureAwait(false);
+
+            return entities.Select(e => ToModel(e)).ToArray();
+        }
+
         public virtual async Task<TModel[]> QueryAsync(string predicate, params string[] includeItems)
         {
             var entities = await Controller.QueryAsync(predicate, includeItems).ConfigureAwait(false);
+
+            return entities.Select(e => ToModel(e)).ToArray();
+        }
+        public virtual async Task<TModel[]> QueryAsync(string predicate, string orderBy, params string[] includeItems)
+        {
+            var entities = await Controller.QueryAsync(predicate, orderBy, includeItems).ConfigureAwait(false);
 
             return entities.Select(e => ToModel(e)).ToArray();
         }

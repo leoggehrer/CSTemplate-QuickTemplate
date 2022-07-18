@@ -83,7 +83,12 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns></returns>
         internal virtual IEnumerable<string> Includes => Array.Empty<string>();
 
-        #region Count
+        #region MaxPageSize and Count
+        /// <summary>
+        /// Gets the maximum page size.
+        /// </summary>
+        public virtual int MaxPageSize => StaticLiterals.MaxPageSize;
+
         /// <summary>
         /// Gets the number of quantity in the collection.
         /// </summary>
@@ -149,39 +154,40 @@ namespace QuickTemplate.Logic.Controllers
             }
             return query.Where(predicate).CountAsync();
         }
-        #endregion Count
+        #endregion  MaxPageSize and Count
 
-        #region Queries
+        #region Get
         /// <summary>
-        /// Returns all of the entities in the collection.
+        /// Returns the element of type T with the identification of id.
         /// </summary>
-        /// <returns>All of the entitities in the collection.</returns>
-        public virtual async Task<TEntity[]> GetAllAsync()
+        /// <param name="id">The identification.</param>
+        /// <returns>The element of the type T with the corresponding identification.</returns>
+        public virtual async Task<TEntity?> GetByIdAsync(int id)
         {
 #if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetAll).ConfigureAwait(false);
+            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetBy).ConfigureAwait(false);
 #endif
-            return await ExecuteGetAllAsync().ConfigureAwait(false);
+            return await ExecuteGetByIdAsync(id).ConfigureAwait(false);
         }
         /// <summary>
-        /// Returns all interfaces of the entities in the collection (without authorization).
+        /// Returns the element of type T with the identification of id.
         /// </summary>
-        /// <returns>All interfaces of the entity collection.</returns>
-        internal virtual Task<TEntity[]> ExecuteGetAllAsync()
+        /// <param name="id">The identification.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>The element of the type T with the corresponding identification (with includes).</returns>
+        public virtual async Task<TEntity?> GetByIdAsync(int id, params string[] includeItems)
         {
-            var query = EntitySet.AsQueryable();
-
-            foreach (var includeItem in Includes.Distinct())
-            {
-                query = query.Include(includeItem);
-            }
-            return query.AsNoTracking().ToArrayAsync();
+#if ACCOUNT_ON
+            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetBy).ConfigureAwait(false);
+#endif
+            return await ExecuteGetByIdAsync(id, includeItems).ConfigureAwait(false);
         }
+
         /// <summary>
-        /// Returns all interfaces of the entities in the collection.
+        /// Gets all items from the repository.
         /// </summary>
         /// <param name="includeItems">The include items</param>
-        /// <returns>All interfaces of the entity collection (with include).</returns>
+        /// <returns>All items in accordance with the parameters.</returns>
         public virtual async Task<TEntity[]> GetAllAsync(params string[] includeItems)
         {
 #if ACCOUNT_ON
@@ -190,11 +196,73 @@ namespace QuickTemplate.Logic.Controllers
             return await ExecuteGetAllAsync(includeItems).ConfigureAwait(false);
         }
         /// <summary>
-        /// Returns all interfaces of the entities in the collection (without authorization).
+        /// Gets all items from the repository.
         /// </summary>
+        /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
         /// <param name="includeItems">The include items</param>
-        /// <returns>All interfaces of the entity collection (with include).</returns>
-        internal virtual Task<TEntity[]> ExecuteGetAllAsync(params string[] includeItems)
+        /// <returns>All items in accordance with the parameters.</returns>
+        public virtual async Task<TEntity[]> GetAllAsync(string orderBy, params string[] includeItems)
+        {
+#if ACCOUNT_ON
+            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetAll).ConfigureAwait(false);
+#endif
+            return await ExecuteGetAllAsync(orderBy, includeItems).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Gets a subset of items from the repository.
+        /// </summary>
+        /// <param name="pageIndex">0 based page index.</param>
+        /// <param name="pageSize">The pagesize.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>Subset in accordance with the parameters.</returns>
+        public virtual async Task<TEntity[]> GetPageListAsync(int pageIndex, int pageSize, params string[] includeItems)
+        {
+            CheckPageParams(pageIndex, pageSize);
+#if ACCOUNT_ON
+            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetPageList).ConfigureAwait(false);
+#endif
+            return await ExecuteGetPageListAsync(pageIndex, pageSize, includeItems).ConfigureAwait(false);
+        }
+        /// <summary>
+        /// Gets a subset of items from the repository.
+        /// </summary>
+        /// <param name="orderBy">Sorts the elements of a sequence in order according to a key.</param>
+        /// <param name="pageIndex">0 based page index.</param>
+        /// <param name="pageSize">The pagesize.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>Subset in accordance with the parameters.</returns>
+        public virtual async Task<TEntity[]> GetPageListAsync(string orderBy, int pageIndex, int pageSize, params string[] includeItems)
+        {
+            CheckPageParams(pageIndex, pageSize);
+#if ACCOUNT_ON
+            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetPageList).ConfigureAwait(false);
+#endif
+            return await ExecuteGetPageListAsync(orderBy, pageIndex, pageSize, includeItems).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Returns the element of type T with the identification of id (without authorization).
+        /// </summary>
+        /// <param name="id">The identification.</param>
+        /// <returns>The element of the type T with the corresponding identification.</returns>
+        internal virtual Task<TEntity?> ExecuteGetByIdAsync(int id)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in Includes.Distinct())
+            {
+                query = query.Include(includeItem);
+            }
+            return query.SingleOrDefaultAsync(e => e.Id == id);
+        }
+        /// <summary>
+        /// Returns the element of type T with the identification of id (without authorization).
+        /// </summary>
+        /// <param name="id">The identification.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>The element of the type T with the corresponding identification (with includes).</returns>
+        internal virtual Task<TEntity?> ExecuteGetByIdAsync(int id, params string[] includeItems)
         {
             var query = EntitySet.AsQueryable();
 
@@ -202,9 +270,113 @@ namespace QuickTemplate.Logic.Controllers
             {
                 query = query.Include(includeItem);
             }
-            return query.AsNoTracking().ToArrayAsync();
+            return query.SingleOrDefaultAsync(e => e.Id == id);
         }
 
+        /// <summary>
+        /// Returns all entities in the collection (without authorization).
+        /// </summary>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>All entity collection (with include).</returns>
+        internal virtual async Task<TEntity[]> ExecuteGetAllAsync(params string[] includeItems)
+        {
+            int idx = 0, qryCount;
+            var result = new List<TEntity>();
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
+            {
+                query = query.Include(includeItem);
+            }
+
+            do
+            {
+                var qry = await query.Skip(idx++ * MaxPageSize)
+                                     .Take(MaxPageSize)
+                                     .AsNoTracking()
+                                     .ToArrayAsync()
+                                     .ConfigureAwait(false);
+
+                qryCount = result.AddRangeAndCount(qry);
+            } while (qryCount == MaxPageSize);
+            return result.ToArray();
+        }
+        /// <summary>
+        /// Returns all entities in the collection (without authorization).
+        /// </summary>
+        /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>All entity collection (with include).</returns>
+        internal virtual async Task<TEntity[]> ExecuteGetAllAsync(string orderBy, params string[] includeItems)
+        {
+            int idx = 0, qryCount;
+            var result = new List<TEntity>();
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
+            {
+                query = query.Include(includeItem);
+            }
+
+            do
+            {
+                var qry = await query.OrderBy(orderBy)
+                                     .Skip(idx++ * MaxPageSize)
+                                     .Take(MaxPageSize)
+                                     .AsNoTracking()
+                                     .ToArrayAsync()
+                                     .ConfigureAwait(false);
+
+                qryCount = result.AddRangeAndCount(qry);
+            } while (qryCount == MaxPageSize);
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Returns a subset of items from the repository.
+        /// </summary>
+        /// <param name="pageIndex">0 based page index.</param>
+        /// <param name="pageSize">The pagesize.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>Subset in accordance with the parameters.</returns>
+        internal virtual Task<TEntity[]> ExecuteGetPageListAsync(int pageIndex, int pageSize, params string[] includeItems)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
+            {
+                query = query.Include(includeItem);
+            }
+            return query.Skip(pageIndex * pageSize)
+                        .Take(pageSize)
+                        .AsNoTracking()
+                        .ToArrayAsync();
+        }
+        /// <summary>
+        /// Returns a subset of items from the repository.
+        /// </summary>
+        /// <param name="orderBy">Sorts the elements of a sequence in order according to a key.</param>
+        /// <param name="pageIndex">0 based page index.</param>
+        /// <param name="pageSize">The pagesize.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>Subset in accordance with the parameters.</returns>
+        internal virtual Task<TEntity[]> ExecuteGetPageListAsync(string orderBy, int pageIndex, int pageSize, params string[] includeItems)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
+            {
+                query = query.Include(includeItem);
+            }
+            return query.OrderBy(orderBy)
+                        .Skip(pageIndex * pageSize)
+                        .Take(pageSize)
+                        .AsNoTracking()
+                        .ToArrayAsync();
+        }
+        #endregion Get
+
+        #region Query
         /// <summary>
         /// Filters a sequence of values based on a predicate.
         /// </summary>
@@ -218,6 +390,45 @@ namespace QuickTemplate.Logic.Controllers
 #endif
             return await ExecuteQueryAsync(predicate, includeItems).ConfigureAwait(false);
         }
+        /// <summary>
+        /// Filters a sequence of values based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>The filter result.</returns>
+        public virtual async Task<TEntity[]> QueryAsync(string predicate, string orderBy, params string[] includeItems)
+        {
+#if ACCOUNT_ON
+            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.QueryBy).ConfigureAwait(false);
+#endif
+            int idx = 0, qryCount;
+            var result = new List<TEntity>();
+            do
+            {
+                var qry = await ExecuteQueryAsync(predicate, orderBy, idx, MaxPageSize).ConfigureAwait(false);
+
+                qryCount = result.AddRangeAndCount(qry);
+            } while (qryCount == MaxPageSize);
+            return result.ToArray();
+        }
+        /// <summary>
+        /// Filters a sequence of values based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
+        /// <param name="pageIndex">0 based page index.</param>
+        /// <param name="pageSize">The pagesize.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>The filter result.</returns>
+        public virtual Task<TEntity[]> QueryAsync(string predicate, string orderBy, int pageIndex, int pageSize, params string[] includeItems)
+        {
+#if ACCOUNT_ON
+            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.QueryBy).ConfigureAwait(false);
+#endif
+            return ExecuteQueryAsync(predicate, orderBy, pageIndex, pageSize, includeItems);
+        }
+
         /// <summary>
         /// Filters a sequence of values based on a predicate (without authorization).
         /// </summary>
@@ -237,6 +448,52 @@ namespace QuickTemplate.Logic.Controllers
         /// <summary>
         /// Filters a sequence of values based on a predicate (without authorization).
         /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="pageIndex">0 based page index.</param>
+        /// <param name="pageSize">The pagesize.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>The filter result.</returns>
+        internal virtual Task<TEntity[]> ExecuteQueryAsync(string predicate, int pageIndex, int pageSize, params string[] includeItems)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
+            {
+                query = query.Include(includeItem);
+            }
+            return query.Where(predicate)
+                        .Skip(pageIndex * pageSize)
+                        .Take(pageSize)
+                        .AsNoTracking()
+                        .ToArrayAsync();
+        }
+        /// <summary>
+        /// Filters a sequence of values based on a predicate (without authorization).
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
+        /// <param name="pageIndex">0 based page index.</param>
+        /// <param name="pageSize">The pagesize.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>The filter result.</returns>
+        internal virtual Task<TEntity[]> ExecuteQueryAsync(string predicate, string orderBy, int pageIndex, int pageSize, params string[] includeItems)
+        {
+            var query = EntitySet.AsQueryable();
+
+            foreach (var includeItem in Includes.Union(includeItems).Distinct())
+            {
+                query = query.Include(includeItem);
+            }
+            return query.Where(predicate)
+                        .OrderBy(orderBy)
+                        .Skip(pageIndex * pageSize)
+                        .Take(pageSize)
+                        .AsNoTracking()
+                        .ToArrayAsync();
+        }
+        /// <summary>
+        /// Filters a sequence of values based on a predicate (without authorization).
+        /// </summary>
         /// <param name="predicate">A function to test each element for a condition.</param>
         /// <param name="includeItems">The include items</param>
         /// <returns>The filter result.</returns>
@@ -251,62 +508,6 @@ namespace QuickTemplate.Logic.Controllers
             return query.Where(predicate).AsNoTracking().ToArrayAsync();
         }
 
-        /// <summary>
-        /// Returns the element of type T with the identification of id.
-        /// </summary>
-        /// <param name="id">The identification.</param>
-        /// <returns>The element of the type T with the corresponding identification.</returns>
-        public virtual async Task<TEntity?> GetByIdAsync(int id)
-        {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetBy).ConfigureAwait(false);
-#endif
-            return await ExecuteGetByIdAsync(id).ConfigureAwait(false);
-        }
-        /// <summary>
-        /// Returns the element of type T with the identification of id (without authorization).
-        /// </summary>
-        /// <param name="id">The identification.</param>
-        /// <returns>The element of the type T with the corresponding identification.</returns>
-        internal virtual Task<TEntity?> ExecuteGetByIdAsync(int id)
-        {
-            var query = EntitySet.AsQueryable();
-
-            foreach (var includeItem in Includes.Distinct())
-            {
-                query = query.Include(includeItem);
-            }
-            return query.SingleOrDefaultAsync(e => e.Id == id);
-        }
-        /// <summary>
-        /// Returns the element of type T with the identification of id.
-        /// </summary>
-        /// <param name="id">The identification.</param>
-        /// <param name="includeItems">The include items</param>
-        /// <returns>The element of the type T with the corresponding identification (with includes).</returns>
-        public virtual async Task<TEntity?> GetByIdAsync(int id, params string[] includeItems)
-        {
-#if ACCOUNT_ON
-            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.GetBy).ConfigureAwait(false);
-#endif
-            return await ExecuteGetByIdAsync(id, includeItems).ConfigureAwait(false);
-        }
-        /// <summary>
-        /// Returns the element of type T with the identification of id (without authorization).
-        /// </summary>
-        /// <param name="id">The identification.</param>
-        /// <param name="includeItems">The include items</param>
-        /// <returns>The element of the type T with the corresponding identification (with includes).</returns>
-        internal virtual Task<TEntity?> ExecuteGetByIdAsync(int id, params string[] includeItems)
-        {
-            var query = EntitySet.AsQueryable();
-
-            foreach (var includeItem in Includes.Union(includeItems).Distinct())
-            {
-                query = query.Include(includeItem);
-            }
-            return query.SingleOrDefaultAsync(e => e.Id == id);
-        }
         #endregion Queries
 
         #region Action
@@ -548,6 +749,20 @@ namespace QuickTemplate.Logic.Controllers
         partial void BeforeExecuteSaveChanges();
         partial void AfterExecuteSaveChanges();
         #endregion SaveChanges
+
+        #region Helpers
+        internal void CheckPageParams(int pageIndex, int pageSize)
+        {
+            if (pageIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            }
+            if (pageSize <= 0 || pageSize > MaxPageSize)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
+            }
+        }
+        #endregion Helpers
     }
 }
 //MdEnd

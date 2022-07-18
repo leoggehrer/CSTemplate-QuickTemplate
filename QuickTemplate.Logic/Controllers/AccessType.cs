@@ -7,8 +7,9 @@ namespace QuickTemplate.Logic.Controllers
     {
         GetBy = 1,
         GetAll = 2 * GetBy,
+        GetPageList = 2 * GetAll,
 
-        QueryCount = 2 * GetAll,
+        QueryCount = 2 * GetPageList,
         QueryCountBy = 2 * QueryCount,
 
         QueryBy = 2 * QueryCountBy,
