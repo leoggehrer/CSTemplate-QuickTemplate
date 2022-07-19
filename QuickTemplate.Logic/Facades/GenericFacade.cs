@@ -11,6 +11,7 @@ namespace QuickTemplate.Logic.Facades
     /// </summary>
     /// <typeparam name="TModel">The model type as public type</typeparam>
     /// <typeparam name="TEntity">The entity type for the internal controller</typeparam>
+    /// <inheritdoc cref="IDataAccess"/>
     internal abstract partial class GenericFacade<TModel, TEntity> : FacadeObject, IDataAccess<TModel>
         where TModel : Models.IdentityModel, new()
         where TEntity : Entities.IdentityEntity, new()
@@ -123,6 +124,19 @@ namespace QuickTemplate.Logic.Facades
         public virtual async Task<TModel[]> QueryAsync(string predicate, string orderBy, params string[] includeItems)
         {
             var entities = await Controller.QueryAsync(predicate, orderBy, includeItems).ConfigureAwait(false);
+
+            return entities.Select(e => ToModel(e)).ToArray();
+        }
+
+        public virtual async Task<TModel[]> QueryAsync(string predicate, int pageIndex, int pageSize, params string[] includeItems)
+        {
+            var entities = await Controller.QueryAsync(predicate, pageIndex, pageSize, includeItems).ConfigureAwait(false);
+
+            return entities.Select(e => ToModel(e)).ToArray();
+        }
+        public virtual async Task<TModel[]> QueryAsync(string predicate, string orderBy, int pageIndex, int pageSize, params string[] includeItems)
+        {
+            var entities = await Controller.QueryAsync(predicate, orderBy, pageIndex, pageSize, includeItems).ConfigureAwait(false);
 
             return entities.Select(e => ToModel(e)).ToArray();
         }

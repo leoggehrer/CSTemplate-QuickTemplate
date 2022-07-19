@@ -76,33 +76,24 @@ namespace QuickTemplate.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets the number of quantity in the collection.
+        /// Get a single model by Id.
         /// </summary>
-        /// <returns>Number of elements in the collection.</returns>
-        [HttpGet("/api/[controller]/Count")]
+        /// <param name="id">Id of the model to get</param>
+        /// <response code="200">Model found</response>
+        /// <response code="404">Model not found</response>
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public virtual async Task<ActionResult<int>> GetCountAsync()
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public virtual async Task<ActionResult<TOutModel?>> GetAsync(
+            [FromQuery(Name = "id")] int id)
         {
-            var result = await DataAccess.CountAsync();
+            var accessModel = await DataAccess.GetByIdAsync(id);
 
-            return Ok(result);
-        }
-        /// <summary>
-        /// Returns the number of quantity in the collection based on a predicate.
-        /// </summary>
-        /// <param name="predicate">A string to test each element for a condition.</param>
-        /// <returns>Number of entities in the collection.</returns>
-        [HttpGet("/api/[controller]/Count/{predicate}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public virtual async Task<ActionResult<int>> GetCountByAsync(string predicate)
-        {
-            var result = await DataAccess.CountAsync(predicate);
-
-            return Ok(result);
+            return accessModel == null ? NotFound() : Ok(ToOutModel(accessModel));
         }
 
         /// <summary>
-        /// Gets a list of models
+        /// Gets a list of models.
         /// </summary>
         /// <returns>List of models</returns>
         [HttpGet]
@@ -115,19 +106,54 @@ namespace QuickTemplate.WebApi.Controllers
         }
 
         /// <summary>
-        /// Get a single model by Id.
+        /// Returns all entities in the collection.
         /// </summary>
-        /// <param name="id">Id of the model to get</param>
-        /// <response code="200">Model found</response>
-        /// <response code="404">Model not found</response>
-        [HttpGet("{id}")]
+        /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
+        /// <returns>All entities of the collection.</returns>
+        [HttpGet("/api/[controller]/Sorted")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<ActionResult<TOutModel?>> GetAsync(int id)
+        public virtual async Task<ActionResult<IEnumerable<TOutModel>>> GetAsync(
+            [FromQuery(Name = "orderBy")] string orderBy)
         {
-            var accessModel = await DataAccess.GetByIdAsync(id);
+            var accessModels = await DataAccess.GetAllAsync(orderBy);
 
-            return accessModel == null ? NotFound() : Ok(ToOutModel(accessModel));
+            return Ok(ToOutModel(accessModels));
+        }
+
+        /// <summary>
+        /// Gets a subset of items from the repository.
+        /// </summary>
+        /// <param name="index">0 based page index.</param>
+        /// <param name="size">The pagesize.</param>
+        /// <returns>Subset in accordance with the parameters.</returns>
+        [HttpGet("/api/[controller]/GetPage")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<IEnumerable<TOutModel>>> GetPageListAsync(
+            [FromQuery(Name = "index")] int index,
+            [FromQuery(Name = "size")] int size)
+        {
+            var accessModels = await DataAccess.GetPageListAsync(index, size);
+
+            return Ok(ToOutModel(accessModels));
+        }
+
+        /// <summary>
+        /// Gets a subset of items from the repository.
+        /// </summary>
+        /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
+        /// <param name="index">0 based page index.</param>
+        /// <param name="size">The pagesize.</param>
+        /// <returns>Subset in accordance with the parameters.</returns>
+        [HttpGet("/api/[controller]/GetSortedPage")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<IEnumerable<TOutModel>>> GetPageListAsync(
+            [FromQuery(Name = "orderBy")] string orderBy,
+            [FromQuery(Name = "index")] int index,
+            [FromQuery(Name = "size")] int size)
+        {
+            var accessModels = await DataAccess.GetPageListAsync(orderBy, index, size);
+
+            return Ok(ToOutModel(accessModels));
         }
 
         /// <summary>
@@ -135,11 +161,69 @@ namespace QuickTemplate.WebApi.Controllers
         /// </summary>
         /// <param name="predicate">A string to test each element for a condition.</param>
         /// <returns>The filter result.</returns>
-        [HttpGet("/api/[controller]/Query/{predicate}")]
+        [HttpGet("/api/[controller]/Query")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAllAsync(string predicate)
+        public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAllAsync(
+            [FromQuery(Name = "predicate")] string predicate)
         {
             var entities = await DataAccess.QueryAsync(predicate);
+
+            return Ok(entities.Select(e => ToOutModel(e)));
+        }
+
+        /// <summary>
+        /// Filters a sequence of values based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
+        /// <returns>The filter result.</returns>
+        [HttpGet("/api/[controller]/QuerySorted")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAllAsync(
+            [FromQuery(Name = "predicate")] string predicate,
+            [FromQuery(Name = "orderBy")] string orderBy)
+        {
+            var entities = await DataAccess.QueryAsync(predicate, orderBy);
+
+            return Ok(entities.Select(e => ToOutModel(e)));
+        }
+
+        /// <summary>
+        /// Filters a sequence of values based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="index">0 based page index.</param>
+        /// <param name="size">The pagesize.</param>
+        /// <returns>The filter result.</returns>
+        [HttpGet("/api/[controller]/QueryPage")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAsync(
+            [FromQuery(Name = "predicate")] string predicate,
+            [FromQuery(Name = "index")] int index,
+            [FromQuery(Name = "size")] int size)
+        {
+            var entities = await DataAccess.QueryAsync(predicate, index, size);
+
+            return Ok(entities.Select(e => ToOutModel(e)));
+        }
+
+        /// <summary>
+        /// Filters a sequence of values based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
+        /// <param name="index">0 based page index.</param>
+        /// <param name="size">The pagesize.</param>
+        /// <returns>The filter result.</returns>
+        [HttpGet("/api/[controller]/QuerySortedPage")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<IEnumerable<TOutModel>>> QueryAsync(
+            [FromQuery(Name = "predicate")] string predicate,
+            [FromQuery(Name = "orderBy")] string orderBy,
+            [FromQuery(Name = "index")] int index,
+            [FromQuery(Name = "size")] int size)
+        {
+            var entities = await DataAccess.QueryAsync(predicate, orderBy, index, size);
 
             return Ok(entities.Select(e => ToOutModel(e)));
         }

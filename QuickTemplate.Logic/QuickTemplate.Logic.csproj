@@ -8,6 +8,7 @@
 
 	<PropertyGroup>
 		<DefineConstants>ACCOUNT_OFF;LOGGING_OFF;REVISION_OFF;DEVELOP_OFF</DefineConstants>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

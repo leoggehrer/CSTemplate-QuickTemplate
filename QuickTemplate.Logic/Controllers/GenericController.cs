@@ -388,7 +388,15 @@ namespace QuickTemplate.Logic.Controllers
 #if ACCOUNT_ON
             await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.QueryBy).ConfigureAwait(false);
 #endif
-            return await ExecuteQueryAsync(predicate, includeItems).ConfigureAwait(false);
+            int idx = 0, qryCount;
+            var result = new List<TEntity>();
+            do
+            {
+                var qry = await ExecuteQueryAsync(predicate, idx, MaxPageSize).ConfigureAwait(false);
+
+                qryCount = result.AddRangeAndCount(qry);
+            } while (qryCount == MaxPageSize);
+            return result.ToArray();
         }
         /// <summary>
         /// Filters a sequence of values based on a predicate.
@@ -416,6 +424,23 @@ namespace QuickTemplate.Logic.Controllers
         /// Filters a sequence of values based on a predicate.
         /// </summary>
         /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="pageIndex">0 based page index.</param>
+        /// <param name="pageSize">The pagesize.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <returns>The filter result.</returns>
+        public virtual Task<TEntity[]> QueryAsync(string predicate, int pageIndex, int pageSize, params string[] includeItems)
+        {
+            CheckPageParams(pageIndex, pageSize);
+#if ACCOUNT_ON
+            await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.QueryBy).ConfigureAwait(false);
+#endif
+            return ExecuteQueryAsync(predicate, pageIndex, pageSize, includeItems);
+        }
+
+        /// <summary>
+        /// Filters a sequence of values based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
         /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
         /// <param name="pageIndex">0 based page index.</param>
         /// <param name="pageSize">The pagesize.</param>
@@ -423,6 +448,7 @@ namespace QuickTemplate.Logic.Controllers
         /// <returns>The filter result.</returns>
         public virtual Task<TEntity[]> QueryAsync(string predicate, string orderBy, int pageIndex, int pageSize, params string[] includeItems)
         {
+            CheckPageParams(pageIndex, pageSize);
 #if ACCOUNT_ON
             await CheckAuthorizationAsync(GetType(), MethodBase.GetCurrentMethod(), AccessType.QueryBy).ConfigureAwait(false);
 #endif

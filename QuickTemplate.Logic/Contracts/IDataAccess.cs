@@ -52,7 +52,7 @@ namespace QuickTemplate.Logic.Contracts
         /// <returns>All interfaces of the element collection.</returns>
         Task<T[]> GetAllAsync(params string[] includeItems);
         /// <summary>
-        /// Returns all interfaces of the elements in the collection.
+        /// Returns all elements in the collection.
         /// </summary>
         /// <param name="orderBy">Sorts the elements of a sequence according to a sort clause.</param>
         /// <returns>All interfaces of the element collection.</returns>
@@ -77,7 +77,7 @@ namespace QuickTemplate.Logic.Contracts
         Task<T[]> GetPageListAsync(string orderBy, int pageIndex, int pageSize, params string[] includeItems);
 
         /// <summary>
-        /// Filters a sequence of values based on a predicate.
+        /// Filters a sequence of elements based on a predicate.
         /// </summary>
         /// <param name="predicate">A string to test each element for a condition.</param>
         /// <param name="includeItems">The include items</param>
@@ -85,13 +85,34 @@ namespace QuickTemplate.Logic.Contracts
         Task<T[]> QueryAsync(string predicate, params string[] includeItems);
 
         /// <summary>
-        /// Filters a sequence of values based on a predicate.
+        /// Filters a sequence of elements based on a predicate.
         /// </summary>
         /// <param name="predicate">A string to test each element for a condition.</param>
         /// <param name="orderBy">Sorts the elements of a sequence in order according to a key.</param>
         /// <param name="includeItems">The include items</param>
         /// <returns>The filter result.</returns>
         Task<T[]> QueryAsync(string predicate, string orderBy, params string[] includeItems);
+
+        /// <summary>
+        /// Filters a subset of elements based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <param name="pageIndex">0 based page index.</param>
+        /// <param name="pageSize">The pagesize.</param>
+        /// <returns>Subset in accordance with the parameters.</returns>
+        Task<T[]> QueryAsync(string predicate, int pageIndex, int pageSize, params string[] includeItems);
+
+        /// <summary>
+        /// Filters a subset of elements based on a predicate.
+        /// </summary>
+        /// <param name="predicate">A string to test each element for a condition.</param>
+        /// <param name="orderBy">Sorts the elements of a sequence in order according to a key.</param>
+        /// <param name="includeItems">The include items</param>
+        /// <param name="pageIndex">0 based page index.</param>
+        /// <param name="pageSize">The pagesize.</param>
+        /// <returns>Subset in accordance with the parameters.</returns>
+        Task<T[]> QueryAsync(string predicate, string orderBy, int pageIndex, int pageSize, params string[] includeItems);
 
         /// <summary>
         /// The element is being tracked by the context but does not yet exist in the repository. 
